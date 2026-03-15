@@ -194,7 +194,7 @@ const API = {
             });
 
             xhr.open('POST', this.TRANSCRIBE_URL);
-            xhr.timeout = 600000; // 10 minutes
+            xhr.timeout = 7200000; // 2 hours - needed for long audio transcriptions
             xhr.send(formData);
         });
     },
@@ -425,9 +425,8 @@ ${transcript}
      * @param {Object[]} [options.attachments] - Array of {filename, content (base64), content_type}
      */
     async sendSmtpEmail(options) {
-        if (!options.smtp_host || !options.smtp_user || !options.smtp_pass) {
-            throw new Error('SMTP settings are incomplete. Please configure them in Settings.');
-        }
+        // SMTP credentials are read server-side from the settings DB
+        // Only validate if explicitly passed (backward compat)
 
         // Parse "Display Name <email>" format for the from field
         let fromEmail = options.from;
@@ -455,11 +454,25 @@ ${transcript}
         if (options.bcc) body.bcc = options.bcc;
         if (options.attachments?.length) body.attachments = options.attachments;
 
-        const response = await fetch(this.SMTP_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+        let response;
+        try {
+            response = await fetch(this.SMTP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+                signal: controller.signal
+            });
+        } catch (err) {
+            clearTimeout(timeoutId);
+            if (err.name === 'AbortError') {
+                throw new Error('Email send timed out. Check your SMTP settings (host, port, encryption).');
+            }
+            throw err;
+        }
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));

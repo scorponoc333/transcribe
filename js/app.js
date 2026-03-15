@@ -251,7 +251,7 @@ const App = {
         this.dom.settingsBtn.addEventListener('click', () => this.openSettings());
         this.dom.settingsClose.addEventListener('click', () => this.closeSettings());
         this.dom.settingsModal.addEventListener('click', (e) => {
-            if (e.target === this.dom.settingsModal) this.closeSettings();
+            // Only close via the close button, not backdrop click
         });
         this.dom.saveSettingsBtn.addEventListener('click', () => this.saveSettings());
         this.dom.apiKeyToggle.addEventListener('click', () => {
@@ -261,6 +261,12 @@ const App = {
         this.dom.smtpPassToggle.addEventListener('click', () => {
             const input = this.dom.smtpPass;
             input.type = input.type === 'password' ? 'text' : 'password';
+        });
+        // Auto-sync encryption when port changes
+        this.dom.smtpPort.addEventListener('change', () => {
+            const portMap = { '587': 'tls', '465': 'ssl', '25': 'none' };
+            const enc = portMap[this.dom.smtpPort.value];
+            if (enc) this.dom.smtpEncryption.value = enc;
         });
 
         // Settings tabs
@@ -393,8 +399,8 @@ const App = {
             return;
         }
 
-        if (file.size > 200 * 1024 * 1024) {
-            this.showToast('File too large. Maximum size is 200MB.', 'error');
+        if (file.size > 500 * 1024 * 1024) {
+            this.showToast('File too large. Maximum size is 500MB.', 'error');
             return;
         }
 
@@ -1281,7 +1287,13 @@ const App = {
         this.dom.whisperModel.value = settings.whisperModel || 'turbo';
         this.dom.smtpHost.value = settings.smtpHost || '';
         this.dom.smtpPort.value = settings.smtpPort || '587';
-        this.dom.smtpEncryption.value = settings.smtpEncryption || 'tls';
+        // If encryption was saved, use it; otherwise infer from port
+        if (settings.smtpEncryption) {
+            this.dom.smtpEncryption.value = settings.smtpEncryption;
+        } else {
+            const portMap = { '587': 'tls', '465': 'ssl', '25': 'none' };
+            this.dom.smtpEncryption.value = portMap[this.dom.smtpPort.value] || 'tls';
+        }
         this.dom.smtpUser.value = settings.smtpUser || '';
         this.dom.smtpPass.value = settings.smtpPass || '';
         this.dom.senderEmail.value = settings.senderEmail || '';

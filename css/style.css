@@ -1052,13 +1052,14 @@ select.form-input option {
 /* ---- Toast ---- */
 .toast {
     position: fixed;
-    bottom: 24px; right: 24px;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
     padding: 16px 24px;
     border-radius: 14px;
     font-weight: 500;
     font-size: 14px;
     z-index: 200;
-    transform: translateY(100px);
     opacity: 0;
     transition: all 0.5s var(--transition-smooth);
     display: flex;
@@ -1069,7 +1070,7 @@ select.form-input option {
 }
 
 .toast svg { width: 18px; height: 18px; flex-shrink: 0; }
-.toast.show { transform: translateY(0); opacity: 1; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 .toast.success { background: rgba(16,185,129,0.95); color: white; }
 .toast.error   { background: rgba(239,68,68,0.95);  color: white; }
 .toast.info    { background: rgba(59,130,246,0.95);  color: white; }
@@ -1173,7 +1174,8 @@ audio::-webkit-media-controls-panel {
     .tab-btn { padding: 10px 12px; font-size: 13px; }
     .tabs-nav { border-radius: 12px; }
     .transcript-body { padding: 20px; max-height: 400px; }
-    .toast { left: 16px; right: 16px; bottom: 16px; max-width: none; }
+    .toast { left: 50%; right: auto; bottom: 16px; max-width: calc(100% - 32px); transform: translateX(-50%) translateY(100px); }
+    .toast.show { transform: translateX(-50%) translateY(0); }
 }
 
 /* ---- Setup Banner ---- */

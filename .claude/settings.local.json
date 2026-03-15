@@ -90,7 +90,9 @@
       "Bash(curl -s http://localhost/transcribe/api/auth.php -X POST -H \"Content-Type: application/json\" -d '{\"\"action\"\":\"\"login\"\",\"\"email\"\":\"\"jasonhogan333@gmail.com\"\",\"\"password\"\":\"\"password\"\"}' -c /tmp/cookies.txt)",
       "Bash(curl -s \"http://localhost/transcribe/api/auth.php?action=login\" -X POST -H \"Content-Type: application/json\" -d '{\"\"email\"\":\"\"jasonhogan333@gmail.com\"\",\"\"password\"\":\"\"admin123\"\"}' -c /tmp/cookies.txt)",
       "Bash(C:/xampp/php/php.exe -l api/ai-costs.php)",
-      "Bash(php -r \"echo ''PHP OK'';\")"
+      "Bash(php -r \"echo ''PHP OK'';\")",
+      "Bash(find:*)",
+      "Bash(ls:*)"
     ]
   }
 }

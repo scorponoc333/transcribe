@@ -4,13 +4,13 @@
  * Receives audio file upload, runs Whisper locally, returns transcript
  */
 
-set_time_limit(600);
+set_time_limit(7200); // 2 hours - needed for long audio transcriptions
 header('Content-Type: application/json');
 require_once __DIR__ . '/auth_middleware.php';
 requireAuth();
 
 $uploadDir = __DIR__ . '/../uploads/';
-$maxSize = 200 * 1024 * 1024;
+$maxSize = 500 * 1024 * 1024; // 500MB to support up to 2-hour recordings
 $allowedExts = ['mp3', 'm4a', 'mp4', 'wav'];
 
 if (!is_dir($uploadDir)) {
@@ -54,7 +54,7 @@ if (!in_array($ext, $allowedExts)) {
 
 if ($file['size'] > $maxSize) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'File too large. Maximum: 200MB']);
+    echo json_encode(['success' => false, 'error' => 'File too large. Maximum: 500MB']);
     exit;
 }
 
