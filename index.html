@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcribe AI</title>
+    <link rel="icon" type="image/png" href="img/logo.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e3a5f',
+                            900: '#0f172a',
+                            950: '#0a0f1e',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Chart.js (for Analytics) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="font-sans min-h-screen">
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="header">
+        <nav class="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img id="headerLogo" src="img/logo.png" alt="Logo" class="header-logo">
+            </div>
+            <div class="header-actions">
+                <button id="historyBtn" class="header-nav-btn" title="History">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span class="header-nav-label">History</span>
+                </button>
+                <button id="analyticsBtn" class="header-nav-btn" title="Analytics">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span class="header-nav-label">Analytics</span>
+                </button>
+                <button id="contactsBtn" class="header-nav-btn" title="Contacts">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span class="header-nav-label">Contacts</span>
+                </button>
+                <button id="usersBtn" class="header-nav-btn" title="Users" style="display:none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span class="header-nav-label">Users</span>
+                </button>
+                <button id="themeToggle" class="header-nav-btn theme-toggle" title="Toggle theme">
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <button id="settingsBtn" class="header-nav-btn" title="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+                <button id="logoutBtn" class="header-nav-btn" title="Sign Out">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span class="header-nav-label">Sign Out</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="max-w-5xl mx-auto px-6 pt-24 pb-16 relative" style="flex:1;width:100%">
+
+        <!-- ---- UPLOAD SECTION ---- -->
+        <section id="uploadSection" class="app-section active">
+            <div class="text-center mb-8 pt-8">
+                <h1 class="text-3xl sm:text-4xl font-bold t-heading mb-3">
+                    Transcribe Your Audio
+                </h1>
+                <p class="t-secondary text-lg max-w-xl mx-auto">
+                    Upload an audio file and get an accurate transcript powered by Whisper AI — entirely on your machine.
+                </p>
+            </div>
+
+            <div id="dropZone" class="upload-zone max-w-2xl mx-auto">
+                <div class="upload-icon mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold t-heading mb-2">Drop your audio file here</h2>
+                <p class="t-secondary mb-5">or click to browse your files</p>
+                <div class="upload-formats">
+                    <span class="format-badge">MP3</span>
+                    <span class="format-badge">M4A</span>
+                    <span class="format-badge">MP4</span>
+                    <span class="format-badge">WAV</span>
+                </div>
+                <input type="file" id="fileInput" hidden accept=".mp3,.m4a,.mp4,.wav,audio/*">
+            </div>
+
+            <div class="text-center mt-6">
+                <div class="learning-mode-divider">
+                    <span class="divider-line"></span>
+                    <span class="divider-text t-muted">or</span>
+                    <span class="divider-line"></span>
+                </div>
+                <button id="startLearningBtn" class="btn-learning-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    Start a Learning Analysis
+                </button>
+                <p class="text-xs t-muted" style="margin-top: 20px;">Paste text or a YouTube URL to generate AI-powered learning reports</p>
+            </div>
+
+            <div class="text-center mt-6">
+                <p class="text-sm t-muted">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 -mt-0.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Your audio never leaves your machine — processed locally with Whisper
+                </p>
+            </div>
+        </section>
+
+        <!-- ---- FILE LOADED SECTION ---- -->
+        <section id="fileSection" class="app-section">
+            <div class="text-center mb-8 pt-8">
+                <h1 id="fileSectionTitle" class="text-2xl font-bold t-heading mb-2">Ready to Transcribe</h1>
+                <p id="fileSectionSubtitle" class="t-secondary">Preview your audio and start transcription when ready</p>
+            </div>
+
+            <div class="glass file-card max-w-2xl mx-auto">
+                <!-- Audio file info (hidden in learning mode) -->
+                <div id="audioFileArea">
+                    <div class="file-info-row">
+                        <div class="file-icon-wrapper">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                        </div>
+                        <div class="file-details">
+                            <h3 id="fileName">audio.mp3</h3>
+                            <p id="fileSize">12.3 MB</p>
+                        </div>
+                        <button id="removeFileBtn" class="remove-file-btn" title="Remove file">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="audio-player-wrapper">
+                        <audio id="audioPlayer" controls preload="metadata"></audio>
+                    </div>
+                </div>
+
+                <!-- Learning mode input area (hidden by default) -->
+                <div id="learningInputArea" style="display:none">
+                    <div class="learning-source-tabs">
+                        <button class="learning-source-tab active" data-source="text" id="learningTabText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            Paste Text
+                        </button>
+                        <button class="learning-source-tab" data-source="youtube" id="learningTabYoutube">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            YouTube URL
+                        </button>
+                    </div>
+
+                    <div id="learningTextPanel" class="learning-panel">
+                        <textarea id="learningTextInput" class="form-input learning-textarea" placeholder="Paste your transcript, article, notes, or any text content here..." rows="8"></textarea>
+                    </div>
+
+                    <div id="learningYoutubePanel" class="learning-panel" style="display:none">
+                        <div class="form-group-compact">
+                            <label for="learningYoutubeUrl">YouTube Video URL</label>
+                            <input type="url" id="learningYoutubeUrl" class="form-input" placeholder="https://www.youtube.com/watch?v=...">
+                        </div>
+                    </div>
+
+                    <div class="form-group-compact" style="margin-top:16px">
+                        <label for="learningObjective">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            What are you looking to learn or understand from this content?
+                        </label>
+                        <textarea id="learningObjective" class="form-input learning-objective" placeholder="E.g., I want to understand the key concepts of machine learning and how they apply to my business..." rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- Recording Type Toggle -->
+                <div class="type-toggle-wrapper">
+                    <label class="type-toggle-label t-secondary">What type of content is this?</label>
+                    <div class="type-toggle">
+                        <button id="typeRecording" class="type-toggle-btn active" data-type="recording">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                            Recording
+                        </button>
+                        <button id="typeMeeting" class="type-toggle-btn" data-type="meeting">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            Meeting
+                        </button>
+                        <button id="typeLearning" class="type-toggle-btn" data-type="learning">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                            Learning
+                        </button>
+                    </div>
+                </div>
+
+                <button id="transcribeBtn" class="btn-primary w-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span id="transcribeBtnText">Start Transcription</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ---- PROCESSING SECTION ---- -->
+        <section id="processingSection" class="app-section">
+            <div class="text-center">
+                <div class="relative max-w-3xl mx-auto">
+                    <div class="pulse-container">
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring"></div>
+                    </div>
+                    <div id="waveform" class="waveform-container"></div>
+                </div>
+
+                <div class="mt-8">
+                    <p id="processingTimer" class="processing-timer mb-4">00:00</p>
+                    <p id="processingStatus" class="processing-status">Transcribing your audio...</p>
+                    <p id="processingSubstatus" class="processing-substatus">Using Whisper AI locally</p>
+                </div>
+
+                <div class="mt-8">
+                    <div class="progress-bar-track max-w-md mx-auto">
+                        <div class="progress-bar-fill indeterminate"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ---- RESULTS SECTION ---- -->
+        <section id="resultsSection" class="app-section">
+            <div class="text-center mb-6 pt-4">
+                <h1 class="text-2xl font-bold t-heading mb-2">Transcription Complete</h1>
+                <p class="t-secondary">Review your transcript and AI-powered insights</p>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="tabs-nav max-w-lg mx-auto mb-6">
+                <button class="tab-btn active" data-tab="transcript">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Transcript
+                </button>
+                <button class="tab-btn" data-tab="insights">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    AI Insights
+                </button>
+            </div>
+
+            <!-- Meeting Attendees Section (visible only for meetings) -->
+            <div id="attendeesSection" class="attendees-section" style="display:none">
+                <div class="attendees-card glass">
+                    <div class="attendees-toggle" id="attendeesToggle">
+                        <div class="attendees-toggle-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span class="attendees-toggle-title">Meeting Attendees</span>
+                            <span class="attendees-count" id="attendeesCount">0</span>
+                        </div>
+                        <svg class="attendees-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="attendees-body" id="attendeesBody" style="display:none">
+                        <div class="attendees-chips" id="attendeesChips"></div>
+                        <div class="attendees-add-row">
+                            <div class="attendee-input-wrap"><input type="text" id="attendeeNameInput" class="form-input form-input-sm" placeholder="Name"></div>
+                            <div class="attendee-input-wrap"><input type="email" id="attendeeEmailInput" class="form-input form-input-sm" placeholder="Email (optional)"></div>
+                            <button id="addAttendeeBtn" class="btn-primary btn-sm">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transcript Tab -->
+            <div id="transcriptTab" class="tab-content active">
+                <div class="glass overflow-hidden">
+                    <div class="transcript-toolbar">
+                        <div class="transcript-stats">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                <span id="wordCount">0 words</span>
+                            </span>
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                                <span id="charCount">0 chars</span>
+                            </span>
+                        </div>
+                        <button id="copyBtn" class="btn-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div id="transcriptBody" class="transcript-body"></div>
+                </div>
+            </div>
+
+            <!-- Insights Tab -->
+            <div id="insightsTab" class="tab-content">
+                <div id="insightsLoading"></div>
+                <div id="insightsContent" class="insights-grid" style="display:none">
+                    <div class="insight-card">
+                        <div class="insight-card-header">
+                            <div class="insight-card-icon summary-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </div>
+                            <h3 class="insight-card-title">Executive Summary</h3>
+                        </div>
+                        <div id="summaryContent" class="insight-card-body"></div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-card-header">
+                            <div class="insight-card-icon keypoints-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            </div>
+                            <h3 class="insight-card-title">Key Points</h3>
+                        </div>
+                        <ul id="keyPointsList" class="insight-list keypoints"></ul>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-card-header">
+                            <div class="insight-card-icon actions-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <h3 class="insight-card-title">Action Items</h3>
+                        </div>
+                        <ul id="actionItemsList" class="insight-list actions"></ul>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-card-header">
+                            <div class="insight-card-icon suggestions-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                            </div>
+                            <h3 class="insight-card-title">Suggestions & Recommendations</h3>
+                        </div>
+                        <ul id="suggestionsList" class="insight-list suggestions"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="coverPageSelector" class="cover-selector" style="display:none">
+                <label class="text-xs t-muted font-semibold" style="display:block;margin-bottom:8px">Cover Page</label>
+                <div id="coverPageOptions" class="cover-selector-options"></div>
+            </div>
+
+            <!-- Actions Row -->
+            <div class="actions-row mt-6">
+                <button id="exportPdfBtn" class="btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export PDF
+                </button>
+                <button id="sendEmailBtn" class="btn-primary" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Send Email
+                </button>
+                <button id="newTranscriptionBtn" class="btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    New Transcription
+                </button>
+            </div>
+        </section>
+
+        <!-- ---- ERROR SECTION ---- -->
+        <section id="errorSection" class="app-section">
+            <div class="glass error-card max-w-2xl mx-auto mt-16">
+                <div class="error-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <h2 class="text-xl font-bold t-heading mb-3">Something went wrong</h2>
+                <p id="errorMessage" class="t-secondary mb-4">An error occurred during transcription.</p>
+                <p id="errorDetails" class="text-sm t-muted mb-6 p-4 rounded-xl text-left font-mono" style="display:none;background:var(--bg-sunken)"></p>
+                <div class="flex gap-3 justify-center flex-wrap">
+                    <button id="retryBtn" class="btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                        Try Again
+                    </button>
+                    <button onclick="App.resetToUpload()" class="btn-secondary">
+                        Start Over
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ---- HISTORY SECTION ---- -->
+        <section id="historySection" class="app-section">
+            <div class="flex items-center justify-between mb-6 pt-4 flex-wrap gap-4">
+                <h1 class="text-2xl font-bold t-heading">Transcription History</h1>
+                <button id="historyBackBtn" class="btn-secondary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    Back to Transcribe
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="history-filters glass">
+                <div class="filter-group">
+                    <label>Search</label>
+                    <input type="text" id="historySearch" class="form-input form-input-sm" placeholder="Search by title or content...">
+                </div>
+                <div class="filter-group">
+                    <label>From</label>
+                    <input type="date" id="historyDateFrom" class="form-input form-input-sm">
+                </div>
+                <div class="filter-group">
+                    <label>To</label>
+                    <input type="date" id="historyDateTo" class="form-input form-input-sm">
+                </div>
+                <div class="filter-group">
+                    <label>Type</label>
+                    <select id="historyMode" class="form-input form-input-sm">
+                        <option value="">All</option>
+                        <option value="recording">Recording</option>
+                        <option value="meeting">Meeting</option>
+                        <option value="learning">Learning</option>
+                    </select>
+                </div>
+                <button id="historyFilterBtn" class="btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Search
+                </button>
+            </div>
+
+            <!-- Results Table -->
+            <div class="history-table-wrap glass">
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Words</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="5" class="text-center t-muted py-8">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="history-pagination" id="historyPagination"></div>
+        </section>
+
+        <!-- ---- ANALYTICS SECTION ---- -->
+        <section id="analyticsSection" class="app-section">
+            <div class="flex items-center justify-between mb-6 pt-4 flex-wrap gap-4">
+                <h1 class="text-2xl font-bold t-heading">Analytics &amp; Reports</h1>
+                <button id="analyticsBackBtn" class="btn-secondary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    Back to Transcribe
+                </button>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="analytics-cards-grid" id="analyticsSummaryCards">
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(37,99,235,0.12);color:#2563eb">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statTotalTranscriptions">—</div>
+                    <div class="analytics-card-label">Total Transcriptions</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(124,58,237,0.12);color:#7c3aed">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statTotalEmails">—</div>
+                    <div class="analytics-card-label">Emails Sent</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(16,185,129,0.12);color:#10b981">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statAvgTime">—</div>
+                    <div class="analytics-card-label">Avg Transcription Time</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(217,119,6,0.12);color:#d97706">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statTotalWords">—</div>
+                    <div class="analytics-card-label">Total Words Processed</div>
+                </div>
+            </div>
+
+            <!-- AI Cost Summary Cards -->
+            <h3 style="margin:32px 0 16px;font-size:18px;font-weight:700;color:var(--fg-heading);display:flex;align-items:center;gap:8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                OpenRouter AI Costs
+            </h3>
+            <div class="analytics-cards-grid">
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(239,68,68,0.12);color:#ef4444">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statTotalCost">—</div>
+                    <div class="analytics-card-label">Total AI Cost (USD)</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(6,182,212,0.12);color:#06b6d4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statTotalOps">—</div>
+                    <div class="analytics-card-label">Total AI Operations</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statAvgCostOp">—</div>
+                    <div class="analytics-card-label">Avg Cost per Operation</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(139,92,246,0.12);color:#8b5cf6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statTotalTokens">—</div>
+                    <div class="analytics-card-label">Total Tokens Used</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(16,185,129,0.12);color:#10b981">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statAvgCost1k">—</div>
+                    <div class="analytics-card-label">Avg Cost per 1K Tokens</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(239,68,68,0.12);color:#ef4444">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statEstMonthly">—</div>
+                    <div class="analytics-card-label">Est. Monthly AI Cost</div>
+                </div>
+            </div>
+
+            <!-- Cost Breakdown Table -->
+            <div id="costBreakdownCard" class="analytics-chart-card glass" style="margin-top:20px;">
+                <h3 class="analytics-chart-title">Cost Breakdown by Operation</h3>
+                <div id="costBreakdownTable" style="padding:4px 0;"></div>
+            </div>
+
+            <!-- ROI & Productivity -->
+            <h3 class="analytics-section-title" style="margin-top:32px">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                ROI & Productivity
+            </h3>
+            <div class="analytics-cards-grid">
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(16,185,129,0.12);color:#10b981">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statTimeSaved">—</div>
+                    <div class="analytics-card-label">
+                        Total Time Saved
+                        <span class="roi-tooltip" id="roiTooltipTrigger" title="">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                        </span>
+                    </div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(37,99,235,0.12);color:#2563eb">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statAvgTimeSaved">—</div>
+                    <div class="analytics-card-label">Avg Saved per Transcription</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(124,58,237,0.12);color:#7c3aed">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statEstimatedValue">—</div>
+                    <div class="analytics-card-label">Estimated Value Saved</div>
+                </div>
+                <div class="analytics-card glass">
+                    <div class="analytics-card-icon" style="background:rgba(217,119,6,0.12);color:#d97706">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div class="analytics-card-value" id="statActiveUsers">—</div>
+                    <div class="analytics-card-label">Active Users</div>
+                </div>
+            </div>
+
+            <!-- Additional Charts -->
+            <div class="analytics-charts-grid" style="margin-top:20px">
+                <div class="analytics-chart-card glass">
+                    <h3 class="analytics-chart-title">Daily AI Costs (30 days)</h3>
+                    <div class="chart-container chart-bar"><canvas id="chartDailyCosts"></canvas></div>
+                </div>
+                <div class="analytics-chart-card glass" id="chartUserUsageCard">
+                    <h3 class="analytics-chart-title">Transcriptions by User</h3>
+                    <div class="chart-container chart-bar"><canvas id="chartUserUsage"></canvas></div>
+                    <table class="active-users-table" style="margin-top:16px;">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Transcriptions</th>
+                                <th>Last Activity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeUsersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <h3 style="margin:32px 0 16px;font-size:18px;font-weight:700;color:var(--fg-heading);display:flex;align-items:center;gap:8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Usage Charts
+            </h3>
+            <div class="analytics-charts-grid">
+                <div class="analytics-chart-card glass">
+                    <h3 class="analytics-chart-title">Transcriptions per Month</h3>
+                    <div class="chart-container chart-bar"><canvas id="chartMonthlyTranscriptions"></canvas></div>
+                </div>
+                <div class="analytics-chart-card glass">
+                    <h3 class="analytics-chart-title">Emails Sent per Month</h3>
+                    <div class="chart-container chart-bar"><canvas id="chartMonthlyEmails"></canvas></div>
+                </div>
+                <div class="analytics-chart-card glass">
+                    <h3 class="analytics-chart-title">Avg Transcription Time</h3>
+                    <div id="avgTimeChartWrap" class="chart-container chart-bar"><canvas id="chartAvgTime"></canvas></div>
+                </div>
+                <div class="analytics-chart-card glass">
+                    <h3 class="analytics-chart-title">Whisper Model Usage</h3>
+                    <div class="chart-container chart-doughnut"><canvas id="chartModelUsage"></canvas></div>
+                    <div id="modelUsageLegend" class="chart-legend-custom"></div>
+                </div>
+                <div class="analytics-chart-card glass">
+                    <h3 class="analytics-chart-title">Monthly AI Costs (USD)</h3>
+                    <div class="chart-container chart-bar"><canvas id="chartMonthlyCosts"></canvas></div>
+                </div>
+                <div class="analytics-chart-card glass">
+                    <h3 class="analytics-chart-title">Cost by AI Model</h3>
+                    <div class="chart-container chart-doughnut"><canvas id="chartCostByModel"></canvas></div>
+                    <div id="costByModelLegend" class="chart-legend-custom"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ---- USERS SECTION (Admin only) ---- -->
+        <section id="usersSection" class="app-section">
+            <div class="section-header" style="display:flex;align-items:center;gap:12px;margin-bottom:8px;padding-top:16px;">
+                <button class="btn-icon" onclick="App.showSection('upload')" title="Back">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <h2 style="font-size:22px;font-weight:700;color:var(--fg-heading);margin:0;">User Management</h2>
+            </div>
+
+            <div class="users-toolbar">
+                <div class="users-search-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="usersSearchInput" class="form-input form-input-sm" placeholder="Search users...">
+                </div>
+                <button class="btn-primary btn-sm" onclick="Users.openAddModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Add User
+                </button>
+            </div>
+
+            <div class="table-container glass" id="usersTableContainer">
+                <table class="data-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="5" class="text-center py-8 t-muted">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="usersPagination" class="pagination-container"></div>
+        </section>
+
+        <!-- ---- CONTACTS SECTION ---- -->
+        <section id="contactsSection" class="app-section">
+            <div class="flex items-center justify-between mb-6 pt-4 flex-wrap gap-4">
+                <h1 class="text-2xl font-bold t-heading">Contacts</h1>
+                <button id="contactsBackBtn" class="btn-secondary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    Back to Transcribe
+                </button>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="contacts-toolbar glass">
+                <div class="contacts-search-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="contactsSearch" class="form-input form-input-sm" placeholder="Search contacts...">
+                </div>
+                <div class="contacts-toolbar-actions">
+                    <button id="contactsImportBtn" class="btn-secondary btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Import CSV
+                    </button>
+                    <input type="file" id="contactsCsvInput" accept=".csv" style="display:none">
+                    <button id="contactsAddBtn" class="btn-primary btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Contact
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contacts Table -->
+            <div class="contacts-table-wrap glass">
+                <table class="contacts-table" id="contactsTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Company</th>
+                            <th>Used</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contactsTableBody">
+                        <tr><td colspan="5" class="text-center t-muted py-8">Loading contacts...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="contacts-pagination" id="contactsPagination"></div>
+        </section>
+
+    </main>
+
+    <!-- ==================== CONTACTS MODAL (Add/Edit) ==================== -->
+    <div id="contactModal" class="modal-overlay">
+        <div class="modal glass" style="max-width:480px">
+            <div class="modal-header">
+                <h2 id="contactModalTitle">Add Contact</h2>
+                <button id="contactModalClose" class="modal-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding:20px">
+                <input type="hidden" id="contactEditId" value="">
+                <div class="form-group-compact mb-3">
+                    <label for="contactName">Full Name</label>
+                    <input type="text" id="contactName" class="form-input" placeholder="John Doe">
+                </div>
+                <div class="form-group-compact mb-3">
+                    <label for="contactEmail">Email Address</label>
+                    <input type="email" id="contactEmail" class="form-input" placeholder="john@example.com">
+                </div>
+                <div class="form-group-compact mb-4">
+                    <label for="contactCompany">Company</label>
+                    <input type="text" id="contactCompany" class="form-input" placeholder="Acme Corp">
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button id="contactModalCancelBtn" class="btn-secondary btn-sm">Cancel</button>
+                    <button id="contactModalSaveBtn" class="btn-primary btn-sm">Save Contact</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+        <p id="appFooterText">Powered by Whisper AI &amp; OpenRouter &middot; Transcribe AI by Botson</p>
+    </footer>
+
+    <!-- ==================== RESET PASSWORD MODAL ==================== -->
+    <div id="resetPwModal" class="modal-overlay">
+        <div class="modal glass" style="max-width:400px">
+            <div class="modal-header">
+                <h2 id="resetPwModalTitle">Reset Password</h2>
+                <button class="modal-close" onclick="Users.closeResetModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <p id="resetPwModalSubtitle" class="text-sm t-muted" style="margin-bottom:16px;"></p>
+            <div class="form-group-compact">
+                <label for="resetPwNewPass">New Password</label>
+                <div class="api-key-wrapper">
+                    <input type="password" id="resetPwNewPass" class="form-input form-input-sm" placeholder="Minimum 6 characters" style="padding-right:40px">
+                    <button type="button" class="api-key-toggle" onclick="Users.toggleResetPwVisibility()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group-compact">
+                <label for="resetPwConfirm">Confirm Password</label>
+                <input type="password" id="resetPwConfirm" class="form-input form-input-sm" placeholder="Re-enter password">
+            </div>
+            <div id="resetPwError" class="form-hint" style="color:#ef4444;display:none;margin-bottom:8px;"></div>
+            <button class="btn-primary w-full" style="margin-top:12px" onclick="Users.submitResetPassword()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Reset Password
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== TRANSCRIPT VIEW MODAL ==================== -->
+    <div id="transcriptViewModal" class="modal-overlay">
+        <div class="modal glass" style="max-width:720px;max-height:85vh;display:flex;flex-direction:column">
+            <div class="modal-header">
+                <div>
+                    <h2 id="viewModalTitle">Transcript</h2>
+                    <p id="viewModalMeta" class="text-sm t-muted" style="margin-top:4px"></p>
+                </div>
+                <button id="viewModalClose" class="modal-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <!-- Tabs for transcript / insights if available -->
+            <div id="viewModalTabs" class="tabs-nav mb-4" style="display:none">
+                <button class="tab-btn active" data-viewtab="transcript">Transcript</button>
+                <button class="tab-btn" data-viewtab="insights">AI Insights</button>
+            </div>
+            <!-- Attendees in view modal (read-only + editable) -->
+            <div id="viewModalAttendees" class="attendees-section" style="display:none">
+                <div class="attendees-card-compact">
+                    <div class="attendees-toggle" id="viewModalAttendeesToggle">
+                        <div class="attendees-toggle-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span class="attendees-toggle-title">Attendees</span>
+                            <span class="attendees-count" id="viewModalAttendeesCount">0</span>
+                        </div>
+                        <svg class="attendees-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="attendees-body" id="viewModalAttendeesBody" style="display:none">
+                        <div class="attendees-chips" id="viewModalAttendeesChips"></div>
+                        <div class="attendees-add-row">
+                            <div class="attendee-input-wrap"><input type="text" id="viewModalAttendeeNameInput" class="form-input form-input-sm" placeholder="Name"></div>
+                            <div class="attendee-input-wrap"><input type="email" id="viewModalAttendeeEmailInput" class="form-input form-input-sm" placeholder="Email (optional)"></div>
+                            <button class="btn-primary btn-xs" onclick="History.addViewModalAttendee()">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="viewModalTranscript" class="transcript-body" style="flex:1;overflow-y:auto;max-height:60vh"></div>
+            <div id="viewModalInsights" class="insights-grid" style="flex:1;overflow-y:auto;max-height:60vh;display:none"></div>
+        </div>
+    </div>
+
+    <!-- ==================== EMAIL LOG MODAL ==================== -->
+    <div id="emailLogModal" class="modal-overlay">
+        <div class="modal glass" style="max-width:640px">
+            <div class="modal-header">
+                <h2>Email Send Log</h2>
+                <button id="emailLogClose" class="modal-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div id="emailLogContent" style="max-height:400px;overflow-y:auto">
+                <p class="t-muted text-center py-8">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== USER MODAL ==================== -->
+    <div id="userModal" class="modal-overlay">
+        <div class="modal glass" style="max-width:440px">
+            <div class="modal-header">
+                <h2 id="userModalTitle">Add User</h2>
+                <button class="modal-close" onclick="Users.closeModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <input type="hidden" id="userModalId">
+            <div class="form-group-compact">
+                <label for="userModalName">Full Name</label>
+                <input type="text" id="userModalName" class="form-input form-input-sm" placeholder="John Doe">
+            </div>
+            <div class="form-group-compact">
+                <label for="userModalEmail">Email</label>
+                <input type="email" id="userModalEmail" class="form-input form-input-sm" placeholder="john@company.com">
+            </div>
+            <div class="form-group-compact">
+                <label for="userModalRole">Role</label>
+                <select id="userModalRole" class="form-input form-input-sm">
+                    <option value="user">User</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="form-group-compact" id="userModalPasswordGroup">
+                <label for="userModalPassword">Password</label>
+                <input type="password" id="userModalPassword" class="form-input form-input-sm" placeholder="Minimum 8 characters">
+            </div>
+            <button class="btn-primary w-full" style="margin-top:12px" onclick="Users.saveUser()">Save User</button>
+        </div>
+    </div>
+
+    <!-- ==================== SETTINGS MODAL ==================== -->
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal glass settings-modal">
+            <div class="modal-header">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-3px;margin-right:6px;opacity:0.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Settings
+                </h2>
+                <button id="settingsClose" class="modal-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <!-- Settings Tabs -->
+            <div class="settings-tabs" id="settingsTabs">
+                <button class="settings-tab active" data-stab="ai">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    AI &amp; Transcription
+                </button>
+                <button class="settings-tab" data-stab="smtp">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Email (SMTP)
+                </button>
+                <button class="settings-tab" data-stab="branding">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Branding
+                </button>
+                <button class="settings-tab" data-stab="covers">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Covers
+                </button>
+            </div>
+
+            <!-- AI & Transcription Panel -->
+            <div class="settings-panel active" id="settingsPanelAi" data-stab-panel="ai">
+                <div class="form-group-compact">
+                    <label for="apiKeyInput">OpenRouter API Key</label>
+                    <div class="api-key-wrapper">
+                        <input type="password" id="apiKeyInput" class="form-input form-input-sm" placeholder="sk-or-..." style="padding-right: 40px">
+                        <button id="apiKeyToggle" class="api-key-toggle" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <p class="form-hint">Required for AI summary, key points, and suggestions</p>
+                </div>
+
+                <div class="form-group-compact">
+                    <label for="openRouterModel">AI Analysis Model</label>
+                    <select id="openRouterModel" class="form-input form-input-sm">
+                        <option value="google/gemini-2.5-pro">Google Gemini 2.5 Pro (Recommended)</option>
+                        <option value="google/gemini-2.5-flash">Google Gemini 2.5 Flash (Fast)</option>
+                        <option value="anthropic/claude-sonnet-4">Claude Sonnet 4</option>
+                        <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                        <option value="openai/gpt-4o">GPT-4o</option>
+                        <option value="openai/gpt-4o-mini">GPT-4o Mini (Budget)</option>
+                        <option value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B</option>
+                        <option value="deepseek/deepseek-chat-v3-0324">DeepSeek V3</option>
+                    </select>
+                    <p class="form-hint">AI model used for analysis, translation, and learning reports via OpenRouter</p>
+                </div>
+
+                <div class="form-group-compact">
+                    <label for="whisperModel">Whisper Model</label>
+                    <select id="whisperModel" class="form-input form-input-sm">
+                        <option value="turbo">Turbo — Fast &amp; Good (Recommended)</option>
+                        <option value="large">Large — Best Accuracy (Slowest)</option>
+                        <option value="medium">Medium — Better Accuracy</option>
+                        <option value="small">Small — Good Balance</option>
+                        <option value="base">Base — Fast, Basic</option>
+                        <option value="tiny">Tiny — Fastest, Lower Accuracy</option>
+                    </select>
+                    <p class="form-hint">Larger models are more accurate but slower. Models download on first use.</p>
+                </div>
+
+                <div class="settings-info-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <span>Get your API key from <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--brand-500);text-decoration:underline">openrouter.ai/keys</a>. Audio is always processed locally via Whisper.</span>
+                </div>
+            </div>
+
+            <!-- Email (SMTP) Panel -->
+            <div class="settings-panel" id="settingsPanelSmtp" data-stab-panel="smtp">
+                <div class="settings-row-2col">
+                    <div class="form-group-compact" style="grid-column: 1 / -1">
+                        <label for="smtpHost">SMTP Server</label>
+                        <input type="text" id="smtpHost" class="form-input form-input-sm" placeholder="smtp.gmail.com">
+                    </div>
+                    <div class="form-group-compact">
+                        <label for="smtpPort">Port</label>
+                        <select id="smtpPort" class="form-input form-input-sm">
+                            <option value="587">587 (TLS)</option>
+                            <option value="465">465 (SSL)</option>
+                            <option value="25">25 (None)</option>
+                        </select>
+                    </div>
+                    <div class="form-group-compact">
+                        <label for="smtpEncryption">Encryption</label>
+                        <select id="smtpEncryption" class="form-input form-input-sm">
+                            <option value="tls">TLS/STARTTLS</option>
+                            <option value="ssl">SSL</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group-compact">
+                    <label for="smtpUser">Username / Email</label>
+                    <input type="text" id="smtpUser" class="form-input form-input-sm" placeholder="your-email@domain.com">
+                </div>
+
+                <div class="form-group-compact">
+                    <label for="smtpPass">Password / App Password</label>
+                    <div class="api-key-wrapper">
+                        <input type="password" id="smtpPass" class="form-input form-input-sm" placeholder="App password or SMTP password" style="padding-right:40px">
+                        <button id="smtpPassToggle" class="api-key-toggle" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <p class="form-hint">For Gmail, use an <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--brand-500)">App Password</a></p>
+                </div>
+
+                <div class="settings-row-2col">
+                    <div class="form-group-compact">
+                        <label for="senderEmail">From Email</label>
+                        <input type="email" id="senderEmail" class="form-input form-input-sm" placeholder="you@domain.com">
+                    </div>
+                    <div class="form-group-compact">
+                        <label for="senderName">Display Name</label>
+                        <input type="text" id="senderName" class="form-input form-input-sm" placeholder="Botson AI">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Branding Panel -->
+            <div class="settings-panel" id="settingsPanelBranding" data-stab-panel="branding">
+                <div class="branding-section">
+                    <label class="form-label-compact">Logo</label>
+                    <p class="branding-help">Upload a custom logo for the header, PDF reports, and email templates. Max 2MB. Accepted: PNG, JPG, SVG, WebP.</p>
+                    <div class="branding-logo-preview">
+                        <img id="brandingLogoPreview" src="img/logo.png" alt="Current Logo" class="branding-logo-img">
+                    </div>
+                    <div class="branding-actions">
+                        <label class="btn-secondary btn-sm branding-upload-label" for="brandingLogoInput">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Upload Logo
+                        </label>
+                        <input type="file" id="brandingLogoInput" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none">
+                        <button id="brandingResetBtn" class="btn-secondary btn-sm" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                            Reset to Default
+                        </button>
+                    </div>
+                </div>
+                <div class="branding-section" style="margin-top:24px">
+                    <label class="form-label-compact">Footer Text</label>
+                    <p class="branding-help">Customize the text shown in the app footer. Leave blank to use the default.</p>
+                    <input type="text" id="footerTextInput" class="form-input form-input-sm" placeholder="Powered by Whisper AI & OpenRouter · Transcribe AI by Botson" style="text-align:center;">
+                </div>
+                <div class="branding-section" style="margin-top:24px">
+                    <label class="form-label-compact">Login Animation</label>
+                    <p class="branding-help">Add an animated overlay effect on the login page. Plays between the background and the login card at reduced opacity.</p>
+                    <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+                        <label class="toggle-switch" style="flex-shrink:0">
+                            <input type="checkbox" id="loginAnimationEnabled">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <select id="loginAnimationSelect" class="form-input form-input-sm" style="flex:1">
+                            <option value="constellations">Constellations — Connected star network</option>
+                            <option value="particles">Rising Particles — Floating dots rising up</option>
+                            <option value="matrix">Matrix Rain — Falling code characters</option>
+                            <option value="waves">Wave Pulse — Flowing sine waves</option>
+                            <option value="fireflies">Fireflies — Soft glowing orbs</option>
+                            <option value="snow">Snowfall — Gentle falling flakes</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="branding-section" style="margin-top:24px">
+                    <label class="form-label-compact">Login Background</label>
+                    <p class="branding-help">Upload a custom background image for the login page. Recommended: 1920×1080 or larger.</p>
+                    <div class="branding-logo-preview" style="height:100px">
+                        <img id="loginBgPreview" src="img/login-bg.png" alt="Login Background" class="branding-logo-img" style="object-fit:cover;width:100%;height:100%;border-radius:8px" onerror="this.style.display='none'">
+                    </div>
+                    <div class="branding-actions">
+                        <label class="btn-secondary btn-sm branding-upload-label" for="loginBgInput" style="cursor:pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Upload Background
+                        </label>
+                        <input type="file" id="loginBgInput" accept="image/png,image/jpeg,image/webp" style="display:none">
+                        <button id="loginBgResetBtn" class="btn-secondary btn-sm" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cover Pages Panel -->
+            <div class="settings-panel" id="settingsPanelCovers" data-stab-panel="covers">
+                <p class="form-hint" style="margin-bottom:16px">Manage cover page images for PDF reports. The default cover is used unless you select another when exporting.</p>
+                <div id="coverPageGrid" class="cover-page-grid"></div>
+                <div style="margin-top:16px;display:flex;gap:8px">
+                    <label class="btn-secondary btn-sm" for="coverPageUploadInput" style="cursor:pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload Cover
+                    </label>
+                    <input type="file" id="coverPageUploadInput" accept="image/png,image/jpeg,image/webp" style="display:none">
+                </div>
+            </div>
+
+            <button id="saveSettingsBtn" class="btn-primary w-full settings-save-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Settings
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== EMAIL MODAL ==================== -->
+    <div id="emailModal" class="modal-overlay">
+        <div class="modal glass email-modal">
+            <div class="modal-header">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-3px;margin-right:6px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Send Transcript
+                </h2>
+                <button id="emailClose" class="modal-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div class="email-form-grid">
+                <div class="form-group form-row">
+                    <label for="emailFrom">From</label>
+                    <input type="text" id="emailFrom" class="form-input" placeholder="Display Name <email@domain.com>">
+                </div>
+                <div class="form-group form-row">
+                    <label for="emailTo">To</label>
+                    <input type="text" id="emailTo" class="form-input" placeholder="recipient@email.com (comma-separate for multiple)">
+                </div>
+                <div class="form-group form-row">
+                    <label for="emailCc">CC</label>
+                    <input type="text" id="emailCc" class="form-input" placeholder="Optional">
+                </div>
+                <div class="form-group form-row">
+                    <label for="emailBcc">BCC</label>
+                    <input type="text" id="emailBcc" class="form-input" placeholder="Optional">
+                </div>
+                <div class="form-group form-row">
+                    <label for="emailSubject">Subject</label>
+                    <input type="text" id="emailSubject" class="form-input" placeholder="Transcription | ...">
+                </div>
+            </div>
+
+            <div class="email-attachment-info">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <span>PDF report will be attached automatically</span>
+            </div>
+
+            <button id="sendEmailSubmit" class="btn-primary w-full" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Send Email
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== LOADING OVERLAY ==================== -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p id="loadingText" class="t-secondary font-medium">Generating PDF...</p>
+    </div>
+
+    <!-- ==================== TOAST ==================== -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ==================== SCRIPTS ==================== -->
+    <script src="js/api.js"></script>
+    <script src="js/pdf.js"></script>
+    <script src="js/email-template.js"></script>
+    <script src="js/autocomplete.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/contacts.js"></script>
+    <script src="js/users.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+hey we're talking about the paying out bots and we're going to discuss the details just a lot of
+context of something that is a project that is coming up I will get you to transcribe this later
+and focus on action items and focus on details in regards to not the thought process but what
+more so the final thinking and direction of the conversation is going
+all right so the way I'm looking at this is that I'm going to take a look at my pain scales
+and then with regards to the I'm going to sneeze here excuse me excuse me so what I'm going to do
+is I'm going to revisit all the pain scales and then take out the most important pain scales that
+have the most value for the lawyer and use those as the basis of the structure of all the questions
+that are going to be asked to the patient to be able to describe their daily pain in their daily pain
+diary and we'll do those questions over the span of what duration as a pilot in the pilot what I
+would like to do is if I could minimize the number of questions but maximize the number of completed
+pain scales I'd like to do you know 20 questions or 30 questions over the course of one week and
+and which would also include the daily free free conversation of a patient about their daily pain
+after they've discussed what they want to discuss then it would ask these 20 questions over the course
+of the the week to be able to complete the pain scale does that make sense so for instance I push
+the button on the app uh let's say for instance um I was in a car accident I went to take out the
+groceries and I hurt my back and I would be like ah here actually let's do some role playing because that
+works really well I'm going to be a patient and I'm going to have injured myself in a car accident
+and I have already seen my lawyer and my lawyer has provided me with your connection to use your
+service I have now just on boarded with your service I've now using the app for the very first
+time I've noticed on my android phone that I've received some notification I'd like you to walk me
+through the perfect situation in regards to you as me the patient what my experience will be like in
+that moment and then I want you to describe what it's going to be like let's say in a day or two what
+the next event is going to happen until you feel that your objective is met please describe okay
+so for the daily log summary what will happen is let's say this is the next day after you've
+completed the intake form pop-up notification there's two ways to trigger the app the first way
+is to passively allow the app to do a push notification where it would pop up and you would hit the button and
+it would ask you five questions in the day those five questions represent the 20 to 25 questions for
+the week that needs to be answered to be able to populate the pain scales that we require in an actual
+let's call it a visit a virtual visit on the phone the second way to be able to trigger a communication
+with the app is to open up the app and press the record button and when you press the record button
+what as you press the record button series of daily questions that are very generic will pop up on the
+screen but it will first say what did you do to yourself that hurt yourself or injured and so you
+will basically say okay well you press the button and you say well I was going outside and picking up
+the groceries and when I come in my back started to hurt and it will always as a daily pain diary it'll
+always say where was your pain what was the nature of your pain what was the strength of your pain how long
+has the pain uh you know been there and uh has it gotten worse since yesterday and then it'll answer
+that you can answer those basic questions and then after you've uh released the text message it will
+continue to uh ask four or five questions which will help fulfill the uh master pain questionnaire list
+and then after that's done it will calculate or rewrite everything for you and then save it
+and then so the next day will come and uh again it will trigger you to answer its question so it'll
+send a push notification and then it will tell you a little tidbit of a fact like hi i'm i'm happier you
+come on remember to do your stretches today or ice your back if it hurts uh how was your pain today
+and then you push the button and then again it'll list you five or six questions the generic questions
+that it'll ask the the the five to eight automatic questions how's your pain today how's your back
+what's the number of pain uh is it uh describe the pain uh and so forth but on the screen it'll have
+keywords keywords like uh you know like throbbing aching sharp dull so that that way the person
+can can uh communicate effectively with the the app while it's being recorded so it'll basically
+kind of like give a template of how to to to which questions to answer but it'll give keywords on it
+so it knows right it's basically a pain scale page and then from there um once you let it go it'll ask you
+a couple more questions uh to help on the next day it'll ask maybe the next five questions of the 20
+for the week make sense and then at that point you turn the app off it records it then it does that
+the next day so by the seventh day or by the 14th day whichever you want to auto populate the the master
+uh pain questionnaire to auto complete the uh 20 pain scales uh it will be able to uh have a whole
+weeks worth of of complete questions on top of the daily uh injury concerns that it has make sense
+what are the daily injury concerns uh it's like the like your daily activities you know you just got
+into a car accident you work on the computer all day oh you know what i'm getting a headache after
+four hours on the computer i'm getting a headache the headache's been lasting me until the next day
+so you open the app up and you just randomly log for example that you feel discomfort yeah exactly
+and then it'll basically discuss it'll basically transcribe what you're saying and then use that as
+a uh a note for the day as a base baseline of what you did that day right and then but then the same
+thing is it will you will always be asked a certain number of questions which are the default questions
+to be able to complete the master pain questionnaire for the week so the so for example if i all of a
+sudden was feeling pain on a wednesday and i had already went into the app earlier and answered some
+pain questions and said i was feeling fine but then later in the day i wasn't feeling fine i would go
+into the app and then i would just report this on my own yeah absolutely and then is that using a
+particular pain scale or is that just me saying one to ten describing if it's a sharp pain moderate
+pain what does that process look like yeah to make it easy what we can do is i can have a series of of
+20 daily log questions we can call it that right a daily log question is let's say you were injured
+uh here the typical questions that i would ask you in the office so where is the pain uh how how how did
+the pain get there what were you doing uh when the pain was there uh on a scale of one to ten how bad
+is the pain can you describe the pain sharp dull achy throbbing radiating uh pulsating uh dull and then
+you just kind of read off whatever it is and then uh what has helped it nothing has helped it ice has
+helped it all that stuff and then after that has been answered all the combinations and permutations
+will have stored inside of a database for example so then for example the computer will know that it
+has to provide us with one to ten or one to five or whatever the requested input is yes and and um i
+actually have a a template that we can use to be able to do that for the daily log diary side of
+things right and then keep that in mind that while we're doing the daily log that could be did pretty
+well everything and anything but in order to be able to uh like analyze and create the analytics
+for the uh the the pain analytics for this the 20 questions for the week in the master pain questionnaire
+has to be answered throughout that week so during the time that you are communicating freely let's call
+it freely communicating with the app the app knows to ask these 20 questions for the week or 30 questions
+or whatever it is to be able to create the analytics okay so in regards to analytics capturing let's
+first deal with what the patient can do in the app so far we see the patient either comes into the app on
+their own and just reports things like discomfort or they're notified through a push notification to come
+into the app and they answer some questions can they answer the questions without the push notification
+or is it the push notification leads them to answer the questions we probably should have them able to
+answer the questions with or without the push notification in the event that they clear it and
+then they can't reach the notification questions yeah we can go either way all that the push notification is
+doing is triggering that patient to go into the app that day obviously when a person is in pain during the first
+six months of of the beginning of the car accident they're going to be using that app pretty regularly
+because they're in pain every day after about a year their pain typically is going to be coming once
+a week or whatnot right that's where the push notification becomes more important because in a year that
+patient might be only in pain at three or three out of ten level or once a week as opposed to every day
+which means the push notification is important for it to pop up so if the push notification pops up how
+are we doing today oh i'm doing great okay just verifying that you know what's your pain scale oh it's
+at a zero and then that way uh it's uh uh it's got two options you know push button uh where you can
+talk to it at any time and the uh the uh quick uh the push notification right do you want to have the option
+for patients to be able to input on their phone without using the talk feature as i know that some
+patients may not have the surroundings in their environment to be able to talk on their phone and
+may prefer it actually that's a good idea maybe what we can do is the questions uh as opposed to a
+talk in text is it possible to do a touch screen opportunity where you have a a like a you open up
+the app and then there's a page uh like this and then there's like questions in there and they just
+basically touch what would be the smartest way to do this in regards to maximizing profits would be
+you would alert them with a very nice aesthetic like notification which pulls them in to the
+application and then once they're inside the application it would be best to likely have them just
+with a bunch of radio buttons or toggles or sliders and answering questions like that that would maximize
+the amount of profit you would make because you would spend quite a bit of money transcribing and
+it would be a cool feature but it's an expensive feature especially for a starter company and then
+the second piece would be you would spend your ai credits the most wisely on your reporting and the
+amount of money you would spend the reporting would be quite minimal but you could do some really
+impressive reports it would just be a matter of using ai to help orchestrate getting data into
+the places where you need to in the application using a obviously to build the application to do
+it at a very rapid rate using ai to make sure that it's very compliant on the compliance end
+and then on the side of basically leveraging off of existing technologies that don't use credits
+we leverage on those in areas where we can still provide people with a very good experience
+but then provide you with the reporting data which is the real money yeah that's a great idea the toggle
+slide over would be great because then they can basically sit there and and literally slide
+10 toggles and then they've answered 10 questions which is going to be much much quicker because
+if you're thinking about timings one there's environmental problems where people don't
+necessarily with their husband around or whatever it is talk they won't necessarily be free they might
+wait to go to their car which means they may not even do it at all and so then if you gave people
+the opportunity or just that was the way you did it you had a bunch of sliders it would look very fun very
+visual it'd be very quick process you could answer probably five questions in the span of seconds
+instead of doing recordings and then transcribing which would literally take probably 10 minutes
+that's actually a great idea we can do it that way and yeah i'd strongly agree with that that's
+actually great and then you know we would basically again same thing keep adding the master questionnaire
+uh like those would be the different questions in the in this maybe the second page it'll answer those
+to change the uh uh the tune of the question so it's not as repetitive but yeah that's 100 great
+so what the client will do then is the client is going to produce an excel spreadsheet the excel
+spreadsheet will then have the distilled number of questions and then the other column will then describe
+what the pain measuring tool will be whether it's a slider whether it's a radio button a drop down
+whatever the client thinks would look the best in that situation he can pick whatever he wants because
+we can do it yeah and then he'll just write basically uh in one column what the question is and in the
+second column what the visual capture is and then when the question is posed by the uh by the ai
+pulling random questions out for that day it will then pull out the measures that are applicable to those
+questions with horizontal rules or something to divide the interface so you can separate the questions or
+show them one by one whatever makes the most sense on a mobile or desktop interface okay that's a good idea
+yeah would they still be able to see it in their language so what we could do would be now let's talk about
+the features that the client has we know the client can basically report pain at random or the client
+can wait to basically be asked to enter the app through the push notification let's talk about the other things
+they can do inside the app they're going to have to have a profile the profile is going to be connected to
+their email and their password and there'll be an ability in there to reset their password there would also be an ability
+an ability inside the profile area then to deal with the situation that you had just described which would be
+remind me what the situation was for with with whom uh there was something that you needed to capture
+outside of just the process of placing information into the app you were asking about something regarding
+the patient i don't know okay well we're going to need a profile section of the app regardless
+because when the patient logs in they'll need an area where they can update their password or perhaps
+their email right and yeah last night would the would the patient be able to see any kind of reporting
+would the patient be able to see anything that they've entered or would that stuff just kind of go into
+the abyss um i have all of those features written down somewhere so on the reporting side for the
+patient there is none when the patient puts things into the app it just goes into the database there will
+be an admin side where there will be reports that will be pulled out based on basically looking at
+individual patients and uh the answers they've answered over time to these pain scales so basically based on these
+questions they've been answering week after week we'll be building reports that will be given to the
+lawyers later which will be needing to be exported into either excel spreadsheets or csvs and this will
+basically be a historical breakdown of answers that the patients have given and we can come up with a bunch of
+different useful reports with understanding what the scope of the project is and what we're trying to accomplish
+um we can the another thing that's important is for instance like let's just say uh with regards to
+the toggle screen for the pain questionnaire uh in the very beginning the patient uh chooses their native
+language that they are most comfortable oh right so so and that way so the profile section that i was
+speaking about earlier once the patient signs in they can go into the profile section and when the application
+first starts they'll have to choose their language so as soon as the application starts the first
+question will ask is what is their language the second question that will be asked is what is their name
+and then from there they'll be brought into the application with some kind of a welcome uh which
+comes after the terms and conditions of the application which will be in their own language uh that can be
+either that will be translated by ai on the spot into whatever their native tongue is that they chose in
+the option um that option can be changed from inside the profile section of the app this app must be both
+desktop and mobile friendly as for part of compliancy and there'll be more requests of compliancy
+information that goes in the system cannot be edited it must just stay in there and it cannot be manipulated by
+any users it is a medical standard it also is going to be operating in canada which means it needs to operate
+under a variety of different standards when it comes to compliance such as in alberta which is where
+this will be starting so we'll start with compliancy for alberta and then later look at national so just
+make sure that when the application is being built that if there are national rules that need to be
+taken in consideration that there is some future thinking towards that and the application can be
+extended but in the beginning we are not going to worry about everything compliance wise but only what
+needs to be done in the province of alberta canada which means that we have to follow the health and
+information act and we need to follow any privacy legislation and we will have to submit a pia
+with the development of this application so that we can use this legally in alberta etc
+okay so we were talking about the reporting aspect now so with the patient side we're pretty much done
+we've discussed that the patient has minimal features inside there so we just need to have a really nice
+interface for them they'll be basically capturing their pain analytics through a database the client
+will be providing so the client will be providing a spreadsheet the spreadsheet will have the 20
+types of questions that are going to be asked and some variations of it we'll make a table of that
+and these questions will be asked as the client mentioned probably over the span of a week
+and there will also be tags associated to those questions and those tags will help us later categorize
+things for reporting and so that way we can see what type of question needs to be answered in that
+period of time it can be randomized and then as the client is presented with questions we will also have
+in the database what type of control they'll use to answer with whether it's a slider or a true and
+false or a button or whatever we need to best answer that question visually to make it a quick and simple
+process for them we haven't decided yet whether there's multiple questions on the screen at the same
+time or they just kind of come back to back i think it would probably be smoothest for the user if it
+was just kind of back to back where one would appear on the screen kind of flash on and they'd complete it
+then they'd complete the next one until it was done for that day and then they'd come in another day
+question for the client client can they complete more than the set number of questions per day
+if they want to do all 20 in a day or is it preferred that it is spread out no absolutely in
+in a day it's actually preferred that they're able to do that more often than not what i'm trying to
+do is i'm assuming that each client is a procrastinator and that they don't want to do this
+and uh what i'm trying to do is create a situation where there is minimal effort for a patient to do
+it and it is done organically and we will still be able to get the uh required analytics so just
+just to confirm just to confirm so then we're not necessarily concerned if the patient
+starts on day one and answers all 20 questions on that day and then next week they did the exact same
+thing or would they answer another 20 questions the next day or is it going to be weekly allotments
+of 20 well if my my goal is at the very minimum they answer all 20 questions in a week but if they
+were to answer it all in one day i'd like the i guess the internal clock to reset so that you know the
+the 20 questions start again on day two uh to complete within that that time frame of that that week so
+basically what it is is we can we have to answer 20 questions within a week's time if we answer those
+20 questions early it then resets and then within that seven day period we have to answer the 20
+questions so then potentially then i just want to confirm the logic if the clients were to be very keen
+and answer the questions daily they could potentially answer hundreds of questions a month yes that
+basically at the end of the day if they were to answer the the 20 master questionnaires every day
+then the analytics uh uh uh for the doctor at the end of the let's say the first month they would have
+30 pain scales of analytics and then that's preferred like that is a good that is preferred yes okay so then
+we just have to make sure that they do a minimum of 20 in a week using notifications how many should
+they do at a time five um i would say uh you know no more than a minute worth of of work so on scaling i
+guess it would be somewhere around three to five then okay yeah a minute yeah a minute two minutes of work
+because i don't know how about we did because we want to keep them answering these questions to get
+the 20. so if we make it too short then it's going to seem tedious that they're coming in the app all
+the time if we make it too long it's going to be seem like a time burden i think the sweet spot is
+probably going to be five the other option is is we could ask like five questions at a time and then it'll
+say do you want to continue you press the next button and then it goes to the next five questions and if it
+says if you do not want to continue and they press no and it says thank you see you tomorrow okay so
+maybe we'll greet them then and say here are your five questions for today feel free to answer more
+questions if you'd like to and then we'll give them an option after they answer the five to then do
+more at a later date or they could also within the application if they decided maybe later in the
+day to pick it up again that they could and continue to answer questions right i think the easiest way
+is to have the five questions on one page maybe two and then they can like or i guess it doesn't
+really you have to keep in mind that most users are probably good on their mobile phones yeah so
+they will not see five questions at a time right that's why it's a better idea to just have one
+question and then a page and then kind of a style that's almost like instagram where you swipe almost
+left or right over the cases and then you get the next question oh that's a good idea that's a great
+idea and then on the bottom uh let's say for instance it has those those um those color the
+like the little box where let's say it has it has five questions you answer one question and then a
+fifth of the the box gets colored in and then you answer a second question and then two fifths yeah so
+we'll have a progress bar on the progress bar that's it the progress bar will show how many questions they've
+answered on the five so we could do maybe circles on the bottom to show how many questions have been answered
+and then how many remain before they've completed their minimal allotment for the day and then and
+then again it will always ask you've done your five questions would you like do you have time to
+continue to ask for another five questions and then it will continue the same process again with another
+slider that starts off at zero where they'll complete another set of five so that is the end for
+the clients we've pretty much detailed all of the insides of the client interface aside from just
+dressing it up to make it look like a professional application now move on to talk about what it's
+going to look like for the lawyer is the lawyer actually going to be logging into the application
+the lawyer can should have a dashboard to show uh the compliance of all of their clients that they've
+referred me the reason why we want to be able to do that is for the the lawyer to justify what they're
+paying for so the lawyer then is going to see a list specifically of clients that are related to
+them and them only yes and then the lawyer is going to see reports based on what they had submitted in
+regards to analytics is it the same level of detail that you'd be able to see in the reporting no no
+essentially what they're looking at is they're just looking at average pain scale you're looking at
+patient compliance of using the product and patient compliance of uh being contacted to go to
+therapy because what the the lawyer wants to know is is this person going to therapy right
+so if i'm sending them a push notification saying have you been attending therapy and
+you know the uh to the patient and they're pushing yes no on the the the push notification just
+to clarify then you are going to be also sending patients push notifications outside of the app ask
+them to complete questions to them ask them to complete certain tasks yeah so like just asking
+them and reminding them are they going to therapy that way that gives the lawyer uh an understanding
+that a they're compliant using the app and b they're compliant going to their therapy strong
+recommendation would be since you're doing something regarding compliance i wouldn't do it with a push
+notification i'd strongly suggest an email notification okay that's fine too okay email notification
+because that that's more legal okay notification probably won't do for much okay fair enough no
+no problem so the push notifications will be used then for bringing the individual into the app
+to do certain requests however if there's something that's important and we need to make sure
+that there's a documented paper trail we'll be using the email route and then be sending out
+an email from the doctor who will be able to in his admin dashboard send out messages to patients by
+selecting them and then choosing whatever the messages he wants to send them so we're talking
+about the lawyer and they will go into a branded email right we're talking lawyer right now right
+we're talking about the lawyer right now but we have to discuss the fact that you brought up a feature
+and that feature would have existed in your admin area which the lawyer did right my apologies yeah
+so now with regards to the understanding of the process of the lawyer when a lawyer gets a client
+over the let's say a typical car accident claim goes two years that lawyer only contacts that patient
+maybe three to four times over those two years once when they do have an initial meeting maybe once in
+the in the the six months later and another one every six months and then once when they're settling the
+claim they will also get occasional uh phone calls by the admin assistant uh to send them to specialists
+so those are literally the only times these patients are actually talking to their lawyer okay now my app
+is is meant for the lawyer to be able to to take at a glance look at the 50 clients that they
+they are using this app on and it shows them more information for their own uh logistics or analytics
+for them are the patients compliant with using the app because they will show how many times it's being
+used uh on a weekly basis or so give me specifics in regards to what specifically the lawyer would see
+nothing bird's eye view but very great right now uh a client uh the the lawyer goes into its dashboard
+patient a uh let's say over the course of of uh february patient a has inputted in the app uh over the
+course of 28 days in february uh 20 times or 40 times uh the patient has acknowledged that they are going to
+their uh physical physical therapy and they've acknowledged it uh twice a week is that a question
+that shows up in the 20 questions no it is one of the push notifications uh where the email notification
+goes to the client are you still going to your physical therapies and then they just press yes and then it
+goes uh and it gets uh uh okay so then what happens is an email notification goes out to the client
+and then when they click on the link inside the email it will bring them into the application
+they'll have to sign in if they're not already signed in and then they'll push on a button to confirm
+yes or no based on whatever the question is yes exactly okay and then the second thing uh with regards to
+the uh analytics is um for the the lawyer is number one the law firm is the master uh account so it lists
+all of the uh 200 clients right they've got two lawyers that work for them and those lawyers underneath
+the master account will only see uh their own clients because remember a law firm may have 10 lawyers
+and each lawyer has okay so just to confirm then so we have another role then because we have users
+who are the patients we've got the doctor which is the admin which is you and then we also have the
+lawyers but there's different hierarchy to lawyer so that means we have the lawyer as in the agency
+or the partnership or practice but then we also have lawyers of a lower ranking that only see a subset of
+information which would be their clients so what you're saying then is we could have two lawyers
+that would exist under the same practice and there'd be a practice username and password and then the
+individual lawyer using a password and the practice using a password would see all of the users that were
+injured patients of any of the lawyers of that practice whereas the lawyers that were in the practice
+would want to see the patients specifically that were under their watch exactly exactly and then uh
+with regards to patient compliance it could also be a color coordination green means they're going
+regularly red is they haven't been in in a month so it keeps so in regards to the reporting metrics to
+keep things simple we'd like to have things be visual so that when the lawyers are looking at this data
+they can grab the data maybe download a csv to give them a lot of the very hard quantitative analytics
+but then on screen so they can kind of see for the sake of compliance we can see things color coded like
+a heat map where things could be hot or cold red or blue or even denser in regards to their darkness or
+lighter whatever you think would best represent that information on screen and we got to be very very
+careful in regards to the um specificity of the pain scales that they're allowed to see
+i would like it to be very generalized because i don't necessarily want them to see the exact
+numbers for them but it would basically be a say specifically exactly what you would like to see
+as a lawyer on the page and keep in mind would this be the same for the agency and the lawyer or would
+it be specific where the lawyer might see something because i understand the agency versus lawyers one
+sees the entire company versus one sees a subset of the people that they serve but would the in regards
+to the analytics be the same amongst the two so the the analytics with the lawyers uh is going to be based
+on a very uh easy pain scale uh the pain scale is going to be one to ten and each one is going to be
+used as uh uh a you know ten is unable to be to move nine is severe uh how is this one how is this
+pain is this pain scale being derived from the data or is this pain scale one of the questions no it is
+being derived from the data and they are just going to have an intensity of pain because all the just
+just to clarify is it taking all of the questions 20 of them over a period of time and distilling them to
+like an average and the average is going to be looked at as like a zero to ten kind of an average
+so for example if they answered things that were um high or lots of pain we would then make that a five
+we'd have other scales that were ten we'd have and then basically we would just kind of arbitrarily
+come up with some kind of an average and then communicate so what will happen so it would be it
+be a number that is a fictitious number derived from the rest of the information yeah all that that's
+important for for the lawyer is that does that patient still want need to continue with more
+treatment okay because the reason why a lawyer so the lawyer that is looking the lawyer is looking at
+the data to see basically if the program continues the program ends exactly the reason being is lawyers
+uh will get information uh from the insurance companies saying that the patient is not in pain
+because the insurance companies want to save money so what they'll try to do is send these patients to
+their medical doctors to show that they're not in pain however so they're going to get a letter from
+the opposite side medical doctor that they're not in pain but what i want them to see is at a glance
+they can see that so and so is being treated at uh collingwood chiropractic and their average pain scale
+is seven out of ten so they know at a glance what they're seeing so essentially that's all that they
+need to see is are they compliant with their care how often are they answering the uh the app and what
+is their average pain scale at that moment and that's all that they need to know okay so then that from
+that aspect of things that works out really well from the we're now going to talk about the next part
+of the app which is the lawyers and the law firm so the law firm will log in and have a different view
+than the lawyers and the data will be different as well the law firm may have multiple lawyers inside
+of it so you'll see a list of lawyers they'll also have a list of injured patients clients and those
+clients will obviously be under lawyers in the law firm so the law firm is going to be able to see data
+from everyone that's in there that's providing pain analytics whereas the lawyers are going to see a
+subset which are just the patients that they're serving in their view the lawyers and law firm will
+also need the capability to oh as well as the doctor to add new people into the system so if a new
+patient needs to be added the super user doctor he can add it to any law firm or any lawyer whereas a
+lawyer can only add to himself a new patient and a law firm can add a new patient to any of the lawyers
+in the law firm now we're going to discuss specifically on the law firm's screen followed
+by the lawyer's screen what information is going to be shown specifically first for the law firm and their
+patients and then we'll go on to the lawyers so the information of the law firm and the lawyer are all
+exactly the same in terms of what the analytics are which i will discuss later the only difference is
+that the law firm is able to see all of the clients and all of the lawyers that are connected to the
+clients on one big main screen with the lawyers that are the sub lawyers all they are able to see
+are all of their own personal clients within the whole gamut of the law firm so that is the difference
+between the law firm and the lawyer in regards to the actual information and data analytics that they
+are to see i'll explain to you what it is number one the lawyer slash law firm is able to see a complete
+list of all their own clients which are color coordinated green means regular and red means
+non-compliant what basically it means is that if a patient or client is regularly using the app by
+creating input it would stay green within let's say a week or two weeks it'll stay green
+as long as it is being inputted within two weeks that actually makes the analytics look pretty good
+if it if a patient or client does not use the app longer than two weeks it turns red so at a glance
+if it has a hundred if the law firm has a hundred uh users uh on this on their app in their in their
+uh their uh dashboard and it's all green then there's a lot of compliance if maybe two percent of it is red
+then it it's showing that it is still uh uh worthwhile uh application to use secondly it also shows the lawyer
+uh that the application is in reg is in regular communication with the patient uh on a weekly basis
+uh so that the lawyer knows that they don't necessarily have to contact the client keep in mind
+the beauty of this application is it is using the doctor as the liaison to the uh the within the car
+accident typically a lawyer will only contact a client four times over a two-year span the first time they
+sign on every six months they'll call and be like how are you doing uh are you still going to treatment
+uh anything i need to know those are basically the questions and finally at the end when they're
+they're discussing settlement so really there's no maintenance of each of these clients uh they don't
+know if if a patient has not has stopped going to treatment uh with this app they're going to be able
+to see that the app has confirmed that the client has uh checked off the box that says yes i am still
+going to treatment on a regular basis also with regard to the app the app can also show monthly quarterly
+usage of the app so you know it'll also again it'll show when the last time the app has been used which
+is very important uh basic analytics is the other feature uh with regards to the doctor there's you
+know 30 40 questions which will constitute what the doctor is seeing in the simple pain scale for the
+lawyer all it's showing is a visual one to ten pain scale where the 10 is you know severe pain or unable
+to move and zero is no pain and all it's going to show is one number to uh in real time indicating
+at what pain scale is that patient at so you might have a list of 100 patients and and 30 of them will
+have a pain level of eight now you said is that in the present moment as in the last number that was
+recorded or is it an average over time no what it is it's going to be at the present moment because
+realistically the lawyer wants to know at what level is that person's pale at that moment because
+six months into their treatment the pain level is at a five you know or six months into their treatment
+it's at an eight or six months into their treatment it's at a two so therefore uh when they see this
+pain scale they they can identify the patients who are still at seven eight and nine and send them to
+more more therapy or send them to specialists because they're at a pain level that's higher
+than where they should be uh within a designated amount of time so at a glance it gives them a tool
+to follow up with those patients to send them to specialists or whatnot they can be like hey this
+patient uh uh mr jason hogan uh was in a car accident a year ago but his pain level is at an eight
+let me give them a call hey i just wanted to give you a call to see what's going on uh is there anything
+that's happening with you uh yeah i'm getting headaches well let me see if we can send you to
+a neurologist so that's the thing or for instance their pain level is at an eight they call up uh jason
+hogan in a year yeah i'm having nightmares oh you're having nightmares let's send you to a psychologist
+so it's really really important to be able to do that a third thing is you know uh what's what's going on
+i see it's a year uh later you have an eight out of ten of pain yeah my jaw hurts i i i i can't eat
+because i can't i can't close my jaw well let me send you to a tmj specialist so the ability to see
+in real time their pain level at that moment is a really good tool for the lawyer to be able to follow
+up without having to call their client that's it okay so that covers both the law firm and the lawyer
+uh oh one more thing is after one year or two years the lawyer can request on the on the app
+uh a medical legal summary or they uh where they can be sent to a specialist that the dr c cap which
+is the app has hired as a third party specialist so dr c cap will have third party specialists uh uh to
+be able to to refer these clients to which is an additional cost for the lawyer but this is the final
+top of the food chain specialist uh medical report which can be paid for by the lawyer for a at the end
+of the day medical legal summary we're going to summarize one more time what is going on with the
+lawyer screen so the law firm is the highest level that can see everyone that is a lawyer and patient
+and then the lawyer is going to see the patients underneath them they will have both access to
+the same analytics which is just basically the present moment of pain that that patient is in
+they'll both have that same level of access they will also have the ability to create a new patient if it
+is the firm it's going to be either under any of the lawyers the firm can also create lawyers just as
+they can also create patients and then the lawyers can only create patients under themselves and then
+the super user the admin the doctor uh they will be able to create patients create lawyers create law
+firms create all the above and uh there's one more thing is it the law firms or is it the lawyer that
+they will need to do once a year so the lawyer uh within the law firm who is in charge of the patient's
+claim uh has the ability to click on a box to request a medical legal summary uh assessment uh which
+is a private and extra fee typically these physiatrists will charge two to five thousand we don't need
+the details of the procedure what we need to know is how does the patient get this is is the law firm
+then going to shoot an email to the patient to get them to fill something out like what is the actual
+action so the action is the lawyer pushes the button uh that says request medical legal summary which
+triggers an action on the doctor side which will now send a referral to a specialist which will contact
+the patient wait wait wait wait wait so what is the system doing specifically the system is sending a
+message to the super user doctor so we have the lawyers we have the patient and then we have the
+super user doctor role and the super user doctor role the lawyers are going to push a button probably once
+a year for each patient which is going to send an alert to the super user doctor and it just notifies
+them that that patient needs what done a referral to a physiatrist okay and does the system have to
+do anything to facilitate that or just notify dr secat and he'll just check it off when he's done it uh
+notify dr secat ideally down the road i'd like to be able to uh have the app to directly send the
+referral to the physiatrist office okay why can't the app do that now do we have the paperwork that needs
+to be filled out by the doctor so does uh does redell know the input fields that would need to be
+submitted that could be placed inside of the doctor's area that could then send the referral yeah i can do
+that we can okay so then the process could be that the lawyer pushes a button and then this triggers what's
+the report called again a physiatrist specialist uh referral okay and that gets sent over to the super user
+account they will get a notification and some kind of a queue they will then click on it they will
+look at that referral and there will be a form and then the form will have what inputs do they need is
+it a lot or just a couple it will be the the uh whatever the requirement is for the referral form that uh
+the physiologics okay so we will get you the referral form information later and so there will be input
+fields on top of the queue and once you then fill out the input fields and click send it would then
+fire off an email with that information to the email address that we had plugged into the system absolutely
+okay uh is there any more features that are inside of the lawyer or law firm area that is it for now okay
+now let's talk about the final role which is the super user which gets to see the most intricate
+level of reporting they can create users whether it's the lawyer the patient or the law firm uh they
+can reset passwords they can what else what what all is there what are they going to see can we actually
+uh rewind that uh part or we'll just keep talking actually there's one more role with regards to the
+lawyer is that um they need to be able to build the client on here but they don't necessarily need
+to build a client uh to be able to pay them they just need to be have a documented documentation box
+that the client has been built for the service so that they can build them separately within their own
+uh emr system so there's an invoicing component to this thing yeah for them yeah okay and the invoicing
+component uh is that an email notification is it sent through the system that there's an invoice
+is it more so a receipt kind of a piece well it is an internal uh uh tracking invoice system for them
+it is not my invoice because remember when i invoice them i'm going to charge a certain fee
+they can charge whatever they want sure so basically what it is is on the side of the lawyer
+the lawyer needs the capability to fill out a form and generate an invoice that is then either emailed
+or sit or appears inside of the system on the patient's end no they just need a tracking system
+because remember they're going to put it onto their disbursements form because remember um they don't
+need to send an invoice from the app they just need to be able to track that that client is invoiced in
+their normal accounting system oh so they're going to have information in their accounting system
+that's also going to be duplicated inside of our system so then they need to be able to enter
+information from their accounting system into our system so they can see some of the data correlated with
+the patient no what what all i'm saying is that uh law firm has let's say law firm has uh 20 clients
+right they just need a box that says uh a a column that says has patient been billed and then it's either
+yes or no because they're going to be billing them separately within their own uh already existing
+so there's no invoice then there's nothing you're basically just checking off a box saying whether
+billed or not yes that is all that's okay that's not much of a feature okay so basically what we need
+then is inside of the area that the law firms and the lawyers would look like that would be their
+specific patients there would just need to be a toggle in there to say whether they were paid or not
+paid yeah was that invoice invoice or not invoice does that reset on some kind of interval like after a
+month or no no it's it's once they've been billed uh it's usually a disbursement uh that you know the
+settlement the settle so it's just on or off yeah and they can bill whatever they want yeah and it just
+stays that way yeah okay all right yeah we're just showing that the action of billing has occurred
+once that's been toggled it just stays that way however they do it offline that is completely up to
+them so we're just showing inside of the application that that event had occurred right right um what i do
+want them to see is the invoice that i send them that is showing unpaid so there's going to be a column
+where they have to pay me through the app through the app okay and then how will they be paying you
+through stripe through stripe or through uh e-transfer okay and so explain to me how the payment works
+is it done per patient or is it done it's going to be done per patient okay and each patient is going to
+be paid for by the law firm uh they're going to be doing ideally the way i want to do it is is two
+payments one prepayment in the beginning and one payment at the end uh when the claim is closed okay so
+when a customer first opens an account then once they go through the wizard basically we'll have
+the lawyer create the account when the account's created they'll come in choose their language first
+after they choose their language they'll be uh placing in whatever they would like probably as
+a password they'll see the terms of use that comes up and then following that that's when we'll see this
+next part yeah exactly and then um what i would like to do is i could invoice it could be payment
+can be within two weeks or or whatever i mean in terms of conditions i'll figure that out i'll talk to
+the lawyers as to how they want to pay them so is the lawyer going to be just to clarify is it the
+patient that's going to be paid or is it a lawyer that's a lawyer is going to be paid okay so the
+scratch that when we come into the application for the first time and go through choosing the language
+that is not occurring for the patient no it is occurring for the lawyer it's occurring for the
+lawyer is that the lawyer or the law firm the law the lawyer the law firm would be doing that okay so
+not the individual lawyers so when a new law firm is created actually we'll we'll have given an option
+because sometimes i'm only dealing with one lawyer within a law firm or i'm dealing with a whole law firm
+so so that's what i can do so it can be a little toggle that says uh we need to deal with that
+situation that's a very important yeah that's what i'm saying so so no no no no from a program
+out again we need to discuss what you just said that's a big deal okay okay so the big deal is is
+we have the case where some lawyers will not necessarily be under a law firm which means those
+lawyers would need to have more capability to be able to operate with the same level as the law firms do
+well to fulfill all the functions well here's here's the thing all you need to do is is instead
+of putting the law firm you just put the name of the lawyer individually so that that's still the
+same so you know what i mean and then later on if we bring on the law firm we put the law firm and then
+we put the subheading of the the lawyer in the hot law firm so what i'm saying though is is you can't
+have a process where the lawyer is disjointed from something so we have to future proof this in the sense
+that if there's a chance that in the future you say you have lawyers now that want to join the firm
+we have to future proof it so that it knows that the firm can just all of a sudden come over and
+replace the hierarchy of the lawyer right yeah okay yeah okay so we'll have a lawyer being able to
+operate without being under a law firm and then there might be the potential in the future that
+their law firm will also want to come under the app so we have to future proof this so that way if it
+just starts off with individual lawyers that are part of a law firm but it's not administrated from the
+top down where the law firm is creating lawyer accounts that will be able to facilitate both
+individual lawyers being created by the super user or having the law firm and the lawyer is created by
+the super user or just the law firm what other features is the super user able to do the super
+user can change anyone's passwords including patients law firms or lawyers the super user can create all of
+the above the above the super user can change accounts no no we can't no we won't change accounts we'll leave those
+because it's legal so so the super user basically has a dashboard to see uh all of the breakdown of all the
+law firms analytics uh so uh we see what they see uh we also see so do you want to be able to have a drop down to
+switch between your different law firms so you can switch the view yes yes essentially all i want
+to see is all green because i don't really necessarily need to to just to read all of the uh items i just
+need to be able to toggle uh and put all of the law firms and see what the green ones are and which ones
+are the red ones right okay so then we want to have a view where we could basically see an individual
+snapshot of a bunch of data from law firms and their patients and then we want to have another
+view that be more of a bird's eye view that just shows everything where we could kind of see things
+that are red or green so we could tell where the problems were just at a glance right and yes exactly
+and with regards to regards to all of the clients that you put on there could also be a screen where
+it's just all clients without the the worry of any of the the law firms so that i can just deal with
+clients without having to deal with yeah so there'd be a page then that would just be the clients a
+page then that would just be law firms a page then that would just be the lawyers so that way we could
+just look at accounts click on the rows and then light boxes would open and we could see user details
+and uh right and then there'll also be another page for payment breakdowns of each client and which
+ones have paid and which ones have not and it'll also show uh accounts receivables and future collections
+uh for those patients uh with the with for those clients and all the billing is done to both lawyers
+and to law firms depending on the situation which means that sometimes you'll be sending stripe
+payment requests to law firms versus straight payment requests to um uh lawyers in regards to your
+billing you mentioned you wanted to do this uh an installment in the beginning for each law firm
+or was the installment in the beginning for each new patient that comes on with each new law firm it's
+each new patient so each patient uh they they they pay or prepay for each patient to come onward okay so
+then the law firms then or the lawyers would then prepay you through the application with stripe for
+each patient that would come on board yes okay so then each time a patient would be added then by the
+law firm or the lawyer there would be a notification then that would go over to the super admin so the
+super admin would know to uh have the the application would automatically trigger the invoice to go over
+for payment and then it would go into a queue keeping track of what has been paid and what hasn't been
+paid yes yes yes and what other payments need to be paid so that's the initial installment is there a
+monthly fee or what's the payment breakdown ideally what we're just going to be doing is we're going to
+be doing a a yearly fee for the patient uh what we're going to do is we're going to bill an initial 500
+uh for the client for the the the the two years it's a two-year claim and then they're going to pay
+another 500 at the end of the claim now any additional year after the um after the uh first two years
+they're going to be paying a hundred dollars a year until the settlement is closed because some claims
+will close up in a year some claims will close in two years but some claims will stay open for 10
+years so i want to make sure i cover the cost for each one so but the bottom line is for every client
+it's a thousand dollars 500 up front 500 when the claim closes okay and it's a flat rate that way okay
+um another thing that needs to be done is the doctor can can see uh the doctor's super user yeah the
+super user can see all of the uh breakdown of the usage of the app by all of the patients green or red
+again uh it will also be able to see the analytics for each patient if needed and it can customize the
+analytics to be to be to see all of the pain scales and it will also be able to uh create a medical legal
+report based on the analytics that have been used for each patient so that we can send that off okay so
+this medical legal report you can't just tell it you have to be very specific in how that's put
+together do you have samples that you can provide uh no but i can i can uh basically so anytime any
+just to clarify anytime you want the client discussed your report at the moment he does not have the
+report but we'll get the details of the report as to what needs to be captured completed we'll just kind
+of put it in the list of items for now so that we can reference it later okay um for example when
+regards to the report generation that is requested by the super user the platform generates reports
+that include weekly compliance reports monthly pain analytics reports so again these are names of
+reports without the details of what the reports are yes so a computer is not going to know based on the
+names what the details are in the inside of the report okay as one of the privacy requirements we also
+have to have the capability that the super admin if requested can retrieve all private information about
+a user to easily provide it to them in a report uh that could be generated into a printed document or a
+pdf actually a pdf would be best that could then be provided to that patient upon request to fulfill compliance requirements in alberta
+the admin super admin also has to be able like we mentioned to add accounts like the lawyers the
+patients and the agencies but they also have to be able to delete those accounts too
+and when the new agencies get created it's the new agencies that will get a stripe bill every single
+time that there is a new patient and when the agency gets added there will be a bill for that as well
+and then that's what causes the notifications that goes into a queue on the admin side that we
+had discussed earlier some of this might be redundant so you may have to take this information
+where we're kind of spitballing and refine it
