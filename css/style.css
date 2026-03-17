@@ -89,8 +89,6 @@
 
     --error-icon-bg: rgba(239,68,68,0.07);
 
-    --toast-shadow: rgba(0,0,0,0.15);
-
     --divider: #e2e8f0;
     --card-bg: #f1f5f9;
     --fg-body: #334155;
@@ -172,8 +170,6 @@
     --setup-border: rgba(245,158,11,0.2);
 
     --error-icon-bg: rgba(239,68,68,0.1);
-
-    --toast-shadow: rgba(0,0,0,0.3);
 
     --divider: rgba(255,255,255,0.08);
     --card-bg: rgba(30,58,95,0.2);
@@ -1049,32 +1045,90 @@ select.form-input option {
 .api-key-toggle:hover { color: var(--fg-secondary); }
 .api-key-toggle svg { width: 18px; height: 18px; }
 
-/* ---- Toast ---- */
-.toast {
+/* ---- Notification Lightbox ---- */
+.notification-overlay {
     position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    padding: 16px 24px;
-    border-radius: 14px;
-    font-weight: 500;
-    font-size: 14px;
-    z-index: 200;
-    opacity: 0;
-    transition: all 0.5s var(--transition-smooth);
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+.notification-overlay.active {
+    display: flex;
+}
+.notification-box {
+    background: var(--bg-card, #fff);
+    border-radius: 16px;
+    padding: 32px 36px 24px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    animation: notificationPop 0.25s ease-out;
+}
+@keyframes notificationPop {
+    from { transform: scale(0.85); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}
+.notification-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    gap: 10px;
-    max-width: 400px;
-    box-shadow: 0 10px 40px var(--toast-shadow);
+    justify-content: center;
+    margin: 0 auto 16px;
 }
-
-.toast svg { width: 18px; height: 18px; flex-shrink: 0; }
-.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-.toast.success { background: rgba(16,185,129,0.95); color: white; }
-.toast.error   { background: rgba(239,68,68,0.95);  color: white; }
-.toast.info    { background: rgba(59,130,246,0.95);  color: white; }
-.toast.warning { background: rgba(245,158,11,0.95);  color: white; }
+.notification-icon svg {
+    width: 28px;
+    height: 28px;
+}
+.notification-icon.success {
+    background: rgba(16,185,129,0.15);
+    color: #10b981;
+}
+.notification-icon.error {
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+}
+.notification-icon.warning {
+    background: rgba(245,158,11,0.15);
+    color: #f59e0b;
+}
+.notification-icon.info {
+    background: rgba(59,130,246,0.15);
+    color: #3b82f6;
+}
+.notification-message {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--fg-body, #333);
+    margin-bottom: 20px;
+    word-break: break-word;
+}
+.notification-close-btn {
+    background: var(--accent, #3b82f6);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 36px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.notification-close-btn:hover {
+    opacity: 0.85;
+}
+.notification-overlay.success .notification-close-btn { background: #10b981; }
+.notification-overlay.error .notification-close-btn   { background: #ef4444; }
+.notification-overlay.warning .notification-close-btn  { background: #f59e0b; }
+.notification-overlay.info .notification-close-btn     { background: #3b82f6; }
 
 /* ---- Loading Overlay ---- */
 .loading-overlay {
@@ -1174,8 +1228,7 @@ audio::-webkit-media-controls-panel {
     .tab-btn { padding: 10px 12px; font-size: 13px; }
     .tabs-nav { border-radius: 12px; }
     .transcript-body { padding: 20px; max-height: 400px; }
-    .toast { left: 50%; right: auto; bottom: 16px; max-width: calc(100% - 32px); transform: translateX(-50%) translateY(100px); }
-    .toast.show { transform: translateX(-50%) translateY(0); }
+    .notification-box { max-width: calc(100% - 32px); padding: 24px 20px 20px; }
 }
 
 /* ---- Setup Banner ---- */
@@ -2348,8 +2401,8 @@ audio::-webkit-media-controls-panel {
     box-shadow: 0 0 0 3px var(--input-focus-ring), 0 1px 2px rgba(0,0,0,0.05);
 }
 
-/* Toast notification — refined */
-.toast {
+/* Notification lightbox — dark mode refinement */
+.notification-box {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }

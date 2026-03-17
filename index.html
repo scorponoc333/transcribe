@@ -1185,8 +1185,14 @@
         <p id="loadingText" class="t-secondary font-medium">Generating PDF...</p>
     </div>
 
-    <!-- ==================== TOAST ==================== -->
-    <div id="toast" class="toast"></div>
+    <!-- ==================== NOTIFICATION LIGHTBOX ==================== -->
+    <div id="notificationOverlay" class="notification-overlay">
+        <div id="notificationBox" class="notification-box">
+            <div id="notificationIcon" class="notification-icon"></div>
+            <div id="notificationMessage" class="notification-message"></div>
+            <button id="notificationClose" class="notification-close-btn">OK</button>
+        </div>
+    </div>
 
     <!-- ==================== SCRIPTS ==================== -->
     <script src="js/api.js"></script>
