@@ -53,11 +53,23 @@ const App = {
                 this.currentUser = result.user;
                 return true;
             }
+            // Explicitly not authenticated — redirect to login
+            window.location.href = 'login.php';
+            return false;
         } catch (e) {
             console.warn('Auth check failed:', e);
+            // Server error (DB down, network issue, etc.) — do NOT redirect
+            // to login.php because that may redirect back here, causing a loop.
+            document.body.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Inter,sans-serif;background:#0f172a;color:#e2e8f0">
+                    <div style="text-align:center;max-width:400px;padding:32px">
+                        <h2 style="margin-bottom:12px;color:#f87171">Connection Error</h2>
+                        <p style="color:#94a3b8;line-height:1.6;margin-bottom:24px">Unable to reach the server. Please check that your database and web server are running.</p>
+                        <button onclick="location.reload()" style="padding:10px 24px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px">Retry</button>
+                    </div>
+                </div>`;
+            return false;
         }
-        window.location.href = 'login.php';
-        return false;
     },
 
     applyRolePermissions() {

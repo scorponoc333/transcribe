@@ -45,6 +45,9 @@ const API = {
     // ─── Auth API ───
     async checkAuth() {
         const res = await fetch('api/auth.php?action=check');
+        if (!res.ok) {
+            throw new Error(`Auth check returned HTTP ${res.status}`);
+        }
         return res.json();
     },
     async logout() {
