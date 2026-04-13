@@ -35,9 +35,8 @@ try {
     }
 
     if ($search !== '') {
-        $where[]           = '(t.title LIKE :search OR t.transcript_text LIKE :search2)';
+        $where[]           = 't.title LIKE :search';
         $params[':search']  = "%$search%";
-        $params[':search2'] = "%$search%";
     }
     if ($dateFrom !== '') {
         $where[]              = 't.created_at >= :date_from';
@@ -63,10 +62,11 @@ try {
     // Fetch page (exclude large blobs) — include user info for admin/manager
     $sql = "SELECT t.id, t.title, t.mode, t.language, t.whisper_model, t.word_count, t.char_count,
                    t.created_at, t.user_id, (t.pdf_blob IS NOT NULL) AS has_pdf,
-                   (SELECT COUNT(*) FROM email_log e WHERE e.transcription_id = t.id) AS email_count,
+                   COALESCE(ec.email_count, 0) AS email_count,
                    u.name AS user_name
             FROM transcriptions t
             LEFT JOIN users u ON u.id = t.user_id
+            LEFT JOIN (SELECT transcription_id, COUNT(*) AS email_count FROM email_log GROUP BY transcription_id) ec ON ec.transcription_id = t.id
             $whereClause
             ORDER BY t.created_at DESC
             LIMIT $perPage OFFSET $offset";

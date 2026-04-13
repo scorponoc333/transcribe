@@ -147,23 +147,55 @@ const History = {
             return;
         }
 
+        const prevDisabled = this.currentPage <= 1;
+        const nextDisabled = this.currentPage >= result.total_pages;
+
         let html = `<span class="t-muted text-sm">${result.total} results</span><div class="pagination-btns">`;
 
-        if (this.currentPage > 1) {
-            html += `<button class="btn-secondary btn-xs" onclick="History.load(${this.currentPage - 1})">Previous</button>`;
+        html += `<button class="pagination-btn${prevDisabled ? ' disabled' : ''}" ${prevDisabled ? 'disabled' : `onclick="History.load(${this.currentPage - 1})"`}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Previous
+        </button>`;
+
+        // Page numbers
+        for (let i = 1; i <= result.total_pages; i++) {
+            if (result.total_pages > 7 && i > 2 && i < result.total_pages - 1 && Math.abs(i - this.currentPage) > 1) {
+                if (i === 3 || i === result.total_pages - 2) html += `<span class="pagination-dots">&hellip;</span>`;
+                continue;
+            }
+            html += `<button class="pagination-num${i === this.currentPage ? ' active' : ''}" onclick="History.load(${i})">${i}</button>`;
         }
 
-        html += `<span class="pagination-info">Page ${this.currentPage} of ${result.total_pages}</span>`;
-
-        if (this.currentPage < result.total_pages) {
-            html += `<button class="btn-secondary btn-xs" onclick="History.load(${this.currentPage + 1})">Next</button>`;
-        }
+        html += `<button class="pagination-btn${nextDisabled ? ' disabled' : ''}" ${nextDisabled ? 'disabled' : `onclick="History.load(${this.currentPage + 1})"`}>
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>`;
 
         html += '</div>';
         container.innerHTML = html;
     },
 
+    _viewingId: null,
+
+    async emailFromView() {
+        if (!this._viewingId) return;
+        this.closeViewModal();
+        // Load the transcription data and open email modal
+        try {
+            const data = await API.getTranscription(this._viewingId);
+            App.transcript = data.transcript_text;
+            App.analysis = data.analysis_json;
+            App.audioMode = data.mode || 'recording';
+            App.transcriptionId = this._viewingId;
+            App.currentFile = { name: data.title || 'transcript' };
+            App.openEmailModal();
+        } catch (err) {
+            App.showToast('Failed to load transcription: ' + err.message, 'error');
+        }
+    },
+
     async viewTranscript(id) {
+        this._viewingId = id;
         const modal = document.getElementById('transcriptViewModal');
         const titleEl = document.getElementById('viewModalTitle');
         const metaEl = document.getElementById('viewModalMeta');
@@ -227,7 +259,7 @@ const History = {
     },
 
     closeViewModal() {
-        document.getElementById('transcriptViewModal').classList.remove('active');
+        App._bounceCloseModal(document.getElementById('transcriptViewModal'));
     },
 
     downloadPdf(id) {
@@ -266,7 +298,7 @@ const History = {
     },
 
     closeEmailLogModal() {
-        document.getElementById('emailLogModal').classList.remove('active');
+        App._bounceCloseModal(document.getElementById('emailLogModal'));
     },
 
     async deleteTranscript(id) {

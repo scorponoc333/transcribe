@@ -45,11 +45,16 @@ const EmailTemplate = {
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.06);">
 
 <!-- HEADER -->
-<tr><td style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#7c3aed 100%);border-radius:16px 16px 0 0;padding:36px 40px 32px;text-align:center;">
-    <img src="${this.logoUrl}" alt="Jason Hogan" width="200" style="display:block;margin:0 auto 20px;max-width:200px;height:auto;">
-    <p style="margin:0;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">${modeLabel} Transcription</p>
-    <h1 style="margin:10px 0 0;font-size:24px;font-weight:700;color:#ffffff;line-height:1.3;">${this._esc(title)}</h1>
-    <p style="margin:12px 0 0;font-size:13px;color:rgba(255,255,255,0.6);">${date}</p>
+<tr><td style="background:linear-gradient(to bottom,#4b8be8 0%,#2557b3 40%,#1a3a7a 75%,#0f172a 100%);border-radius:16px 16px 0 0;padding:44px 40px 36px;text-align:center;">
+    <img src="${this.logoUrl}" alt="Jason Hogan" width="180" style="display:block;margin:0 auto 24px;max-width:180px;height:auto;opacity:0.95;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
+    <tr><td style="background:#000000;border-radius:20px;padding:6px 20px;">
+        <span style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#ffffff;font-weight:700;">${modeLabel} Transcription</span>
+    </td></tr>
+    </table>
+    <div style="width:48px;height:2px;background:rgba(255,255,255,0.25);margin:0 auto 16px;border-radius:1px;"></div>
+    <h1 style="margin:0 0 0;font-size:22px;font-weight:700;color:#ffffff;line-height:1.35;letter-spacing:-0.3px;">${this._esc(title)}</h1>
+    <p style="margin:14px 0 0;font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:0.5px;">${date}</p>
 </td></tr>
 
 <!-- BODY -->
@@ -121,8 +126,7 @@ ${this._consultationBanner()}
 
 <!-- FOOTER -->
 <tr><td style="background:#0f172a;border-radius:0 0 16px 16px;padding:28px 40px;text-align:center;">
-    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;">Sent via <strong style="color:rgba(255,255,255,0.7);">Botson Transcribe</strong> by Jason Hogan</p>
-    <p style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,0.3);">${date}</p>
+    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;">Transcription &amp; Learning Tool developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:underline;">Jason Hogan</a></p>
 </td></tr>
 
 </table>
@@ -148,11 +152,16 @@ ${this._consultationBanner()}
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.06);">
 
 <!-- HEADER -->
-<tr><td style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#7c3aed 100%);border-radius:16px 16px 0 0;padding:36px 40px 32px;text-align:center;">
-    <img src="${this.logoUrl}" alt="Jason Hogan" width="200" style="display:block;margin:0 auto 20px;max-width:200px;height:auto;">
-    <p style="margin:0;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Audio Transcription</p>
-    <h1 style="margin:10px 0 0;font-size:24px;font-weight:700;color:#ffffff;line-height:1.3;">${this._esc(title)}</h1>
-    <p style="margin:12px 0 0;font-size:13px;color:rgba(255,255,255,0.6);">${date}</p>
+<tr><td style="background:linear-gradient(to bottom,#4b8be8 0%,#2557b3 40%,#1a3a7a 75%,#0f172a 100%);border-radius:16px 16px 0 0;padding:44px 40px 36px;text-align:center;">
+    <img src="${this.logoUrl}" alt="Jason Hogan" width="180" style="display:block;margin:0 auto 24px;max-width:180px;height:auto;opacity:0.95;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
+    <tr><td style="background:#000000;border-radius:20px;padding:6px 20px;">
+        <span style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#ffffff;font-weight:700;">Audio Transcription</span>
+    </td></tr>
+    </table>
+    <div style="width:48px;height:2px;background:rgba(255,255,255,0.25);margin:0 auto 16px;border-radius:1px;"></div>
+    <h1 style="margin:0 0 0;font-size:22px;font-weight:700;color:#ffffff;line-height:1.35;letter-spacing:-0.3px;">${this._esc(title)}</h1>
+    <p style="margin:14px 0 0;font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:0.5px;">${date}</p>
 </td></tr>
 
 <!-- BODY -->
@@ -170,7 +179,7 @@ ${this._consultationBanner()}
     <!-- Info box -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
     <tr><td style="padding:28px 40px;">
-        <div style="background:#f8fafc;border-left:3px solid #2563eb;border-radius:0 8px 8px 0;padding:20px 24px;">
+        <div style="background:#f8fafc;border-radius:8px;padding:20px 24px;">
             <p style="margin:0;font-size:15px;color:#334155;line-height:26px;">The attached PDF contains the complete transcript of your audio recording. Open the attachment to read the full text.</p>
         </div>
     </td></tr>
@@ -184,8 +193,7 @@ ${this._consultationBanner()}
 
 <!-- FOOTER -->
 <tr><td style="background:#0f172a;border-radius:0 0 16px 16px;padding:28px 40px;text-align:center;">
-    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;">Sent via <strong style="color:rgba(255,255,255,0.7);">Botson Transcribe</strong> by Jason Hogan</p>
-    <p style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,0.3);">${date}</p>
+    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;">Transcription &amp; Learning Tool developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:underline;">Jason Hogan</a></p>
 </td></tr>
 
 </table>
@@ -204,8 +212,8 @@ ${this._consultationBanner()}
 <tr><td style="background:#ffffff;padding:0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
     <tr><td style="padding:28px 40px 8px;text-align:center;">
-        <h2 style="margin:0 0 4px;font-size:20px;font-weight:800;color:#1e293b;">My contact information</h2>
-        <p style="margin:0 0 20px;font-size:13px;color:#64748b;">Make sure to connect with me on <a href="https://www.linkedin.com/in/jasonhogan333/" style="color:#2563eb;text-decoration:underline;font-weight:600;">Linkedin</a></p>
+        <h2 style="margin:0 0 6px;font-size:28px;font-weight:800;color:#1e293b;">My contact information</h2>
+        <p style="margin:0 0 24px;font-size:15px;color:#64748b;">Make sure to connect with me on <a href="https://www.linkedin.com/in/jasonhogan333/" style="color:#2563eb;text-decoration:underline;font-weight:600;">LinkedIn</a></p>
     </td></tr>
     </table>
 
@@ -303,7 +311,15 @@ ${this._consultationBanner()}
     /**
      * Botson greeting section — mascot on left delivering the message, text on right
      */
+    _getGreeting() {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good morning!';
+        if (hour < 17) return 'Good afternoon!';
+        return 'Good evening!';
+    },
+
     _greetingSection(bodyText) {
+        const greeting = this._getGreeting();
         return `
     <!-- Greeting with Botson -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -316,7 +332,7 @@ ${this._consultationBanner()}
             </td>
             <!-- Greeting Text -->
             <td valign="middle" style="padding:0;">
-                <p style="margin:0;font-size:20px;font-weight:700;color:#1e293b;line-height:28px;font-family:Georgia,'Times New Roman',serif;">Hello there!</p>
+                <p style="margin:0;font-size:20px;font-weight:700;color:#1e293b;line-height:28px;font-family:Georgia,'Times New Roman',serif;">${greeting}</p>
                 <p style="margin:10px 0 0;font-size:15px;color:#475569;line-height:26px;">${bodyText}</p>
             </td>
         </tr>
@@ -534,11 +550,16 @@ ${this._consultationBanner()}
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.06);">
 
 <!-- HEADER -->
-<tr><td style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#7c3aed 100%);border-radius:16px 16px 0 0;padding:36px 40px 32px;text-align:center;">
-    <img src="${this.logoUrl}" alt="Jason Hogan" width="200" style="display:block;margin:0 auto 20px;max-width:200px;height:auto;">
-    <p style="margin:0;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);font-weight:600;">Learning Analysis Report</p>
-    <h1 style="margin:10px 0 0;font-size:24px;font-weight:700;color:#ffffff;line-height:1.3;">${this._esc(title)}</h1>
-    <p style="margin:12px 0 0;font-size:13px;color:rgba(255,255,255,0.6);">${date}</p>
+<tr><td style="background:linear-gradient(to bottom,#4b8be8 0%,#2557b3 40%,#1a3a7a 75%,#0f172a 100%);border-radius:16px 16px 0 0;padding:44px 40px 36px;text-align:center;">
+    <img src="${this.logoUrl}" alt="Jason Hogan" width="180" style="display:block;margin:0 auto 24px;max-width:180px;height:auto;opacity:0.95;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
+    <tr><td style="background:#000000;border-radius:20px;padding:6px 20px;">
+        <span style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#ffffff;font-weight:700;">Learning Analysis</span>
+    </td></tr>
+    </table>
+    <div style="width:48px;height:2px;background:rgba(255,255,255,0.25);margin:0 auto 16px;border-radius:1px;"></div>
+    <h1 style="margin:0 0 0;font-size:22px;font-weight:700;color:#ffffff;line-height:1.35;letter-spacing:-0.3px;">${this._esc(title)}</h1>
+    <p style="margin:14px 0 0;font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:0.5px;">${date}</p>
 </td></tr>
 
 <!-- BODY -->
@@ -570,8 +591,7 @@ ${this._consultationBanner()}
 
 <!-- FOOTER -->
 <tr><td style="background:#0f172a;border-radius:0 0 16px 16px;padding:28px 40px;text-align:center;">
-    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;">Sent via <strong style="color:rgba(255,255,255,0.7);">Botson Transcribe</strong> by Jason Hogan</p>
-    <p style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,0.3);">${date}</p>
+    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;">Transcription &amp; Learning Tool developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:underline;">Jason Hogan</a></p>
 </td></tr>
 
 </table>

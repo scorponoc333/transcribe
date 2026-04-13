@@ -59,6 +59,7 @@ try {
             'whisperModel',
             'footerText',
             'loginAnimation', 'loginAnimationEnabled',
+            'loginAnimationOpacity', 'loginAnimationSpeed',
         ];
 
         $stmt = $db->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (:key, :value)

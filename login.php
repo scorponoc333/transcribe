@@ -24,7 +24,7 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In — Transcribe AI</title>
-    <link rel="icon" type="image/png" href="img/logo.png">
+    <link rel="icon" type="image/png" href="img/fav%20icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -55,10 +55,7 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                 <div class="login-logo">
                     <img src="img/logo.png" alt="Transcribe AI">
                 </div>
-                <div class="login-title">
-                    <h1>Welcome Back</h1>
-                    <p>Sign in to Transcribe AI</p>
-                </div>
+                <p class="login-tagline">Transcription &amp; Learning Tool</p>
             </div>
             <div class="login-card-body">
 
@@ -153,7 +150,19 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
     </div>  <!-- close login-card -->
 
         <div class="login-footer">
-            Powered by Whisper AI & OpenRouter &middot; Transcribe AI by Botson
+            Transcribe AI developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Jason Hogan</a>
+        </div>
+    </div>
+
+    <!-- Login Success Transition Overlay -->
+    <div id="loginTransition" class="login-transition">
+        <div class="login-transition-box">
+            <canvas id="loginTransitionCanvas" width="420" height="420"></canvas>
+            <div class="login-transition-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h2 class="login-transition-title" id="loginTransitionTitle">Authenticating...</h2>
+            <p class="login-transition-subtitle" id="loginTransitionSubtitle">Verifying your credentials</p>
         </div>
     </div>
 
@@ -224,8 +233,7 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                 const data = await res.json();
 
                 if (data.success) {
-                    showAlert('Signed in! Redirecting...', 'success');
-                    setTimeout(() => { window.location.href = 'index.html'; }, 500);
+                    showLoginTransition();
                 } else {
                     showAlert(data.error || 'Login failed.');
                     setLoading(btn, false);
@@ -306,12 +314,142 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
         });
 
         // ═══════════════════════════════════════════════
+        //  LOGIN SUCCESS TRANSITION
+        // ═══════════════════════════════════════════════
+        function showLoginTransition() {
+            const overlay = document.getElementById('loginTransition');
+            const titleEl = document.getElementById('loginTransitionTitle');
+            const subtitleEl = document.getElementById('loginTransitionSubtitle');
+            overlay.classList.add('active');
+
+            // Start plasma particles on the transition canvas
+            const tc = document.getElementById('loginTransitionCanvas');
+            const tctx = tc.getContext('2d');
+            const tw = tc.width, th = tc.height;
+            const colors = [
+                [59,130,246],[96,165,250],[139,92,246],[168,85,247],
+                [236,72,153],[244,114,182],[6,182,212],[20,184,166],
+                [99,102,241],[245,158,11],[16,185,129],[251,113,133]
+            ];
+            const particles = [];
+            for (let i = 0; i < 100; i++) {
+                const angle = (i / 100) * Math.PI * 2;
+                const r = 20 + Math.random() * 180;
+                const col = colors[Math.floor(Math.random() * colors.length)];
+                particles.push({
+                    x: tw/2, y: th/2, angle, radius: r, speed: 0.008 + Math.random() * 0.022,
+                    size: 1.5 + Math.random() * 4, r: col[0], g: col[1], b: col[2],
+                    alpha: 0.4 + Math.random() * 0.6, phase: Math.random() * Math.PI * 2,
+                    phaseSpeed: 0.02 + Math.random() * 0.04,
+                    trail: [], trailMax: 3 + Math.floor(Math.random() * 5),
+                    sparkle: Math.random() > 0.65, sparklePhase: Math.random() * Math.PI * 2,
+                });
+            }
+            let time = 0;
+            let tAnimFrame;
+            function drawTransition() {
+                tctx.clearRect(0, 0, tw, th);
+                time += 0.016;
+                const cx = tw/2, cy = th/2;
+                // Soft glow
+                const bg = tctx.createRadialGradient(cx, cy, 0, cx, cy, 190);
+                bg.addColorStop(0, `rgba(99,102,241,${0.06 + 0.03 * Math.sin(time)})`);
+                bg.addColorStop(1, 'rgba(0,0,0,0)');
+                tctx.fillStyle = bg;
+                tctx.fillRect(0, 0, tw, th);
+                // Lines
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i+1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+                        const d = Math.sqrt(dx*dx+dy*dy);
+                        if (d < 80) {
+                            tctx.save(); tctx.globalAlpha = (1 - d/50) * 0.1;
+                            tctx.strokeStyle = `rgb(${particles[i].r},${particles[i].g},${particles[i].b})`;
+                            tctx.lineWidth = 0.5;
+                            tctx.beginPath(); tctx.moveTo(particles[i].x, particles[i].y); tctx.lineTo(particles[j].x, particles[j].y); tctx.stroke();
+                            tctx.restore();
+                        }
+                    }
+                }
+                particles.forEach(p => {
+                    p.angle += p.speed; p.phase += p.phaseSpeed; p.sparklePhase += 0.08;
+                    const wobble = Math.sin(time * 1.5 + p.phase) * 6;
+                    const breathe = 1 + 0.15 * Math.sin(time * 0.4 + p.phase * 2);
+                    p.x = cx + Math.cos(p.angle) * (p.radius * breathe + wobble);
+                    p.y = cy + Math.sin(p.angle) * (p.radius * breathe + wobble);
+                    p.trail.push({x: p.x, y: p.y}); if (p.trail.length > p.trailMax) p.trail.shift();
+                    const alpha = p.alpha * (0.5 + 0.5 * Math.sin(p.phase));
+                    const col = `${p.r},${p.g},${p.b}`;
+                    tctx.save();
+                    // Glow
+                    tctx.globalAlpha = alpha * 0.15;
+                    const glow = tctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 5);
+                    glow.addColorStop(0, `rgba(${col},0.4)`); glow.addColorStop(1, `rgba(${col},0)`);
+                    tctx.fillStyle = glow; tctx.beginPath(); tctx.arc(p.x, p.y, p.size * 5, 0, Math.PI * 2); tctx.fill();
+                    // Core
+                    tctx.globalAlpha = alpha; tctx.fillStyle = `rgb(${col})`; tctx.beginPath(); tctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); tctx.fill();
+                    // Bright center
+                    tctx.globalAlpha = alpha * 0.7; tctx.fillStyle = 'rgba(255,255,255,0.7)'; tctx.beginPath(); tctx.arc(p.x, p.y, p.size * 0.3, 0, Math.PI * 2); tctx.fill();
+                    // Sparkle
+                    if (p.sparkle && Math.sin(p.sparklePhase) > 0.3) {
+                        tctx.globalAlpha = Math.sin(p.sparklePhase) * alpha * 0.6;
+                        tctx.fillStyle = '#fff';
+                        const s = p.size * 2;
+                        tctx.beginPath(); tctx.moveTo(p.x-s,p.y); tctx.lineTo(p.x,p.y-1); tctx.lineTo(p.x+s,p.y); tctx.lineTo(p.x,p.y+1); tctx.closePath(); tctx.fill();
+                        tctx.beginPath(); tctx.moveTo(p.x,p.y-s); tctx.lineTo(p.x-1,p.y); tctx.lineTo(p.x,p.y+s); tctx.lineTo(p.x+1,p.y); tctx.closePath(); tctx.fill();
+                    }
+                    tctx.restore();
+                });
+                tAnimFrame = requestAnimationFrame(drawTransition);
+            }
+            drawTransition();
+
+            // Cycling text messages
+            const messages = [
+                'Verifying your credentials...',
+                'Securing your session...',
+                'Loading your workspace...',
+                'Preparing your dashboard...',
+                'Initializing transcription engine...',
+                'Almost there...',
+                'Setting up your environment...',
+                'Connecting to AI services...',
+            ];
+            let msgIdx = 0;
+            const msgInterval = setInterval(() => {
+                subtitleEl.style.opacity = '0';
+                setTimeout(() => {
+                    msgIdx = (msgIdx + 1) % messages.length;
+                    subtitleEl.textContent = messages[msgIdx];
+                    subtitleEl.style.opacity = '1';
+                }, 300);
+            }, 1800);
+
+            // After ~3 seconds, animate lock icon change and exit
+            setTimeout(() => {
+                titleEl.textContent = 'Welcome!';
+                subtitleEl.textContent = 'Launching Transcribe AI...';
+                // Change lock to unlocked
+                document.querySelector('.login-transition-icon').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
+            }, 2500);
+
+            setTimeout(() => {
+                clearInterval(msgInterval);
+                cancelAnimationFrame(tAnimFrame);
+                overlay.classList.add('exit');
+                setTimeout(() => { window.location.href = 'index.html'; }, 700);
+            }, 3500);
+        }
+
+        // ═══════════════════════════════════════════════
         //  LOGIN PAGE ANIMATIONS
         // ═══════════════════════════════════════════════
 
         const canvas = document.getElementById('loginAnimationCanvas');
         const ctx = canvas.getContext('2d');
         let animFrame = null;
+        let animOpacity = 0.5;
+        let animSpeed = 1.0;
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -325,6 +463,12 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
             .then(r => r.json())
             .then(data => {
                 const s = data.settings || {};
+                // Apply opacity (0-100 → 0-1)
+                animOpacity = Math.max(0.1, Math.min(1, (parseInt(s.loginAnimationOpacity) || 50) / 100));
+                canvas.style.opacity = animOpacity;
+                // Apply speed (10-200 → 0.2-4.0 multiplier)
+                animSpeed = Math.max(0.2, Math.min(4, (parseInt(s.loginAnimationSpeed) || 50) / 50));
+
                 if (s.loginAnimationEnabled === '1' || s.loginAnimationEnabled === 'true') {
                     startAnimation(s.loginAnimation || 'constellations');
                 }
@@ -382,8 +526,8 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                     ctx.fillStyle = 'rgba(140,200,255,0.7)';
                     ctx.fill();
-                    p.x += p.vx;
-                    p.y += p.vy;
+                    p.x += p.vx * animSpeed;
+                    p.y += p.vy * animSpeed;
                     if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
                     if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
                 }
@@ -416,8 +560,8 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 for (let i = pts.length - 1; i >= 0; i--) {
                     const p = pts[i];
-                    p.x += p.vx;
-                    p.y += p.vy;
+                    p.x += p.vx * animSpeed;
+                    p.y += p.vy * animSpeed;
                     p.life++;
                     const fade = Math.max(0, p.alpha * (1 - p.y / -200));
                     if (p.y < -10) {
@@ -440,8 +584,12 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
             const cols = Math.ceil(canvas.width / fontSize);
             const drops = new Array(cols).fill(0).map(() => Math.random() * -100);
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()アイウエオカキクケコサシスセソ';
+            let acc = 0;
 
             function draw() {
+                acc += animSpeed;
+                if (acc < 1) { animFrame = requestAnimationFrame(draw); return; }
+                acc = 0;
                 ctx.fillStyle = 'rgba(10, 15, 30, 0.06)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.font = fontSize + 'px monospace';
@@ -449,13 +597,11 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                 for (let i = 0; i < cols; i++) {
                     const char = chars[Math.floor(Math.random() * chars.length)];
                     const y = drops[i] * fontSize;
-                    // Head char is brighter
-                    ctx.fillStyle = `rgba(80,200,120,0.9)`;
+                    ctx.fillStyle = `rgba(100,180,255,0.9)`;
                     ctx.fillText(char, i * fontSize, y);
-                    // Trail chars are dimmer
                     if (drops[i] > 1) {
                         const prevChar = chars[Math.floor(Math.random() * chars.length)];
-                        ctx.fillStyle = `rgba(0,180,80,0.25)`;
+                        ctx.fillStyle = `rgba(59,130,246,0.25)`;
                         ctx.fillText(prevChar, i * fontSize, y - fontSize);
                     }
 
@@ -492,7 +638,7 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                     ctx.lineWidth = 2;
                     ctx.stroke();
                 }
-                time += 0.015;
+                time += 0.015 * animSpeed;
                 animFrame = requestAnimationFrame(draw);
             }
             draw();
@@ -539,8 +685,8 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                     ctx.fill();
 
                     // Drift
-                    f.x += f.vx + Math.sin(t * 0.005 + f.phase) * 0.3;
-                    f.y += f.vy + Math.cos(t * 0.004 + f.phase) * 0.3;
+                    f.x += (f.vx + Math.sin(t * 0.005 + f.phase) * 0.3) * animSpeed;
+                    f.y += (f.vy + Math.cos(t * 0.004 + f.phase) * 0.3) * animSpeed;
                     if (f.x < -20) f.x = canvas.width + 20;
                     if (f.x > canvas.width + 20) f.x = -20;
                     if (f.y < -20) f.y = canvas.height + 20;
@@ -570,9 +716,9 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
             function draw() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 for (const f of flakes) {
-                    f.wobble += f.wobbleSpeed;
-                    f.x += f.vx + Math.sin(f.wobble) * 0.5;
-                    f.y += f.vy;
+                    f.wobble += f.wobbleSpeed * animSpeed;
+                    f.x += (f.vx + Math.sin(f.wobble) * 0.5) * animSpeed;
+                    f.y += f.vy * animSpeed;
                     if (f.y > canvas.height + 10) {
                         f.y = -10;
                         f.x = Math.random() * canvas.width;

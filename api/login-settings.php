@@ -11,7 +11,7 @@ require_once __DIR__ . '/db.php';
 
 try {
     $db = getDB();
-    $stmt = $db->query("SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('loginAnimation', 'loginAnimationEnabled')");
+    $stmt = $db->query("SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('loginAnimation', 'loginAnimationEnabled', 'loginAnimationOpacity', 'loginAnimationSpeed')");
     $settings = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['setting_key']] = $row['setting_value'];

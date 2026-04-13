@@ -42,6 +42,7 @@ const App = {
         }
         Users.init();
         this.initAutocomplete();
+        this.initWorkflowAutocomplete();
         this.loadCoverPages();
     },
 
@@ -76,30 +77,26 @@ const App = {
         if (!this.currentUser) return;
         const role = this.currentUser.role;
 
-        // Nav buttons visibility
         const usersBtn = document.getElementById('usersBtn');
         const settingsBtn = document.getElementById('settingsBtn');
         const analyticsBtn = document.getElementById('analyticsBtn');
-        const contactsBtn = document.getElementById('contactsBtn');
+        const peopleDropdown = document.getElementById('peopleDropdown');
 
         if (role === 'admin') {
-            // Admin: full access
             if (usersBtn) usersBtn.style.display = '';
             if (settingsBtn) settingsBtn.style.display = '';
             if (analyticsBtn) analyticsBtn.style.display = '';
-            if (contactsBtn) contactsBtn.style.display = '';
+            if (peopleDropdown) peopleDropdown.style.display = '';
         } else if (role === 'manager') {
-            // Manager: no Settings, no Users
             if (usersBtn) usersBtn.style.display = 'none';
             if (settingsBtn) settingsBtn.style.display = 'none';
             if (analyticsBtn) analyticsBtn.style.display = '';
-            if (contactsBtn) contactsBtn.style.display = '';
+            if (peopleDropdown) peopleDropdown.style.display = '';
         } else {
-            // User: only History visible, no Settings/Analytics/Contacts/Users
             if (usersBtn) usersBtn.style.display = 'none';
             if (settingsBtn) settingsBtn.style.display = 'none';
             if (analyticsBtn) analyticsBtn.style.display = 'none';
-            if (contactsBtn) contactsBtn.style.display = 'none';
+            if (peopleDropdown) peopleDropdown.style.display = 'none';
         }
     },
 
@@ -216,13 +213,16 @@ const App = {
         // Upload zone
         const dz = this.dom.dropZone;
         dz.addEventListener('click', () => this.dom.fileInput.click());
-        dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); });
-        dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+        dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); this._startDropZoneVortex(true); });
+        dz.addEventListener('dragleave', () => { dz.classList.remove('dragover'); this._startDropZoneVortex(false); });
         dz.addEventListener('drop', (e) => {
             e.preventDefault();
             dz.classList.remove('dragover');
+            this._stopDropZoneVortex();
             if (e.dataTransfer.files.length) this.handleFile(e.dataTransfer.files[0]);
         });
+        dz.addEventListener('mouseenter', () => this._startDropZoneVortex(false));
+        dz.addEventListener('mouseleave', () => { if (!dz.classList.contains('dragover')) this._stopDropZoneVortex(); });
         this.dom.fileInput.addEventListener('change', (e) => {
             if (e.target.files.length) this.handleFile(e.target.files[0]);
         });
@@ -306,6 +306,9 @@ const App = {
         this.dom.emailClose.addEventListener('click', () => this.closeEmailModal());
         this.dom.sendEmailSubmit.addEventListener('click', () => this.sendEmail());
 
+        // Transcribe home button
+        document.getElementById('transcribeBtn_nav')?.addEventListener('click', () => this.resetToUpload());
+
         // History
         document.getElementById('historyBtn').addEventListener('click', () => this.showHistory());
         document.getElementById('historyBackBtn').addEventListener('click', () => this.showSection('upload'));
@@ -314,11 +317,27 @@ const App = {
         document.getElementById('analyticsBtn').addEventListener('click', () => this.showAnalytics());
         document.getElementById('analyticsBackBtn').addEventListener('click', () => this.showSection('upload'));
 
+        // People dropdown
+        document.getElementById('peopleBtn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dd = document.getElementById('peopleDropdown');
+            dd.classList.toggle('open');
+        });
+        document.addEventListener('click', () => {
+            document.getElementById('peopleDropdown')?.classList.remove('open');
+        });
+
         // Contacts
-        document.getElementById('contactsBtn')?.addEventListener('click', () => this.showContacts());
+        document.getElementById('contactsBtn')?.addEventListener('click', () => {
+            document.getElementById('peopleDropdown')?.classList.remove('open');
+            this.showContacts();
+        });
 
         // Users (admin only)
-        document.getElementById('usersBtn')?.addEventListener('click', () => this.showUsers());
+        document.getElementById('usersBtn')?.addEventListener('click', () => {
+            document.getElementById('peopleDropdown')?.classList.remove('open');
+            this.showUsers();
+        });
         document.getElementById('usersBackBtn')?.addEventListener('click', () => this.showSection('upload'));
 
         // Logout
@@ -379,6 +398,10 @@ const App = {
         const titleEl = document.getElementById('fileSectionTitle');
         const subtitleEl = document.getElementById('fileSectionSubtitle');
         const btnText = document.getElementById('transcribeBtnText');
+        const typeToggleWrapper = document.querySelector('.type-toggle-wrapper');
+
+        // Hide the type toggle when in learning mode (user already chose it)
+        if (typeToggleWrapper) typeToggleWrapper.style.display = mode === 'learning' ? 'none' : '';
 
         if (mode === 'learning') {
             if (audioArea) audioArea.style.display = 'none';
@@ -420,14 +443,8 @@ const App = {
             return;
         }
 
-        this.currentFile = file;
-        this.dom.fileName.textContent = file.name;
-        this.dom.fileSize.textContent = this.formatFileSize(file.size);
-
-        const url = URL.createObjectURL(file);
-        this.dom.audioPlayer.src = url;
-
-        this.showSection('file');
+        // Launch the workflow lightbox instead of going to file section
+        this.startWorkflow(file);
     },
 
     // ---- Transcription ----
@@ -439,10 +456,13 @@ const App = {
 
         if (!this.currentFile) return;
 
-        API.clearPendingCosts(); // Reset cost tracking for new transcription
+        this._bgTranscribing = true;
+        this._bgResult = null;
+        API.clearPendingCosts();
         this.showSection('processing');
         this.startTimer();
         this.startWaveformAnimation();
+        this.startParticleAnimation('particleCanvas', 60);
         this.dom.processingStatus.textContent = 'Uploading audio file...';
         this.dom.processingSubstatus.textContent = 'Sending to Whisper for transcription';
 
@@ -461,6 +481,7 @@ const App = {
             this.transcript = result.transcript;
             this.stopTimer();
             this.stopWaveformAnimation();
+            this.stopParticleAnimation();
 
             // Language detection & translation (if OpenRouter key available)
             const apiKey = this.getSetting('openRouterApiKey');
@@ -477,7 +498,16 @@ const App = {
             }
 
             this.displayTranscript();
-            this.showSection('results');
+            this._bgTranscribing = false;
+
+            // If user navigated away, show floating complete indicator
+            if (this.state !== 'processing') {
+                this.showFloatingComplete();
+                // Still do AI analysis in background if meeting
+            } else {
+                this.hideFloatingIndicator();
+                this.showSection('results');
+            }
             this.showToast('Transcription complete!', 'success');
 
             // AI analysis only for meeting mode
@@ -508,6 +538,9 @@ const App = {
         } catch (error) {
             this.stopTimer();
             this.stopWaveformAnimation();
+            this.stopParticleAnimation();
+            this._bgTranscribing = false;
+            this.hideFloatingIndicator();
             this.showError(error.message);
         }
     },
@@ -567,8 +600,10 @@ const App = {
             }
             transcriptSource = 'youtube';
 
+            this._bgTranscribing = true;
             this.showSection('processing');
             this.startTimer();
+            this.startParticleAnimation('particleCanvas', 60);
             this.dom.processingStatus.textContent = 'Fetching YouTube transcript...';
             this.dom.processingSubstatus.textContent = 'Pulling captions from the video';
 
@@ -578,6 +613,9 @@ const App = {
                 if (!transcriptText) throw new Error('No transcript available for this video');
             } catch (err) {
                 this.stopTimer();
+                this.stopParticleAnimation();
+                this._bgTranscribing = false;
+                this.hideFloatingIndicator();
                 this.showError('YouTube transcript fetch failed: ' + err.message);
                 return;
             }
@@ -588,8 +626,10 @@ const App = {
                 return;
             }
             transcriptSource = 'text';
+            this._bgTranscribing = true;
             this.showSection('processing');
             this.startTimer();
+            this.startParticleAnimation('particleCanvas', 60);
         }
 
         this.transcript = transcriptText;
@@ -600,9 +640,16 @@ const App = {
             const objective = document.getElementById('learningObjective')?.value.trim() || '';
             this.analysis = await API.analyzeLearning(transcriptText, objective, apiKey);
             this.stopTimer();
+            this.stopParticleAnimation();
+            this._bgTranscribing = false;
             this.displayTranscript();
             this.displayLearningResults(this.analysis);
-            this.showSection('results');
+            if (this.state !== 'processing') {
+                this.showFloatingComplete();
+            } else {
+                this.hideFloatingIndicator();
+                this.showSection('results');
+            }
             this.showToast('Learning analysis complete!', 'success');
 
             // Set title from analysis
@@ -618,6 +665,9 @@ const App = {
             this.saveToDatabase(transcriptSource);
         } catch (error) {
             this.stopTimer();
+            this.stopParticleAnimation();
+            this._bgTranscribing = false;
+            this.hideFloatingIndicator();
             this.showError('Learning analysis failed: ' + error.message);
         }
     },
@@ -895,7 +945,7 @@ const App = {
 
     // ---- Export PDF ----
     async exportPdf() {
-        this.showLoading('Generating PDF...');
+        this.showLoading('Generating PDF...', 'pdf');
         try {
             const filename = this.currentFile?.name?.replace(/\.[^.]+$/, '') || 'transcript';
             const coverPath = this.selectedCoverPage || 'img/covers/default-cover.png';
@@ -937,6 +987,12 @@ const App = {
             });
 
             this.transcriptionId = saveResult.id;
+            this._bgResult = { transcriptionId: saveResult.id };
+
+            // Auto-send email if workflow requested it
+            if (this._workflowEmailAddress) {
+                this._autoSendWorkflowEmail(saveResult.id);
+            }
 
             // Extract attendees from AI analysis (meeting mode) — match against contacts for emails
             if (this.audioMode === 'meeting' && this.analysis?.attendees?.length) {
@@ -1017,7 +1073,23 @@ const App = {
     },
 
     closeEmailModal() {
-        this.dom.emailModal.classList.remove('active');
+        this._bounceCloseModal(this.dom.emailModal);
+    },
+
+    _setFooterText(el, text) {
+        const defaultText = 'Transcription & Learning Tool developed by Jason Hogan';
+        const display = text || defaultText;
+        // Auto-link "Jason Hogan" to LinkedIn
+        const linked = display.replace(/Jason Hogan/g, '<a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Jason Hogan</a>');
+        el.innerHTML = linked;
+    },
+
+    _bounceCloseModal(overlay) {
+        if (!overlay || !overlay.classList.contains('active')) return;
+        overlay.classList.add('closing');
+        setTimeout(() => {
+            overlay.classList.remove('active', 'closing');
+        }, 400);
     },
 
     async sendEmail() {
@@ -1113,7 +1185,8 @@ const App = {
     },
 
     // ---- History ----
-    showHistory() {
+    _showHistoryOld() {
+        // Replaced by the new showHistory with loading animation
         this.showSection('history');
         History.load();
     },
@@ -1162,6 +1235,13 @@ const App = {
         Object.entries(sectionMap).forEach(([key, el]) => {
             if (el) el.classList.toggle('active', key === name);
         });
+
+        // Show floating indicator if navigating away from processing during transcription
+        if (this._bgTranscribing && name !== 'processing') {
+            this.showFloatingIndicator();
+        } else if (name === 'processing' && this._bgTranscribing) {
+            this.hideFloatingIndicator();
+        }
 
         this.state = name;
     },
@@ -1232,13 +1312,53 @@ const App = {
         document.addEventListener('keydown', escClose);
     },
 
-    showLoading(text) {
+    _loadingOverlayTextInterval: null,
+    _emailLoadingMessages: [
+        'This will just take a moment',
+        'Generating your PDF report...',
+        'Formatting the email template...',
+        'Attaching your transcript...',
+        'Connecting to mail server...',
+        'Sending your email...',
+        'Almost done...',
+    ],
+
+    showLoading(text, icon) {
         this.dom.loadingText.textContent = text;
         this.dom.loadingOverlay.classList.add('active');
+        this.startMiniParticles('loadingOverlayCanvas', 35);
+
+        // Set icon
+        const iconEl = document.getElementById('loadingOverlayIcon');
+        if (iconEl && icon === 'pdf') {
+            iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+        } else if (iconEl) {
+            iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+        }
+
+        // Cycle subtitle text
+        const subtextEl = document.getElementById('loadingSubtext');
+        if (subtextEl) {
+            let idx = 0;
+            subtextEl.textContent = this._emailLoadingMessages[0];
+            this._loadingOverlayTextInterval = setInterval(() => {
+                subtextEl.style.opacity = '0';
+                setTimeout(() => {
+                    idx = (idx + 1) % this._emailLoadingMessages.length;
+                    subtextEl.textContent = this._emailLoadingMessages[idx];
+                    subtextEl.style.opacity = '1';
+                }, 300);
+            }, 2000);
+        }
     },
 
     hideLoading() {
+        if (this._loadingOverlayTextInterval) {
+            clearInterval(this._loadingOverlayTextInterval);
+            this._loadingOverlayTextInterval = null;
+        }
         this.dom.loadingOverlay.classList.remove('active');
+        this.stopMiniParticles('loadingOverlayCanvas');
     },
 
     // ---- Waveform ----
@@ -1303,6 +1423,14 @@ const App = {
         // Load cover pages in settings tab
         this.renderSettingsCoverPages();
 
+        // Load login background preview
+        this._loadLoginBgPreview();
+
+        // Sync theme buttons
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.getElementById('themeLight')?.classList.toggle('active', !isDark);
+        document.getElementById('themeDark')?.classList.toggle('active', isDark);
+
         // Reset to first tab
         document.querySelectorAll('.settings-tab').forEach(b => b.classList.toggle('active', b.dataset.stab === 'ai'));
         document.querySelectorAll('.settings-panel').forEach(p => p.classList.toggle('active', p.dataset.stabPanel === 'ai'));
@@ -1345,10 +1473,22 @@ const App = {
         const animSelect = document.getElementById('loginAnimationSelect');
         if (animEnabled) animEnabled.checked = settings.loginAnimationEnabled === '1' || settings.loginAnimationEnabled === 'true';
         if (animSelect) animSelect.value = settings.loginAnimation || 'constellations';
+
+        // Animation opacity & speed
+        const animOpacity = document.getElementById('loginAnimationOpacity');
+        const animSpeed = document.getElementById('loginAnimationSpeed');
+        if (animOpacity) {
+            animOpacity.value = settings.loginAnimationOpacity || '50';
+            document.getElementById('animOpacityVal').textContent = animOpacity.value;
+        }
+        if (animSpeed) {
+            animSpeed.value = settings.loginAnimationSpeed || '50';
+            document.getElementById('animSpeedVal').textContent = animSpeed.value;
+        }
     },
 
     closeSettings() {
-        this.dom.settingsModal.classList.remove('active');
+        this._bounceCloseModal(this.dom.settingsModal);
     },
 
     async saveSettings() {
@@ -1367,6 +1507,8 @@ const App = {
             footerText: (document.getElementById('footerTextInput')?.value || '').trim(),
             loginAnimationEnabled: document.getElementById('loginAnimationEnabled')?.checked ? '1' : '0',
             loginAnimation: document.getElementById('loginAnimationSelect')?.value || 'constellations',
+            loginAnimationOpacity: document.getElementById('loginAnimationOpacity')?.value || '50',
+            loginAnimationSpeed: document.getElementById('loginAnimationSpeed')?.value || '50',
         };
 
         try {
@@ -1378,7 +1520,7 @@ const App = {
             // Apply footer text to DOM
             const footerEl = document.getElementById('appFooterText');
             if (footerEl) {
-                footerEl.textContent = fields.footerText || 'Powered by Whisper AI & OpenRouter \u00b7 Transcribe AI by Botson';
+                this._setFooterText(footerEl, fields.footerText);
             }
             this.closeSettings();
             this.showToast('Settings saved successfully', 'success');
@@ -1400,7 +1542,7 @@ const App = {
             // Apply footer text
             if (settings.footerText) {
                 const footerEl = document.getElementById('appFooterText');
-                if (footerEl) footerEl.textContent = settings.footerText;
+                if (footerEl) this._setFooterText(footerEl, settings.footerText);
             }
 
             if (!settings.openRouterApiKey) {
@@ -1485,17 +1627,28 @@ const App = {
         if (saved === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
+        // Sync settings UI
+        const isDark = saved === 'dark';
+        document.getElementById('themeLight')?.classList.toggle('active', !isDark);
+        document.getElementById('themeDark')?.classList.toggle('active', isDark);
     },
 
     toggleTheme() {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        if (isDark) {
-            document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('theme', 'light');
-        } else {
+        this.setThemeFromSettings(isDark ? 'light' : 'dark');
+    },
+
+    setThemeFromSettings(theme) {
+        if (theme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
             localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
         }
+        // Update settings UI buttons
+        document.getElementById('themeLight')?.classList.toggle('active', theme === 'light');
+        document.getElementById('themeDark')?.classList.toggle('active', theme === 'dark');
     },
 
     // ---- Utilities ----
@@ -1707,6 +1860,31 @@ const App = {
     },
 
     // ---- Login Background ----
+    _loadLoginBgPreview() {
+        const preview = document.getElementById('loginBgPreview');
+        const placeholder = document.getElementById('loginBgPlaceholder');
+        if (!preview) return;
+        // Try common extensions
+        const exts = ['png', 'jpg', 'jpeg', 'webp'];
+        let found = false;
+        const tryNext = (i) => {
+            if (i >= exts.length) {
+                preview.style.display = 'none';
+                if (placeholder) placeholder.style.display = '';
+                return;
+            }
+            const img = new Image();
+            img.onload = () => {
+                preview.src = `img/login-bg.${exts[i]}?t=${Date.now()}`;
+                preview.style.display = '';
+                if (placeholder) placeholder.style.display = 'none';
+            };
+            img.onerror = () => tryNext(i + 1);
+            img.src = `img/login-bg.${exts[i]}?t=${Date.now()}`;
+        };
+        tryNext(0);
+    },
+
     async uploadLoginBackground(file) {
         try {
             this.showToast('Uploading login background...', 'info');
@@ -1722,7 +1900,12 @@ const App = {
             this.showToast('Login background updated!', 'success');
             // Update preview
             const preview = document.getElementById('loginBgPreview');
-            if (preview) preview.src = result.url + '?t=' + Date.now();
+            const placeholder = document.getElementById('loginBgPlaceholder');
+            if (preview) {
+                preview.src = result.url + '?t=' + Date.now();
+                preview.style.display = '';
+            }
+            if (placeholder) placeholder.style.display = 'none';
         } catch (err) {
             this.showToast('Failed: ' + err.message, 'error');
         }
@@ -1815,6 +1998,675 @@ const App = {
                 multiValue: false
             });
         }
+    },
+
+    // =====================================================
+    // DROP ZONE VORTEX ANIMATION
+    // =====================================================
+    _dropVortexId: null,
+    _dropVortexParticles: null,
+
+    _startDropZoneVortex(isDrag) {
+        if (this._dropVortexId) return; // already running
+        const canvas = document.getElementById('dropZoneCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        const w = rect.width, h = rect.height;
+        const cx = w / 2, cy = h / 2;
+
+        const colors = [
+            [59,130,246],[96,165,250],[147,197,253],
+            [139,92,246],[168,85,247],[192,132,252],
+            [236,72,153],[244,114,182],[251,113,133],
+            [99,102,241],[75,139,232],[14,165,233],
+            [6,182,212],[20,184,166],[245,158,11]
+        ];
+
+        // Create vortex particles
+        const count = isDrag ? 120 : 75;
+        const particles = [];
+        for (let i = 0; i < count; i++) {
+            const angle = (i / count) * Math.PI * 2;
+            const r = 30 + Math.random() * (Math.min(w, h) * 0.45);
+            const col = colors[Math.floor(Math.random() * colors.length)];
+            particles.push({
+                angle: angle,
+                radius: r,
+                targetRadius: r,
+                speed: 0.008 + Math.random() * 0.02,
+                size: 1 + Math.random() * 3,
+                r: col[0], g: col[1], b: col[2],
+                alpha: 0.2 + Math.random() * 0.5,
+                phase: Math.random() * Math.PI * 2,
+                drift: (Math.random() - 0.5) * 0.3,
+            });
+        }
+        this._dropVortexParticles = particles;
+        let time = 0;
+        const intensity = isDrag ? 1.5 : 1;
+
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            time += 0.016;
+
+            // Soft radial glow in center
+            const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.35);
+            glow.addColorStop(0, `rgba(59,130,246,${0.06 * intensity})`);
+            glow.addColorStop(0.6, `rgba(99,102,241,${0.03 * intensity})`);
+            glow.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, w, h);
+
+            particles.forEach(p => {
+                p.angle += p.speed * intensity;
+                p.phase += 0.03;
+
+                // Spiral inward slightly during drag
+                if (isDrag) {
+                    p.targetRadius = Math.max(15, p.targetRadius - 0.15);
+                }
+                p.radius += (p.targetRadius - p.radius) * 0.02;
+
+                const wobble = Math.sin(time * 2 + p.phase) * 6 * intensity;
+                const x = cx + Math.cos(p.angle) * (p.radius + wobble);
+                const y = cy + Math.sin(p.angle) * (p.radius + wobble);
+                const alpha = p.alpha * (0.5 + 0.5 * Math.sin(p.phase));
+
+                // Outer glow
+                ctx.save();
+                ctx.globalAlpha = alpha * 0.2;
+                ctx.fillStyle = `rgb(${p.r},${p.g},${p.b})`;
+                ctx.beginPath();
+                ctx.arc(x, y, p.size * 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Core
+                ctx.globalAlpha = alpha * 0.7;
+                ctx.beginPath();
+                ctx.arc(x, y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Bright dot
+                ctx.globalAlpha = alpha * 0.5;
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.beginPath();
+                ctx.arc(x, y, p.size * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            this._dropVortexId = requestAnimationFrame(animate);
+        };
+        animate();
+    },
+
+    _stopDropZoneVortex() {
+        if (this._dropVortexId) {
+            cancelAnimationFrame(this._dropVortexId);
+            this._dropVortexId = null;
+        }
+        const canvas = document.getElementById('dropZoneCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        this._dropVortexParticles = null;
+    },
+
+    // =====================================================
+    // PLASMA PARTICLE ANIMATION SYSTEM
+    // =====================================================
+    _particleAnimId: null,
+    _particleColors: [
+        [59,130,246],[139,92,246],[236,72,153],[245,158,11],
+        [6,182,212],[16,185,129],[244,63,94],[168,85,247],
+        [20,184,166],[99,102,241],[251,146,60],[52,211,153]
+    ],
+
+    _createPlasmaParticles(w, h, count) {
+        const particles = [];
+        const cx = w / 2, cy = h / 2;
+        for (let i = 0; i < count; i++) {
+            const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+            const radius = 15 + Math.random() * (Math.min(cx, cy) * 0.85);
+            const col = this._particleColors[Math.floor(Math.random() * this._particleColors.length)];
+            particles.push({
+                x: cx + Math.cos(angle) * radius,
+                y: cy + Math.sin(angle) * radius,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                size: 1 + Math.random() * 4,
+                r: col[0], g: col[1], b: col[2],
+                alpha: 0.4 + Math.random() * 0.6,
+                phase: Math.random() * Math.PI * 2,
+                phaseSpeed: 0.015 + Math.random() * 0.035,
+                orbitSpeed: (Math.random() - 0.5) * 0.012,
+                orbitRadius: radius,
+                orbitAngle: angle,
+                trail: [],
+                trailMax: 4 + Math.floor(Math.random() * 6),
+                sparkle: Math.random() > 0.7,
+                sparklePhase: Math.random() * Math.PI * 2,
+            });
+        }
+        return particles;
+    },
+
+    _drawPlasma(ctx, w, h, particles, time) {
+        // Soft radial background glow
+        const cx = w / 2, cy = h / 2;
+        const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.5);
+        bgGrad.addColorStop(0, `rgba(99,102,241,${0.04 + 0.02 * Math.sin(time * 0.5)})`);
+        bgGrad.addColorStop(0.5, `rgba(139,92,246,${0.02 + 0.01 * Math.sin(time * 0.7)})`);
+        bgGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Draw connections between nearby particles
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 60) {
+                    const alpha = (1 - dist / 60) * 0.12;
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.strokeStyle = `rgb(${particles[i].r},${particles[i].g},${particles[i].b})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        }
+
+        particles.forEach(p => {
+            p.orbitAngle += p.orbitSpeed;
+            p.phase += p.phaseSpeed;
+            p.sparklePhase += 0.08;
+
+            // Plasma-like orbital motion with wobble
+            const wobble = Math.sin(time * 1.5 + p.phase) * 8;
+            const breathe = 1 + 0.15 * Math.sin(time * 0.4 + p.phase * 2);
+            const ox = cx + Math.cos(p.orbitAngle) * (p.orbitRadius * breathe + wobble);
+            const oy = cy + Math.sin(p.orbitAngle) * (p.orbitRadius * breathe + wobble);
+            p.x += (ox - p.x) * 0.035 + p.vx;
+            p.y += (oy - p.y) * 0.035 + p.vy;
+
+            if (p.x < 0 || p.x > w) p.vx *= -0.8;
+            if (p.y < 0 || p.y > h) p.vy *= -0.8;
+            p.x = Math.max(0, Math.min(w, p.x));
+            p.y = Math.max(0, Math.min(h, p.y));
+
+            // Store trail
+            p.trail.push({ x: p.x, y: p.y });
+            if (p.trail.length > p.trailMax) p.trail.shift();
+
+            const pulseAlpha = 0.5 + 0.5 * Math.sin(p.phase);
+            const alpha = p.alpha * pulseAlpha;
+            const col = `${p.r},${p.g},${p.b}`;
+
+            // Trail
+            if (p.trail.length > 1) {
+                ctx.save();
+                for (let t = 0; t < p.trail.length - 1; t++) {
+                    const trailAlpha = (t / p.trail.length) * alpha * 0.25;
+                    const trailSize = p.size * (t / p.trail.length) * 0.6;
+                    ctx.globalAlpha = trailAlpha;
+                    ctx.fillStyle = `rgb(${col})`;
+                    ctx.beginPath();
+                    ctx.arc(p.trail[t].x, p.trail[t].y, trailSize, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            ctx.save();
+            // Outer plasma glow
+            ctx.globalAlpha = alpha * 0.15;
+            const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 6);
+            glow.addColorStop(0, `rgba(${col},0.4)`);
+            glow.addColorStop(1, `rgba(${col},0)`);
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mid glow
+            ctx.globalAlpha = alpha * 0.4;
+            ctx.fillStyle = `rgba(${col},0.6)`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Core
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = `rgb(${col})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Bright center
+            ctx.globalAlpha = alpha * 0.8;
+            ctx.fillStyle = `rgba(255,255,255,0.7)`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 0.35, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Sparkle
+            if (p.sparkle) {
+                const sparkAlpha = Math.max(0, Math.sin(p.sparklePhase)) * alpha * 0.7;
+                if (sparkAlpha > 0.1) {
+                    ctx.globalAlpha = sparkAlpha;
+                    ctx.fillStyle = '#fff';
+                    const sLen = p.size * 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x - sLen, p.y);
+                    ctx.lineTo(p.x, p.y - 1);
+                    ctx.lineTo(p.x + sLen, p.y);
+                    ctx.lineTo(p.x, p.y + 1);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y - sLen);
+                    ctx.lineTo(p.x - 1, p.y);
+                    ctx.lineTo(p.x, p.y + sLen);
+                    ctx.lineTo(p.x + 1, p.y);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+            ctx.restore();
+        });
+    },
+
+    startParticleAnimation(canvasId, count) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const w = canvas.offsetWidth, h = canvas.offsetHeight;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        ctx.scale(dpr, dpr);
+        const particles = this._createPlasmaParticles(w, h, count || 80);
+        let time = 0;
+
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            time += 0.016;
+            this._drawPlasma(ctx, w, h, particles, time);
+            this._particleAnimId = requestAnimationFrame(animate);
+        };
+        animate();
+    },
+
+    stopParticleAnimation() {
+        if (this._particleAnimId) {
+            cancelAnimationFrame(this._particleAnimId);
+            this._particleAnimId = null;
+        }
+    },
+
+    // Mini plasma for small canvases (loading overlay, floating indicator)
+    _miniAnimIds: {},
+    startMiniParticles(canvasId, count = 25) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
+        const particles = this._createPlasmaParticles(w, h, count);
+        let time = 0;
+        const animate = () => {
+            ctx.clearRect(0, 0, w, h);
+            time += 0.016;
+            this._drawPlasma(ctx, w, h, particles, time);
+            this._miniAnimIds[canvasId] = requestAnimationFrame(animate);
+        };
+        animate();
+    },
+
+    stopMiniParticles(canvasId) {
+        if (this._miniAnimIds[canvasId]) {
+            cancelAnimationFrame(this._miniAnimIds[canvasId]);
+            delete this._miniAnimIds[canvasId];
+        }
+    },
+
+    // =====================================================
+    // LOADING ANIMATION OVERLAY (for History, etc.)
+    // =====================================================
+    _loadingTextInterval: null,
+    _loadingMessages: [
+        'Fetching your transcriptions...',
+        'Organizing your data...',
+        'Almost there...',
+        'Loading records...',
+        'Preparing your history...',
+        'Crunching the numbers...',
+        'Sorting by date...',
+        'Gathering insights...',
+    ],
+    _processingMessages: [
+        'Processing audio waves...',
+        'Whisper is listening carefully...',
+        'Analyzing sound patterns...',
+        'Transcribing your content...',
+        'Converting speech to text...',
+        'Detecting language nuances...',
+        'Almost there, hang tight...',
+        'AI is hard at work...',
+        'Extracting every word...',
+        'Fine-tuning the transcript...',
+    ],
+
+    showLoadingAnimation(title, subtitle, messages) {
+        const overlay = document.getElementById('loadingAnimOverlay');
+        const titleEl = document.getElementById('loadingAnimTitle');
+        const subtitleEl = document.getElementById('loadingAnimSubtitle');
+        if (!overlay) return;
+        titleEl.textContent = title || 'Loading...';
+        subtitleEl.textContent = subtitle || '';
+        overlay.style.display = 'flex';
+        overlay.classList.remove('fade-out');
+        requestAnimationFrame(() => overlay.classList.add('active'));
+        this.startMiniParticles('loadingAnimCanvas', 40);
+
+        // Cycle subtitle text
+        const msgs = messages || this._loadingMessages;
+        let idx = 0;
+        this._loadingTextInterval = setInterval(() => {
+            subtitleEl.style.opacity = '0';
+            setTimeout(() => {
+                idx = (idx + 1) % msgs.length;
+                subtitleEl.textContent = msgs[idx];
+                subtitleEl.style.opacity = '1';
+            }, 300);
+        }, 2200);
+    },
+
+    hideLoadingAnimation() {
+        if (this._loadingTextInterval) {
+            clearInterval(this._loadingTextInterval);
+            this._loadingTextInterval = null;
+        }
+        const overlay = document.getElementById('loadingAnimOverlay');
+        if (!overlay) return;
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+            overlay.classList.remove('active', 'fade-out');
+            overlay.style.display = 'none';
+            this.stopMiniParticles('loadingAnimCanvas');
+        }, 500);
+    },
+
+    // Override showHistory to show loading animation
+    showHistory() {
+        this.showSection('history');
+        this.showLoadingAnimation('Loading History...', 'Fetching your transcriptions');
+        History.load().then(() => {
+            this.hideLoadingAnimation();
+        }).catch(() => {
+            this.hideLoadingAnimation();
+        });
+    },
+
+    // =====================================================
+    // WORKFLOW LIGHTBOX FLOW (file drop → type → email → learning input)
+    // =====================================================
+    _workflowFile: null,
+    _workflowType: null,
+    _workflowEmail: false,
+    _workflowEmailAddress: '',
+
+    startWorkflow(file) {
+        this._workflowFile = file;
+        this._workflowType = null;
+        this._workflowEmail = false;
+        this._workflowEmailAddress = '';
+        // Open type selection lightbox
+        document.getElementById('workflowTypeModal').classList.add('active');
+    },
+
+    selectWorkflowType(type) {
+        this._workflowType = type;
+        document.getElementById('workflowTypeModal').classList.remove('active');
+        // Open email preference lightbox
+        document.getElementById('wfEmailNo')?.classList.add('active');
+        document.getElementById('wfEmailYes')?.classList.remove('active');
+        document.getElementById('wfEmailField').style.display = 'none';
+        document.getElementById('wfEmailAddress').value = '';
+        document.getElementById('workflowEmailModal').classList.add('active');
+    },
+
+    setWorkflowEmail(wantEmail) {
+        this._workflowEmail = wantEmail;
+        document.getElementById('wfEmailYes')?.classList.toggle('active', wantEmail);
+        document.getElementById('wfEmailNo')?.classList.toggle('active', !wantEmail);
+        document.getElementById('wfEmailField').style.display = wantEmail ? '' : 'none';
+        if (wantEmail) {
+            setTimeout(() => document.getElementById('wfEmailAddress')?.focus(), 100);
+        }
+    },
+
+    submitWorkflowEmail() {
+        if (this._workflowEmail) {
+            const email = document.getElementById('wfEmailAddress')?.value.trim();
+            if (!email) {
+                this.showToast('Please enter an email address', 'error');
+                return;
+            }
+            this._workflowEmailAddress = email;
+        }
+        document.getElementById('workflowEmailModal').classList.remove('active');
+
+        if (this._workflowType === 'learning') {
+            // Show learning input lightbox
+            document.getElementById('wfLearnTextInput').value = '';
+            document.getElementById('wfLearnYoutubeUrl').value = '';
+            document.getElementById('wfLearnObjective').value = '';
+            this.setWfLearningSource('text');
+            document.getElementById('workflowLearningModal').classList.add('active');
+        } else {
+            // Start transcription directly
+            this._beginWorkflowTranscription();
+        }
+    },
+
+    setWfLearningSource(source) {
+        document.getElementById('wfLearnTabText')?.classList.toggle('active', source === 'text');
+        document.getElementById('wfLearnTabYoutube')?.classList.toggle('active', source === 'youtube');
+        document.getElementById('wfLearnTextPanel').style.display = source === 'text' ? '' : 'none';
+        document.getElementById('wfLearnYoutubePanel').style.display = source === 'youtube' ? '' : 'none';
+        this._wfLearningSource = source;
+    },
+    _wfLearningSource: 'text',
+
+    submitWorkflowLearning() {
+        if (this._wfLearningSource === 'youtube') {
+            const url = document.getElementById('wfLearnYoutubeUrl')?.value.trim();
+            if (!url) { this.showToast('Please enter a YouTube URL', 'error'); return; }
+        } else {
+            const text = document.getElementById('wfLearnTextInput')?.value.trim();
+            if (!text) { this.showToast('Please paste some text content', 'error'); return; }
+        }
+        document.getElementById('workflowLearningModal').classList.remove('active');
+        this._beginWorkflowTranscription();
+    },
+
+    closeWorkflowModals() {
+        this._bounceCloseModal(document.getElementById('workflowTypeModal'));
+        this._bounceCloseModal(document.getElementById('workflowEmailModal'));
+        this._bounceCloseModal(document.getElementById('workflowLearningModal'));
+        this._workflowFile = null;
+    },
+
+    _beginWorkflowTranscription() {
+        // Set the mode
+        this.setAudioMode(this._workflowType);
+
+        if (this._workflowType === 'learning') {
+            // Populate the learning fields from workflow
+            if (this._wfLearningSource === 'youtube') {
+                this.learningSource = 'youtube';
+                const url = document.getElementById('wfLearnYoutubeUrl')?.value.trim();
+                const el = document.getElementById('learningYoutubeUrl');
+                if (el) el.value = url;
+                this.setLearningSource('youtube');
+            } else {
+                this.learningSource = 'text';
+                const text = document.getElementById('wfLearnTextInput')?.value.trim();
+                const el = document.getElementById('learningTextInput');
+                if (el) el.value = text;
+                this.setLearningSource('text');
+            }
+            const obj = document.getElementById('wfLearnObjective')?.value.trim();
+            const objEl = document.getElementById('learningObjective');
+            if (objEl && obj) objEl.value = obj;
+
+            // If there's also an audio file, transcribe it first then do learning
+            if (this._workflowFile) {
+                this.currentFile = this._workflowFile;
+                this.dom.fileName.textContent = this._workflowFile.name;
+                this.dom.fileSize.textContent = this.formatFileSize(this._workflowFile.size);
+                this.dom.audioPlayer.src = URL.createObjectURL(this._workflowFile);
+            }
+            this.startTranscription();
+        } else {
+            // Recording or Meeting — set file and start
+            this.currentFile = this._workflowFile;
+            this.dom.fileName.textContent = this._workflowFile.name;
+            this.dom.fileSize.textContent = this.formatFileSize(this._workflowFile.size);
+            this.dom.audioPlayer.src = URL.createObjectURL(this._workflowFile);
+            this.startTranscription();
+        }
+    },
+
+    // =====================================================
+    // BACKGROUND TRANSCRIPTION + FLOATING INDICATOR
+    // =====================================================
+    _bgTranscribing: false,
+    _bgResult: null,
+    _bgTimerInterval: null,
+
+    showFloatingIndicator() {
+        const el = document.getElementById('bgTranscriptionIndicator');
+        if (!el) return;
+        el.style.display = 'flex';
+        el.classList.remove('completed');
+        document.getElementById('bgIndicatorViewBtn').style.display = 'none';
+        document.querySelector('.bg-indicator-content').style.display = '';
+        this.startMiniParticles('bgParticleCanvas', 15);
+        // Sync timer
+        this._bgTimerInterval = setInterval(() => {
+            const el = document.getElementById('bgIndicatorTimer');
+            if (el) {
+                const mins = Math.floor(this.timerSeconds / 60).toString().padStart(2, '0');
+                const secs = (this.timerSeconds % 60).toString().padStart(2, '0');
+                el.textContent = `${mins}:${secs}`;
+            }
+        }, 500);
+    },
+
+    hideFloatingIndicator() {
+        const el = document.getElementById('bgTranscriptionIndicator');
+        if (el) el.style.display = 'none';
+        this.stopMiniParticles('bgParticleCanvas');
+        if (this._bgTimerInterval) {
+            clearInterval(this._bgTimerInterval);
+            this._bgTimerInterval = null;
+        }
+    },
+
+    showFloatingComplete() {
+        const el = document.getElementById('bgTranscriptionIndicator');
+        if (!el) return;
+        el.classList.add('completed');
+        document.querySelector('.bg-indicator-content').style.display = 'none';
+        document.getElementById('bgIndicatorViewBtn').style.display = '';
+        this.stopMiniParticles('bgParticleCanvas');
+        if (this._bgTimerInterval) {
+            clearInterval(this._bgTimerInterval);
+            this._bgTimerInterval = null;
+        }
+    },
+
+    viewBgTranscriptionResult() {
+        this.hideFloatingIndicator();
+        if (this._bgResult && this._bgResult.transcriptionId) {
+            History.viewTranscript(this._bgResult.transcriptionId);
+        } else {
+            // Show results section
+            this.showSection('results');
+        }
+    },
+
+    // =====================================================
+    // WORKFLOW EMAIL AUTOCOMPLETE INIT
+    // =====================================================
+    async _autoSendWorkflowEmail(transcriptionId) {
+        try {
+            const senderEmail = this.getSetting('senderEmail');
+            const senderName = this.getSetting('senderName') || 'Transcribe AI';
+            if (!senderEmail) return;
+
+            const filename = this.currentFile?.name?.replace(/\.[^.]+$/, '') || 'transcript';
+            const pdfBase64 = await API.generatePdfBase64(this.transcript, this.analysis, filename, this.audioMode);
+
+            let htmlBody = '';
+            if (this.audioMode === 'meeting') {
+                htmlBody = EmailTemplate.generate(this.transcript, this.analysis, filename);
+            } else if (this.audioMode === 'learning' && this.analysis) {
+                htmlBody = EmailTemplate.generateLearning ? EmailTemplate.generateLearning(this.analysis, filename) : EmailTemplate.generate(this.transcript, this.analysis, filename);
+            } else {
+                htmlBody = EmailTemplate.generateRecording ? EmailTemplate.generateRecording(this.transcript, filename) : EmailTemplate.generate(this.transcript, null, filename);
+            }
+
+            await API.sendSmtpEmail({
+                from: senderEmail,
+                from_name: senderName,
+                to: [this._workflowEmailAddress],
+                subject: `Transcription: ${this.analysis?.title || filename}`,
+                html: htmlBody,
+                pdf_base64: pdfBase64,
+                pdf_filename: `${filename}_transcript.pdf`,
+            });
+
+            // Log the email
+            if (transcriptionId) {
+                await API.logEmail(transcriptionId, this._workflowEmailAddress, `Transcription: ${this.analysis?.title || filename}`);
+            }
+
+            this.showToast('Email sent successfully!', 'success');
+            this._workflowEmailAddress = '';
+        } catch (err) {
+            console.error('Auto-email failed:', err);
+            this.showToast('Email send failed: ' + err.message, 'error');
+        }
+    },
+
+    initWorkflowAutocomplete() {
+        if (typeof Autocomplete === 'undefined') return;
+        const emailInput = document.getElementById('wfEmailAddress');
+        if (!emailInput) return;
+        Autocomplete.attach(emailInput, {
+            onSearch: async (query) => {
+                try { return await API.searchContacts(query); }
+                catch { return []; }
+            },
+            onSelect: (contact, input) => {
+                input.value = contact.email || contact.name;
+            },
+            multiValue: false
+        });
     }
 };
 

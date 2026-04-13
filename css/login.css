@@ -56,7 +56,7 @@ body.login-page {
 .login-bg-gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, #0a0f1e 0%, #0f172a 30%, #1e3a5f 60%, #1a1040 100%);
+    background: linear-gradient(to bottom, #4b8be8 0%, #2557b3 35%, #1a3a7a 70%, #0f172a 100%);
 }
 
 /* Animated gradient orbs */
@@ -114,9 +114,13 @@ body.login-page {
 }
 
 .login-card-header {
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1a2e4d 100%);
-    padding: 32px 36px 28px;
+    background: linear-gradient(to bottom, #4b8be8 0%, #2557b3 50%, #1a3a7a 100%);
+    padding: 40px 36px 32px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .login-card-body {
@@ -147,12 +151,22 @@ body.login-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
 .login-logo img {
-    height: 48px;
+    height: 72px;
     width: auto;
     filter: brightness(0) invert(1);
+}
+.login-tagline {
+    margin: 16px 0 0;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
 }
 .login-title {
     text-align: center;
@@ -417,6 +431,116 @@ body.login-page {
     color: var(--login-text-muted);
     font-size: 12px;
     opacity: 0.6;
+}
+
+/* ---- Login Transition Overlay ---- */
+.login-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: linear-gradient(to bottom, #4b8be8 0%, #2557b3 35%, #1a3a7a 70%, #0f172a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+}
+.login-transition.active {
+    opacity: 1;
+    visibility: visible;
+}
+[data-theme="dark"] .login-transition {
+    background: linear-gradient(to bottom, #1a3a7a 0%, #0f172a 40%, #070b14 100%);
+}
+.login-transition.active .login-transition-box {
+    animation: ltBounceIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.login-transition.exit .login-transition-box {
+    animation: ltBounceOut 0.5s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+.login-transition.exit {
+    opacity: 0;
+    transition: opacity 0.5s ease 0.2s;
+}
+@keyframes ltBounceIn {
+    0% { transform: scale(0.2) rotate(-8deg); opacity: 0; }
+    50% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+    70% { transform: scale(0.95) rotate(-1deg); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes ltBounceOut {
+    0% { transform: scale(1); opacity: 1; }
+    30% { transform: scale(1.1); }
+    100% { transform: scale(0.15) rotate(12deg); opacity: 0; }
+}
+.login-transition-box {
+    text-align: center;
+    transform: scale(0.2);
+    opacity: 0;
+}
+.login-transition-box {
+    position: relative;
+}
+.login-transition-box canvas {
+    display: block;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    width: 420px;
+    height: 420px;
+}
+.login-transition-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px; height: 120px;
+    margin-top: -20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    animation: ltIconFloat 3s ease-in-out infinite;
+    border: 1px solid rgba(255,255,255,0.12);
+}
+.login-transition-icon svg {
+    width: 56px;
+    height: 56px;
+}
+@keyframes ltIconFloat {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-10px); }
+}
+.login-transition-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 10px;
+    letter-spacing: -0.3px;
+}
+.login-transition-subtitle {
+    font-size: 16px;
+    color: rgba(255,255,255,0.55);
+    margin: 0;
+    min-height: 24px;
+    transition: opacity 0.3s ease;
+}
+@media (max-width: 480px) {
+    .login-transition-box canvas {
+        width: 300px;
+        height: 300px;
+    }
+    .login-transition-icon {
+        width: 90px; height: 90px;
+    }
+    .login-transition-icon svg {
+        width: 44px; height: 44px;
+    }
+    .login-transition-title { font-size: 22px; }
+    .login-transition-subtitle { font-size: 14px; }
 }
 
 /* ---- Responsive ---- */
