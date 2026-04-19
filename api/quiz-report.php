@@ -1795,5 +1795,91 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     }
 }
 </style>
+
+<style id="v3109MatrixHeader">
+@media (max-width: 768px) {
+    .topbar {
+        position: relative;
+        overflow: hidden;
+    }
+    .topbar > * {
+        position: relative;
+        z-index: 1;
+    }
+    .tb-matrix {
+        display: block;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.14;
+    }
+    /* Unified logo size on mobile (matches index.html) */
+    .topbar-brand-logo,
+    .topbar-logo {
+        height: 22px !important;
+        max-width: 90px !important;
+    }
+}
+@media (min-width: 769px) {
+    .tb-matrix { display: none; }
+}
+</style>
+<script id="v3109MatrixScript">
+(function () {
+    if (!window.matchMedia('(max-width: 768px)').matches) return;
+    const tb = document.querySelector('.topbar');
+    if (!tb) return;
+    // Create + mount the canvas
+    const cvs = document.createElement('canvas');
+    cvs.className = 'tb-matrix';
+    cvs.setAttribute('aria-hidden', 'true');
+    tb.insertBefore(cvs, tb.firstChild);
+    const ctx = cvs.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ<>/';
+    let cols = 0, drops = [], cellW = 12 * dpr, cellH = 16 * dpr;
+    let W = 0, H = 0;
+
+    function resize() {
+        const rect = cvs.getBoundingClientRect();
+        W = Math.max(1, Math.floor(rect.width * dpr));
+        H = Math.max(1, Math.floor(rect.height * dpr));
+        cvs.width = W; cvs.height = H;
+        cols = Math.ceil(W / cellW);
+        drops = new Array(cols).fill(0).map(() => Math.random() * -H);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let running = true;
+    document.addEventListener('visibilitychange', () => {
+        running = !document.hidden;
+        if (running) tick();
+    });
+    function tick() {
+        if (!running) return;
+        ctx.fillStyle = 'rgba(0, 8, 24, 0.08)';
+        ctx.fillRect(0, 0, W, H);
+        ctx.font = 'bold ' + (13 * dpr) + "px 'Courier New', monospace";
+        ctx.textBaseline = 'top';
+        for (let i = 0; i < cols; i++) {
+            const ch = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+            const x = i * cellW;
+            const y = drops[i];
+            ctx.fillStyle = 'rgba(220, 235, 255, 0.95)';
+            ctx.fillText(ch, x, y);
+            drops[i] += cellH * 0.11;
+            if (drops[i] > H + Math.random() * 40) {
+                drops[i] = -cellH * (Math.random() * 6 + 1);
+            }
+        }
+        requestAnimationFrame(tick);
+    }
+    tick();
+})();
+</script>
 </body>
 </html>
