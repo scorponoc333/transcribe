@@ -7109,7 +7109,7 @@ function viewQuizReportSlideUp() {
 <style id="v388BadgeLift">
 @media (min-width: 769px) {
     #jaiHeroSection .jaihero-logo {
-        transform: translateY(-50px);
+        transform: translateY(-130px);
     }
     #jaiHeroSection .jaihero-badge {
         margin-top: -170px !important;
@@ -7122,7 +7122,7 @@ function viewQuizReportSlideUp() {
 <style id="v390MobileBadge">
 @media (max-width: 768px) {
     #jaiHeroSection .jaihero-logo {
-        transform: translateY(-50px);
+        transform: translateY(-130px);
     }
     #jaiHeroSection .jaihero-badge {
         margin-top: -124px !important;
