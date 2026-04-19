@@ -23,7 +23,7 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In — Transcribe AI</title>
+    <title>Sign In — Jason AI</title>
     <link rel="icon" type="image/png" href="img/fav%20icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,7 +53,8 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
         <div class="login-card">
             <div class="login-card-header">
                 <div class="login-logo">
-                    <img src="img/logo.png" alt="Transcribe AI">
+                    <?php $loginLogo = file_exists(__DIR__ . '/img/custom-logo.png') ? 'img/custom-logo.png' : 'img/logo.png'; ?>
+                    <img id="loginLogo" src="<?= $loginLogo ?>?t=<?= time() ?>" alt="Jason AI">
                 </div>
                 <p class="login-tagline">Transcription &amp; Learning Tool</p>
             </div>
@@ -150,7 +151,7 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
     </div>  <!-- close login-card -->
 
         <div class="login-footer">
-            Transcribe AI developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Jason Hogan</a>
+            Developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Jason Hogan</a>
         </div>
     </div>
 
@@ -428,7 +429,7 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
             // After ~3 seconds, animate lock icon change and exit
             setTimeout(() => {
                 titleEl.textContent = 'Welcome!';
-                subtitleEl.textContent = 'Launching Transcribe AI...';
+                subtitleEl.textContent = 'Launching Jason AI...';
                 // Change lock to unlocked
                 document.querySelector('.login-transition-icon').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
             }, 2500);
@@ -469,6 +470,51 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                 // Apply speed (10-200 → 0.2-4.0 multiplier)
                 animSpeed = Math.max(0.2, Math.min(4, (parseInt(s.loginAnimationSpeed) || 50) / 50));
 
+                // Apply brand color — full palette
+                if (s.brandColor) {
+                    const hex = s.brandColor;
+                    const ri = parseInt(hex.slice(1,3),16)/255;
+                    const gi = parseInt(hex.slice(3,5),16)/255;
+                    const bi = parseInt(hex.slice(5,7),16)/255;
+                    const mx = Math.max(ri,gi,bi), mn = Math.min(ri,gi,bi);
+                    let h, sat, l = (mx+mn)/2;
+                    if (mx === mn) { h = sat = 0; }
+                    else {
+                        const d = mx - mn;
+                        sat = l > 0.5 ? d/(2-mx-mn) : d/(mx+mn);
+                        switch(mx){
+                            case ri: h = ((gi-bi)/d + (gi<bi?6:0))/6; break;
+                            case gi: h = ((bi-ri)/d + 2)/6; break;
+                            case bi: h = ((ri-gi)/d + 4)/6; break;
+                        }
+                    }
+                    h = Math.round(h*360);
+                    const sc = Math.min(Math.round(sat*100), 85);
+                    const hsl = (ss, ll) => `hsl(${h}, ${ss}%, ${ll}%)`;
+                    const root = document.documentElement;
+                    root.style.setProperty('--brand-grad-light', hsl(Math.min(sc, 70), 35));
+                    root.style.setProperty('--brand-grad-mid', hsl(Math.min(sc, 80), 25));
+                    root.style.setProperty('--brand-grad-dark', hsl(Math.min(sc, 75), 17));
+                    // Full brand scale for accent colors
+                    root.style.setProperty('--brand-500', hsl(sc, 40));
+                    root.style.setProperty('--brand-600', hsl(sc, 33));
+                    // RGB for rgba() usage
+                    const hslToRgb = (hh,ss2,ll2) => {
+                        hh/=360; ss2/=100; ll2/=100;
+                        let rr,gg,bb;
+                        if(ss2===0){rr=gg=bb=ll2;}else{
+                            const q=ll2<0.5?ll2*(1+ss2):ll2+ss2-ll2*ss2, p=2*ll2-q;
+                            const h2r=(pp,qq,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return pp+(qq-pp)*6*t;if(t<1/2)return qq;if(t<2/3)return pp+(qq-pp)*(2/3-t)*6;return pp;};
+                            rr=h2r(p,q,hh+1/3);gg=h2r(p,q,hh);bb=h2r(p,q,hh-1/3);
+                        }
+                        return [Math.round(rr*255),Math.round(gg*255),Math.round(bb*255)];
+                    };
+                    const [r5,g5,b5] = hslToRgb(h,sc,40);
+                    const [r6,g6,b6] = hslToRgb(h,sc,33);
+                    root.style.setProperty('--brand-500-rgb', `${r5},${g5},${b5}`);
+                    root.style.setProperty('--brand-600-rgb', `${r6},${g6},${b6}`);
+                }
+
                 if (s.loginAnimationEnabled === '1' || s.loginAnimationEnabled === 'true') {
                     startAnimation(s.loginAnimation || 'constellations');
                 }
@@ -484,6 +530,7 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                 waves: animWaves,
                 fireflies: animFireflies,
                 snow: animSnow,
+                audiospectrum: animAudioSpectrum,
             };
             const runner = runners[type];
             if (runner) runner();
@@ -731,6 +778,112 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
                     ctx.fillStyle = `rgba(220, 230, 255, ${f.alpha})`;
                     ctx.fill();
                 }
+                animFrame = requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        // ─── 7. AUDIO SPECTRUM ───
+        function animAudioSpectrum() {
+            const w = () => canvas.width;
+            const h = () => canvas.height;
+
+            function buildBars() {
+                const n = Math.max(48, Math.min(160, Math.round(w() / 18)));
+                const bars = new Array(n);
+                for (let i = 0; i < n; i++) {
+                    bars[i] = {
+                        current: 0,
+                        target:  0,
+                        peak:    0,
+                        peakVel: 0,
+                        p1: Math.random() * Math.PI * 2,
+                        p2: Math.random() * Math.PI * 2,
+                        p3: Math.random() * Math.PI * 2,
+                        f1: 0.7 + Math.random() * 1.3,
+                        f2: 1.3 + Math.random() * 2.2,
+                        f3: 0.25 + Math.random() * 0.6,
+                    };
+                }
+                return bars;
+            }
+
+            let bars = buildBars();
+            let t = 0;
+            let hueBase = 0;
+
+            let lastW = w();
+            window.addEventListener('resize', () => {
+                if (Math.abs(w() - lastW) > 40) {
+                    bars = buildBars();
+                    lastW = w();
+                }
+            });
+
+            function draw() {
+                const W = w(), H = h();
+                ctx.clearRect(0, 0, W, H);
+                const n = bars.length;
+                const barWidth = (W / n) * 0.72;
+                const stride   =  W / n;
+                const centerY  = H / 2;
+                const maxHeight = H * 0.42;
+                t += 0.016 * animSpeed;
+                hueBase = (hueBase + 0.18 * animSpeed) % 360;
+
+                const sweepPhase = t * 1.2;
+
+                for (let i = 0; i < n; i++) {
+                    const b = bars[i];
+                    const x = i * stride + (stride - barWidth) / 2;
+
+                    const bias = 0.55 + 0.45 * Math.cos((i / n) * Math.PI);
+                    const a1 = Math.sin(t * b.f1 + b.p1);
+                    const a2 = Math.sin(t * b.f2 + b.p2) * 0.55;
+                    const a3 = Math.sin(t * b.f3 + b.p3) * 0.35;
+                    const sweep = Math.max(0, Math.sin(sweepPhase - i * 0.15)) * 0.3;
+                    b.target = Math.max(0, Math.min(1,
+                        0.18 + 0.5 * (a1 + a2 + a3) * 0.45 * bias + sweep
+                    ));
+
+                    const lerp = b.target > b.current ? 0.35 : 0.12;
+                    b.current += (b.target - b.current) * lerp;
+
+                    if (b.current > b.peak) {
+                        b.peak = b.current;
+                        b.peakVel = 0;
+                    } else {
+                        b.peakVel += 0.0008 * animSpeed;
+                        b.peak = Math.max(b.current, b.peak - b.peakVel);
+                    }
+
+                    const hue = (hueBase + (i / n) * 260) % 360;
+                    const barH = b.current * maxHeight;
+
+                    const gTop = ctx.createLinearGradient(0, centerY, 0, centerY - barH);
+                    gTop.addColorStop(0, 'hsla(' + hue + ', 95%, 62%, 0.95)');
+                    gTop.addColorStop(1, 'hsla(' + ((hue + 45) % 360) + ', 95%, 72%, 0.35)');
+                    ctx.fillStyle = gTop;
+                    ctx.fillRect(x, centerY - barH, barWidth, barH);
+
+                    const gBot = ctx.createLinearGradient(0, centerY, 0, centerY + barH);
+                    gBot.addColorStop(0, 'hsla(' + hue + ', 95%, 62%, 0.95)');
+                    gBot.addColorStop(1, 'hsla(' + ((hue + 45) % 360) + ', 95%, 72%, 0.35)');
+                    ctx.fillStyle = gBot;
+                    ctx.fillRect(x, centerY, barWidth, barH);
+
+                    ctx.fillStyle = 'hsla(' + hue + ', 95%, 68%, 0.10)';
+                    ctx.fillRect(x - barWidth * 0.3, centerY - barH * 1.08, barWidth * 1.6, barH * 2.16);
+
+                    const peakH = b.peak * maxHeight;
+                    ctx.fillStyle = 'hsla(' + ((hue + 30) % 360) + ', 100%, 82%, 0.95)';
+                    ctx.fillRect(x, centerY - peakH - 2, barWidth, 2);
+                    ctx.fillRect(x, centerY + peakH, barWidth, 2);
+                }
+
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.fillRect(0, centerY - 0.5, W, 1);
+
                 animFrame = requestAnimationFrame(draw);
             }
             draw();
