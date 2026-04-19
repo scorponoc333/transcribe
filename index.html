@@ -3007,5 +3007,73 @@
 }
 </style>
 
+
+<script>
+/* ---- Hash router: landing on /index.html#<section> opens that section ---- */
+(function () {
+    function routeFromHash() {
+        const hash = (window.location.hash || '').replace(/^#/, '').toLowerCase();
+        if (!hash) return;
+        // Small delay to make sure App + ReportPages are initialized
+        const tryRoute = (attemptsLeft) => {
+            const A = window.App;
+            if (!A) {
+                if (attemptsLeft > 0) return setTimeout(() => tryRoute(attemptsLeft - 1), 80);
+                return;
+            }
+            switch (hash) {
+                case 'history':
+                    if (typeof A.showHistory === 'function') A.showHistory();
+                    else if (typeof A.showSection === 'function') A.showSection('history');
+                    break;
+                case 'analytics':
+                    if (typeof A.showAnalytics === 'function') A.showAnalytics();
+                    else if (typeof A.showSection === 'function') A.showSection('analytics');
+                    break;
+                case 'contacts':
+                    if (typeof A.showContacts === 'function') A.showContacts();
+                    else if (typeof A.showSection === 'function') A.showSection('contacts');
+                    break;
+                case 'users':
+                    if (typeof A.showUsers === 'function') A.showUsers();
+                    else if (typeof A.showSection === 'function') A.showSection('users');
+                    break;
+                case 'reports':
+                case 'reportpages':
+                case 'report-pages':
+                    if (typeof A.showReportPages === 'function') A.showReportPages();
+                    else if (typeof A.showSection === 'function') A.showSection('reportPages');
+                    break;
+                case 'settings': {
+                    const m = document.getElementById('settingsModal');
+                    if (m) m.classList.add('active');
+                    break;
+                }
+                case 'feedback': {
+                    if (typeof window.openFeedbackModal === 'function') window.openFeedbackModal();
+                    break;
+                }
+                case 'transcribe':
+                case 'upload':
+                    if (typeof A.showSection === 'function') A.showSection('upload');
+                    break;
+                default:
+                    // Unknown hash — ignore
+                    break;
+            }
+        };
+        tryRoute(30);
+    }
+    // Route on initial load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', routeFromHash);
+    } else {
+        routeFromHash();
+    }
+    // And on any subsequent hash change
+    window.addEventListener('hashchange', routeFromHash);
+})();
+</script>
+
 </body>
 </html>
