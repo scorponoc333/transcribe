@@ -2593,9 +2593,9 @@ async function tbSignOut() {
         }
         #jaiHeroSection .jaihero-logo {
             display: block;
-            height: 48px;
+            height: 120px;
             width: auto;
-            max-width: 260px;
+            max-width: 520px;
             aspect-ratio: 2.5 / 1;
             object-fit: contain;
             margin: 0 auto 28px auto;
@@ -6683,8 +6683,8 @@ function copyTranscript() {
 <style id="v381HeroLogoMobile">
 @media (max-width: 768px) {
     #jaiHeroSection .jaihero-logo {
-        height: 96px !important;
-        max-width: 320px !important;
+        height: 88px !important;
+        max-width: 260px !important;
     }
 }
 </style>
