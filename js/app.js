@@ -1176,6 +1176,17 @@ const App = window.App = {
         this.dom.emailTo.value = attendeeEmails.length ? attendeeEmails.join(', ') : '';
         this.dom.emailCc.value = '';
         this.dom.emailBcc.value = '';
+
+        // Attachment chip: "Title · Type · PDF"
+        const chip = document.getElementById('emailAttachmentChip');
+        if (chip) {
+            const modeLabel = this.audioMode === 'learning' ? 'Learning'
+                            : this.audioMode === 'meeting'  ? 'Meeting'
+                            : 'Audio';
+            chip.textContent = `${title} · ${modeLabel} · PDF`;
+            chip.dataset.pending = '';
+        }
+
         this.dom.emailModal.classList.add('active');
     },
 
