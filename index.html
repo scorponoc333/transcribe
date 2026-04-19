@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260419u">
-    <link rel="stylesheet" href="css/ai-loading.css?v=20260419u">
+    <link rel="stylesheet" href="css/style.css?v=20260419v">
+    <link rel="stylesheet" href="css/ai-loading.css?v=20260419v">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1938,18 +1938,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=20260419u"></script>
-    <script src="js/api.js?v=20260419u"></script>
-    <script src="js/pdf.js?v=20260419u"></script>
-    <script src="js/email-template.js?v=20260419u"></script>
-    <script src="js/autocomplete.js?v=20260419u"></script>
-    <script src="js/history.js?v=20260419u"></script>
-    <script src="js/assembler.js?v=20260419u"></script>
-    <script src="js/analytics.js?v=20260419u"></script>
-    <script src="js/contacts.js?v=20260419u"></script>
-    <script src="js/users.js?v=20260419u"></script>
-    <script src="js/app.js?v=20260419u"></script>
-    <script src="js/upload-particles.js?v=20260419u"></script>
+    <script src="js/ai-loading.js?v=20260419v"></script>
+    <script src="js/api.js?v=20260419v"></script>
+    <script src="js/pdf.js?v=20260419v"></script>
+    <script src="js/email-template.js?v=20260419v"></script>
+    <script src="js/autocomplete.js?v=20260419v"></script>
+    <script src="js/history.js?v=20260419v"></script>
+    <script src="js/assembler.js?v=20260419v"></script>
+    <script src="js/analytics.js?v=20260419v"></script>
+    <script src="js/contacts.js?v=20260419v"></script>
+    <script src="js/users.js?v=20260419v"></script>
+    <script src="js/app.js?v=20260419v"></script>
+    <script src="js/upload-particles.js?v=20260419v"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -2335,6 +2335,10 @@
             <button class="rs-filter" data-type="meeting">Meeting</button>
             <button class="rs-filter" data-type="learning">Learning</button>
         </div>
+        <button type="button" id="rsShareBtn" class="rs-share-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <span>Share a Report</span>
+        </button>
     </div>
     <div class="rs-list" id="rsList">
         <div class="rs-loading"></div>
@@ -3395,6 +3399,138 @@
     } else {
         init();
     }
+})();
+</script>
+
+<style id="v346QueuePolish">
+@media screen {
+/* A) 125px 'Share a Report' button inside the All Reports sidebar header */
+.rs-share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    height: 125px;
+    margin-top: 14px;
+    padding: 0 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: linear-gradient(135deg,
+        var(--brand-400) 0%,
+        var(--brand-500) 40%,
+        var(--brand-grad-mid) 80%,
+        var(--brand-grad-dark) 100%);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow:
+        0 10px 28px rgba(var(--brand-500-rgb), 0.35),
+        inset 0 1px 0 rgba(255,255,255,0.22);
+    position: relative;
+    overflow: hidden;
+}
+.rs-share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 14px 36px rgba(var(--brand-400-rgb), 0.45),
+        inset 0 1px 0 rgba(255,255,255,0.28);
+}
+.rs-share-btn:active { transform: translateY(0); }
+.rs-share-btn svg { stroke: #ffffff; flex-shrink: 0; }
+/* Continuous subtle shine — matches btn-primary vibe */
+.rs-share-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+    transform: skewX(-20deg);
+    transition: none;
+    animation: rsShareShine 5.5s ease-in-out infinite;
+}
+@keyframes rsShareShine {
+    0%, 85%  { left: -100%; }
+    100%     { left: 160%; }
+}
+
+/* B) History action icons — brand-color outline/border for visual punch */
+.history-table td a.btn-icon,
+.history-table td button.btn-icon {
+    border: 1.5px solid rgba(var(--brand-500-rgb), 0.32) !important;
+    background: rgba(var(--brand-500-rgb), 0.04) !important;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease !important;
+}
+.history-table td a.btn-icon svg,
+.history-table td button.btn-icon svg {
+    stroke: var(--brand-500, #2557b3) !important;
+    transition: stroke 0.2s ease !important;
+}
+.history-table td a.btn-icon:hover,
+.history-table td button.btn-icon:hover {
+    border-color: var(--brand-500, #2557b3) !important;
+    background: rgba(var(--brand-500-rgb), 0.12) !important;
+    transform: translateY(-1px);
+}
+
+/* Dark-mode variant — lighter tint */
+[data-theme="dark"] .history-table td a.btn-icon,
+[data-theme="dark"] .history-table td button.btn-icon {
+    border: 1.5px solid rgba(var(--brand-300-rgb, 147, 197, 253), 0.38) !important;
+    background: rgba(var(--brand-400-rgb), 0.08) !important;
+}
+[data-theme="dark"] .history-table td a.btn-icon svg,
+[data-theme="dark"] .history-table td button.btn-icon svg {
+    stroke: var(--brand-300, #93c5fd) !important;
+}
+[data-theme="dark"] .history-table td a.btn-icon:hover,
+[data-theme="dark"] .history-table td button.btn-icon:hover {
+    border-color: var(--brand-300, #93c5fd) !important;
+    background: rgba(var(--brand-400-rgb), 0.22) !important;
+}
+[data-theme="dark"] .history-table td a.btn-icon:hover svg,
+[data-theme="dark"] .history-table td button.btn-icon:hover svg {
+    stroke: var(--brand-200, #bfdbfe) !important;
+}
+
+/* C) Dark-mode date picker calendar icon — invert so it's visible */
+[data-theme="dark"] .history-filters input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.85) sepia(0.2) hue-rotate(180deg);
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+/* D) From / To labels — clearer separation in dark mode */
+[data-theme="dark"] .history-filters label {
+    font-weight: 800 !important;
+    letter-spacing: 1.5px !important;
+    color: var(--brand-200, #bfdbfe) !important;
+}
+}
+</style>
+<script>
+(function () {
+    // A) Share a Report click -> open the email lightbox for the last-
+    //    opened transcription. If none is set (user just landed on the
+    //    transcribe page), trigger the History.emailTranscript pattern by
+    //    opening the All Reports panel ready to pick one.
+    document.getElementById('rsShareBtn')?.addEventListener('click', () => {
+        if (window.App && window.App.transcriptionId && typeof window.App.openEmailModal === 'function') {
+            try { window.App.openEmailModal(); return; }
+            catch (e) {}
+        }
+        // Fallback — if the user hasn't opened a report yet, guide them.
+        if (window.App && typeof window.App.showToast === 'function') {
+            window.App.showToast('Click a report from the list below first, then Share a Report will email that one.', 'info');
+        } else {
+            alert('Click a report from the list first, then Share a Report will email it.');
+        }
+    });
 })();
 </script>
 </body>
