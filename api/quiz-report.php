@@ -903,5 +903,53 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     }
 })();
 </script>
+
+<style id="qrTitleTypewriter">
+@media screen {
+.qr-cover-title.typewriting::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 0.9em;
+    margin-left: 4px;
+    background: currentColor;
+    vertical-align: text-bottom;
+    animation: qrTitleCaret 0.85s steps(1) infinite;
+}
+.qr-cover-title.typewriting.done::after { animation: none; opacity: 0; }
+@keyframes qrTitleCaret { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+}
+</style>
+<script>
+(function () {
+    function run() {
+        const el = document.querySelector('.qr-cover-title');
+        if (!el) return;
+        const full = el.textContent.trim();
+        if (!full) return;
+        el.dataset.fullTitle = full;
+        el.textContent = '';
+        el.classList.add('typewriting');
+        setTimeout(() => {
+            let i = 0;
+            const typeSpeed = 28;
+            function step() {
+                if (i < full.length) {
+                    el.textContent += full[i];
+                    i++;
+                    const ch = full[i - 1];
+                    const pause = (ch === ',' || ch === '.') ? 180 : 0;
+                    setTimeout(step, typeSpeed + pause);
+                } else {
+                    el.classList.add('done');
+                }
+            }
+            step();
+        }, 1750);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+    else run();
+})();
+</script>
 </body>
 </html>

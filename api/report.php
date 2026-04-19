@@ -670,7 +670,7 @@ body {
     transform: scale(1.08);
 }
 .title-edit-input {
-    width: 96%;
+    width: 90vw;
     max-width: 1100px;
     min-width: 360px;
     padding: 16px 22px;
@@ -5425,5 +5425,115 @@ function copyTranscript() {
     }
 })();
 </script>
+
+<style id="jaiTitleTypewriter">
+@media screen {
+.jaihero-title.typewriting::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 0.9em;
+    margin-left: 4px;
+    background: currentColor;
+    vertical-align: text-bottom;
+    animation: jaiTitleCaret 0.85s steps(1) infinite;
+}
+.jaihero-title.typewriting.done::after { animation: none; opacity: 0; }
+@keyframes jaiTitleCaret {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+}
+</style>
+<script>
+/* Typewriter effect on the hero title. Runs after the cover assemble
+   timeline reaches the title beat (~1.95s) so it reads as part of the
+   same choreography. */
+(function () {
+    function run() {
+        const el = document.getElementById('reportTitle');
+        if (!el) return;
+        const full = el.textContent.trim();
+        if (!full) return;
+        // Preserve full title under data attribute in case we need to restore.
+        el.dataset.fullTitle = full;
+        el.textContent = '';
+        el.classList.add('typewriting');
+        // Wait for the cover's clip-path reveal of the title to begin.
+        setTimeout(() => {
+            let i = 0;
+            const typeSpeed = 28; // ms per char
+            function step() {
+                if (i < full.length) {
+                    el.textContent += full[i];
+                    i++;
+                    // Tiny pause on commas/periods for cadence
+                    const ch = full[i - 1];
+                    const pause = (ch === ',' || ch === '.') ? 180 : 0;
+                    setTimeout(step, typeSpeed + pause);
+                } else {
+                    el.classList.add('done');
+                }
+            }
+            step();
+        }, 2100);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+    } else {
+        run();
+    }
+})();
+</script>
+
+<style id="jaiSmartPagebreaks">
+@media print {
+    /* Keep each .report-section's heading attached to its first block of
+       content. Never orphan a heading at the bottom of a page. */
+    .report-section h2.section-title,
+    .report-section .section-pad > h2,
+    .report-section .section-pad > h3 {
+        page-break-after: avoid;
+        break-after: avoid;
+    }
+    /* Keep list items / table rows / concept cards intact — don't split
+       a single bullet or card across two pages. */
+    .report-section li,
+    .learning-report-table tr,
+    .learning-concept-card,
+    .concept-card,
+    .exercise-header,
+    .celebration-card {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    /* Allow the charts grid to break between chart cards (big figures
+       deserve a fresh page rather than cropping). */
+    .charts-grid > .chart-card {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    /* Widow/orphan control on body paragraphs so we don't leave a
+       single line stranded at the top or bottom of a page. */
+    .report-section p {
+        orphans: 3;
+        widows: 3;
+    }
+    /* Compact the spacing between sections so content flows to fill
+       rather than leaving a third of the page blank. */
+    .report-section {
+        page-break-inside: auto;
+        break-inside: auto;
+    }
+    /* Any element that was forcing a new page via .print-new-page can
+       still do so — but ONLY when the previous section actually ran
+       out of room. Using avoid here gives the layout engine more
+       freedom to fill. */
+    .report-section.print-new-page {
+        page-break-before: auto;
+        break-before: auto;
+    }
+}
+</style>
 </body>
 </html>
