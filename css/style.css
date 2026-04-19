@@ -5601,7 +5601,7 @@ audio::-webkit-media-controls-panel {
 
 /* ─── Mobile polish: tighten paddings/sizes elsewhere ─────────── */
 @media (max-width: 768px) {
-    main { padding: 72px 16px 24px !important; }
+    main { padding: 60px 16px 24px !important; }
     .upload-zone { padding: 50px 24px !important; border-radius: 22px !important; }
     .upload-icon svg { width: 56px !important; height: 56px !important; }
     .upload-zone h2 { font-size: 18px !important; }
