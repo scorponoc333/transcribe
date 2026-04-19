@@ -6351,6 +6351,17 @@ function copyTranscript() {
     const drawer = document.getElementById('rpOffcanvas');
     const backdrop = document.getElementById('rpOffcanvasBackdrop');
     const modal = document.getElementById('rpEmailModal');
+    // v3.83 — attach click listeners directly, don't rely on inline onclick
+    // (some extensions strip inline handlers and this flow was observed
+    // silently failing).
+    const __rpInline = document.getElementById('rpInlineMenu');
+    const __rpMobile = document.getElementById('rpMobileMenu');
+    function __rpOpen(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (typeof window.rpOpenOffcanvas === 'function') window.rpOpenOffcanvas();
+    }
+    if (__rpInline) __rpInline.addEventListener('click', __rpOpen);
+    if (__rpMobile) __rpMobile.addEventListener('click', __rpOpen);
 
     // Off-canvas
     window.rpOpenOffcanvas = function () {
