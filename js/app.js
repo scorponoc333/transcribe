@@ -1,5 +1,5 @@
 /**
- * Transcribe AI - Main Application Controller
+ * JAI Transcribe - Main Application Controller
  * Manages UI state, event handlers, and user interactions
  */
 
@@ -66,7 +66,7 @@ const App = {
                     <div style="text-align:center;max-width:400px;padding:32px">
                         <h2 style="margin-bottom:12px;color:#f87171">Connection Error</h2>
                         <p style="color:#94a3b8;line-height:1.6;margin-bottom:24px">Unable to reach the server. Please check that your database and web server are running.</p>
-                        <button onclick="location.reload()" style="padding:10px 24px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px">Retry</button>
+                        <button onclick="location.reload()" style="padding:10px 24px;background:var(--brand-600,#2563eb);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px">Retry</button>
                     </div>
                 </div>`;
             return false;
@@ -80,23 +80,23 @@ const App = {
         const usersBtn = document.getElementById('usersBtn');
         const settingsBtn = document.getElementById('settingsBtn');
         const analyticsBtn = document.getElementById('analyticsBtn');
-        const peopleDropdown = document.getElementById('peopleDropdown');
+        const contactsBtn = document.getElementById('contactsBtn');
 
         if (role === 'admin') {
             if (usersBtn) usersBtn.style.display = '';
             if (settingsBtn) settingsBtn.style.display = '';
             if (analyticsBtn) analyticsBtn.style.display = '';
-            if (peopleDropdown) peopleDropdown.style.display = '';
+            if (contactsBtn) contactsBtn.style.display = '';
         } else if (role === 'manager') {
             if (usersBtn) usersBtn.style.display = 'none';
             if (settingsBtn) settingsBtn.style.display = 'none';
             if (analyticsBtn) analyticsBtn.style.display = '';
-            if (peopleDropdown) peopleDropdown.style.display = '';
+            if (contactsBtn) contactsBtn.style.display = '';
         } else {
             if (usersBtn) usersBtn.style.display = 'none';
             if (settingsBtn) settingsBtn.style.display = 'none';
             if (analyticsBtn) analyticsBtn.style.display = 'none';
-            if (peopleDropdown) peopleDropdown.style.display = 'none';
+            if (contactsBtn) contactsBtn.style.display = 'none';
         }
     },
 
@@ -285,6 +285,24 @@ const App = {
             if (enc) this.dom.smtpEncryption.value = enc;
         });
 
+        // Brand color picker — live preview + hex display
+        const brandPicker = document.getElementById('brandColorPicker');
+        const brandHex = document.getElementById('brandColorHex');
+        if (brandPicker) {
+            brandPicker.addEventListener('input', () => {
+                if (brandHex) brandHex.textContent = brandPicker.value;
+                this.applyBrandColor(brandPicker.value);
+            });
+        }
+        const brandReset = document.getElementById('brandColorReset');
+        if (brandReset) {
+            brandReset.addEventListener('click', () => {
+                if (brandPicker) brandPicker.value = '#1a3366';
+                if (brandHex) brandHex.textContent = '#1a3366';
+                this.resetBrandColor();
+            });
+        }
+
         // Settings tabs
         document.getElementById('settingsTabs').addEventListener('click', (e) => {
             const btn = e.target.closest('.settings-tab');
@@ -304,38 +322,44 @@ const App = {
 
         // Email modal — only close via X button or after send (no click-outside)
         this.dom.emailClose.addEventListener('click', () => this.closeEmailModal());
+        document.getElementById('emailCancelBtn')?.addEventListener('click', () => this.closeEmailModal());
         this.dom.sendEmailSubmit.addEventListener('click', () => this.sendEmail());
 
         // Transcribe home button
         document.getElementById('transcribeBtn_nav')?.addEventListener('click', () => this.resetToUpload());
 
-        // History
-        document.getElementById('historyBtn').addEventListener('click', () => this.showHistory());
+        // History (inside "More" dropdown)
+        document.getElementById('historyBtn')?.addEventListener('click', () => {
+            document.getElementById('moreDropdown')?.classList.remove('open');
+            this.showHistory();
+        });
         document.getElementById('historyBackBtn').addEventListener('click', () => this.showSection('upload'));
 
-        // Analytics
-        document.getElementById('analyticsBtn').addEventListener('click', () => this.showAnalytics());
+        // Analytics (inside "More" dropdown)
+        document.getElementById('analyticsBtn')?.addEventListener('click', () => {
+            document.getElementById('moreDropdown')?.classList.remove('open');
+            this.showAnalytics();
+        });
         document.getElementById('analyticsBackBtn').addEventListener('click', () => this.showSection('upload'));
 
-        // People dropdown
-        document.getElementById('peopleBtn')?.addEventListener('click', (e) => {
+        // "More" dropdown toggle
+        document.getElementById('moreBtn')?.addEventListener('click', (e) => {
             e.stopPropagation();
-            const dd = document.getElementById('peopleDropdown');
-            dd.classList.toggle('open');
+            document.getElementById('moreDropdown')?.classList.toggle('open');
         });
         document.addEventListener('click', () => {
-            document.getElementById('peopleDropdown')?.classList.remove('open');
+            document.getElementById('moreDropdown')?.classList.remove('open');
         });
 
-        // Contacts
+        // Contacts (inside "More" dropdown)
         document.getElementById('contactsBtn')?.addEventListener('click', () => {
-            document.getElementById('peopleDropdown')?.classList.remove('open');
+            document.getElementById('moreDropdown')?.classList.remove('open');
             this.showContacts();
         });
 
-        // Users (admin only)
+        // Users (inside "More" dropdown, admin only)
         document.getElementById('usersBtn')?.addEventListener('click', () => {
-            document.getElementById('peopleDropdown')?.classList.remove('open');
+            document.getElementById('moreDropdown')?.classList.remove('open');
             this.showUsers();
         });
         document.getElementById('usersBackBtn')?.addEventListener('click', () => this.showSection('upload'));
@@ -424,8 +448,17 @@ const App = {
         this.learningSource = source;
         document.getElementById('learningTabText')?.classList.toggle('active', source === 'text');
         document.getElementById('learningTabYoutube')?.classList.toggle('active', source === 'youtube');
-        document.getElementById('learningTextPanel').style.display = source === 'text' ? '' : 'none';
-        document.getElementById('learningYoutubePanel').style.display = source === 'youtube' ? '' : 'none';
+
+        // Smooth panel transition
+        const textPanel = document.getElementById('learningTextPanel');
+        const ytPanel   = document.getElementById('learningYoutubePanel');
+        if (source === 'text') {
+            if (ytPanel)   { ytPanel.style.opacity = '0'; setTimeout(() => { ytPanel.style.display = 'none'; }, 350); }
+            if (textPanel) { textPanel.style.display = ''; requestAnimationFrame(() => { textPanel.style.opacity = '1'; }); }
+        } else {
+            if (textPanel) { textPanel.style.opacity = '0'; setTimeout(() => { textPanel.style.display = 'none'; }, 350); }
+            if (ytPanel)   { ytPanel.style.display = ''; requestAnimationFrame(() => { ytPanel.style.opacity = '1'; }); }
+        }
     },
 
     // ---- File Handling ----
@@ -456,13 +489,21 @@ const App = {
 
         if (!this.currentFile) return;
 
+        // Prevent double-transcription — only one at a time
+        if (this._bgTranscribing) {
+            this.showToast('A transcription is already in progress. Please wait for it to finish.', 'info');
+            this.showSection('processing');
+            this.hideFloatingIndicator();
+            return;
+        }
+
         this._bgTranscribing = true;
         this._bgResult = null;
         API.clearPendingCosts();
         this.showSection('processing');
         this.startTimer();
         this.startWaveformAnimation();
-        this.startParticleAnimation('particleCanvas', 60);
+        // Particles disabled on processing screen — keep waveform + pulse rings only
         this.dom.processingStatus.textContent = 'Uploading audio file...';
         this.dom.processingSubstatus.textContent = 'Sending to Whisper for transcription';
 
@@ -500,15 +541,7 @@ const App = {
             this.displayTranscript();
             this._bgTranscribing = false;
 
-            // If user navigated away, show floating complete indicator
-            if (this.state !== 'processing') {
-                this.showFloatingComplete();
-                // Still do AI analysis in background if meeting
-            } else {
-                this.hideFloatingIndicator();
-                this.showSection('results');
-            }
-            this.showToast('Transcription complete!', 'success');
+            const wasOnProcessing = (this.state === 'processing');
 
             // AI analysis only for meeting mode
             if (this.audioMode === 'meeting') {
@@ -527,12 +560,26 @@ const App = {
                 }
             }
 
-            // Hide insights tab for recording mode
             this.updateTabVisibility();
 
-            // Auto-save: for recording mode save now; for meeting mode, save after analysis
+            // Auto-save first so we have a transcriptionId, then redirect
             if (this.audioMode === 'recording') {
-                this.saveToDatabase();
+                await this.saveToDatabase();
+            }
+
+            this._bgTranscribing = false;
+            this.showToast('Transcription complete!', 'success');
+
+            if (!wasOnProcessing) {
+                this.showFloatingComplete();
+            } else {
+                this.hideFloatingIndicator();
+                const rid = this._bgResult?.transcriptionId || this.transcriptionId;
+                if (rid) {
+                    this._showReportTransition(rid);
+                } else {
+                    this.showSection('results');
+                }
             }
 
         } catch (error) {
@@ -592,7 +639,8 @@ const App = {
         let transcriptText = '';
         let transcriptSource = 'text';
 
-        if (this.learningSource === 'youtube') {
+        // YouTube source removed — paste-only flow
+        if (false) {
             const url = document.getElementById('learningYoutubeUrl')?.value.trim();
             if (!url) {
                 this.showToast('Please enter a YouTube URL', 'error');
@@ -603,20 +651,37 @@ const App = {
             this._bgTranscribing = true;
             this.showSection('processing');
             this.startTimer();
-            this.startParticleAnimation('particleCanvas', 60);
+            this.startWaveformAnimation();
             this.dom.processingStatus.textContent = 'Fetching YouTube transcript...';
             this.dom.processingSubstatus.textContent = 'Pulling captions from the video';
 
             try {
                 const ytResult = await API.getYouTubeTranscript(url);
                 transcriptText = ytResult.transcript;
-                if (!transcriptText) throw new Error('No transcript available for this video');
+                if (!transcriptText) throw new Error('No transcript available');
+                if (ytResult.title) this._ytVideoTitle = ytResult.title;
             } catch (err) {
                 this.stopTimer();
-                this.stopParticleAnimation();
+                this.stopWaveformAnimation();
                 this._bgTranscribing = false;
                 this.hideFloatingIndicator();
-                this.showError('YouTube transcript fetch failed: ' + err.message);
+                this.showSection('upload');
+                this.setAudioMode('learning');
+                this.setLearningSource('text');
+                // Open YouTube in a new tab for the user and show instructions
+                window.open(url, '_blank');
+                this.showToast(
+                    'Opened the YouTube video in a new tab. To get the transcript: click "..." below the video → "Show transcript" → select all text (Ctrl+A) → copy (Ctrl+C) → paste it in the text box here.',
+                    'info',
+                    15000
+                );
+                setTimeout(() => {
+                    const textInput = document.getElementById('learningTextInput');
+                    if (textInput) {
+                        textInput.focus();
+                        textInput.placeholder = 'Paste the YouTube transcript here (Ctrl+V) — we opened the video in a new tab for you';
+                    }
+                }, 500);
                 return;
             }
         } else {
@@ -629,7 +694,7 @@ const App = {
             this._bgTranscribing = true;
             this.showSection('processing');
             this.startTimer();
-            this.startParticleAnimation('particleCanvas', 60);
+            this.startWaveformAnimation();
         }
 
         this.transcript = transcriptText;
@@ -640,32 +705,39 @@ const App = {
             const objective = document.getElementById('learningObjective')?.value.trim() || '';
             this.analysis = await API.analyzeLearning(transcriptText, objective, apiKey);
             this.stopTimer();
-            this.stopParticleAnimation();
-            this._bgTranscribing = false;
-            this.displayTranscript();
-            this.displayLearningResults(this.analysis);
-            if (this.state !== 'processing') {
-                this.showFloatingComplete();
-            } else {
-                this.hideFloatingIndicator();
-                this.showSection('results');
-            }
-            this.showToast('Learning analysis complete!', 'success');
+            this.stopWaveformAnimation();
 
             // Set title from analysis
             if (this.analysis.title) {
                 this.dom.resultTitle && (this.dom.resultTitle.textContent = this.analysis.title);
             }
 
-            // Update tab visibility - show insights, default to insights tab
-            this.updateTabVisibility();
-            this.switchTab('insights');
+            // Save to database FIRST so we have a transcriptionId for the report
+            await this.saveToDatabase(transcriptSource);
 
-            // Save to database
-            this.saveToDatabase(transcriptSource);
+            this._bgTranscribing = false;
+            this.showToast('Learning analysis complete!', 'success');
+
+            // Redirect to the branded report page
+            const rid = this._bgResult?.transcriptionId || this.transcriptionId;
+            if (this.state !== 'processing') {
+                this.showFloatingComplete();
+            } else {
+                this.hideFloatingIndicator();
+                if (rid) {
+                    this._showReportTransition(rid);
+                } else {
+                    // Fallback only if save somehow failed
+                    this.displayTranscript();
+                    this.displayLearningResults(this.analysis);
+                    this.showSection('results');
+                    this.updateTabVisibility();
+                    this.switchTab('insights');
+                }
+            }
         } catch (error) {
             this.stopTimer();
-            this.stopParticleAnimation();
+            this.stopWaveformAnimation();
             this._bgTranscribing = false;
             this.hideFloatingIndicator();
             this.showError('Learning analysis failed: ' + error.message);
@@ -1102,12 +1174,13 @@ const App = {
         if (!subject) { this.showToast('Please enter a subject.', 'error'); return; }
 
         this.closeEmailModal();
-        this.showLoading('Preparing email & PDF...');
+        this.showLoading('Sending email...');
 
         try {
-            // Generate PDF as base64
+            // The email body links to api/report.php (signed URL) — no PDF attachment needed.
+            // The landing page renders the full transcription, analysis, and a print-to-PDF
+            // button. This avoids EmailIt's ~10MB body limit on big attachments.
             const filename = this.currentFile?.name?.replace(/\.[^.]+$/, '') || 'transcript';
-            const pdfBase64 = await API.generatePdfBase64(this.transcript, this.analysis, filename, this.audioMode);
 
             // Generate email HTML based on mode
             const title = this.analysis?.title || filename;
@@ -1134,18 +1207,16 @@ const App = {
             const ccVal = this.dom.emailCc.value.trim();
             const bccVal = this.dom.emailBcc.value.trim();
 
-            // SMTP credentials are now read server-side from the settings DB
+            // EmailIt API key is read server-side. We pass transcription_id so
+            // send-smtp.php can mint an HMAC-signed URL to api/report.php and
+            // substitute it into the {{REPORT_URL}} placeholder in the HTML.
             const emailOptions = {
                 from: from,
                 from_name: this.getSetting('senderName') || '',
                 to: toList,
                 subject: subject,
                 html: html,
-                attachments: [{
-                    filename: `${filename.replace(/[^a-zA-Z0-9_-]/g, '_')}${this.audioMode === 'learning' ? '_learning_report' : '_transcript'}.pdf`,
-                    content: pdfBase64,
-                    content_type: 'application/pdf'
-                }]
+                transcription_id: this.transcriptionId || null,
             };
 
             if (ccVal) emailOptions.cc = ccVal.split(',').map(e => e.trim()).filter(Boolean);
@@ -1199,7 +1270,54 @@ const App = {
         this.showSection('error');
     },
 
+    browseAwayFromProcessing() {
+        // Navigate to upload while transcription continues in background
+        this.showSection('upload');
+        this.showToast('Transcription continues in the background', 'info');
+    },
+
+    returnToProcessing() {
+        // Clicking the floating pill takes you back to the processing screen
+        if (this._bgTranscribing) {
+            this.showSection('processing');
+        }
+    },
+
     resetToUpload() {
+        // If a transcription is running, go to upload but keep the pill visible
+        if (this._bgTranscribing) {
+            this.showSection('upload');
+            return;
+        }
+        // If already on upload page with an audio mode, draw attention to the drop zone
+        if ((this.state === 'upload' || this.state === 'file') && this.audioMode !== 'learning') {
+            const zone = document.getElementById('dropZone');
+            if (zone) {
+                zone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                zone.classList.remove('attention');
+                // Force reflow
+                zone.offsetHeight;
+                zone.classList.add('attention');
+                setTimeout(() => zone.classList.remove('attention'), 1200);
+                this.showToast('Drop your audio file in the box above', 'info');
+            }
+            return;
+        }
+        // If on Learning Analysis screen, switch out of learning mode and show the
+        // audio upload drop zone (no toast — the transition itself is the feedback).
+        if (this.audioMode === 'learning') {
+            this.audioMode = 'recording';
+            this.showSection('upload');
+            const zone = document.getElementById('dropZone');
+            if (zone) {
+                zone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                zone.classList.remove('attention');
+                zone.offsetHeight;
+                zone.classList.add('attention');
+                setTimeout(() => zone.classList.remove('attention'), 1200);
+            }
+            return;
+        }
         this.currentFile = null;
         this.transcript = '';
         this.analysis = null;
@@ -1234,6 +1352,37 @@ const App = {
 
         Object.entries(sectionMap).forEach(([key, el]) => {
             if (el) el.classList.toggle('active', key === name);
+        });
+
+        // Sync the top-bar nav button highlight so the user can see where they are.
+        // For items inside the "More" dropdown, highlight the More trigger button
+        // AND the specific dropdown item.
+        const navMap = {
+            upload:     'transcribeBtn_nav',
+            file:       'transcribeBtn_nav',
+            processing: 'transcribeBtn_nav',
+            results:    'transcribeBtn_nav',
+            error:      'transcribeBtn_nav',
+            history:    'moreBtn',
+            analytics:  'moreBtn',
+            contacts:   'moreBtn',
+            users:      'moreBtn',
+        };
+        // Dropdown item ids for sub-highlight inside the More menu
+        const moreItemMap = {
+            history:    'historyBtn',
+            analytics:  'analyticsBtn',
+            contacts:   'contactsBtn',
+            users:      'usersBtn',
+        };
+        const activeBtnId = navMap[name];
+        document.querySelectorAll('.header-nav-btn').forEach((b) => {
+            b.classList.toggle('is-current', b.id === activeBtnId);
+        });
+        // Highlight the active item inside the More dropdown
+        document.querySelectorAll('.header-more-item').forEach((item) => {
+            const activeMoreId = moreItemMap[name];
+            item.classList.toggle('is-current', item.id === activeMoreId);
         });
 
         // Show floating indicator if navigating away from processing during transcription
@@ -1464,6 +1613,14 @@ const App = {
             modelSelect.value = settings.openRouterModel || 'google/gemini-2.5-pro';
         }
 
+        // Brand color
+        const brandPicker = document.getElementById('brandColorPicker');
+        const brandHex = document.getElementById('brandColorHex');
+        if (brandPicker) {
+            brandPicker.value = settings.brandColor || '#2557b3';
+            if (brandHex) brandHex.textContent = brandPicker.value;
+        }
+
         // Footer text
         const footerInput = document.getElementById('footerTextInput');
         if (footerInput) footerInput.value = settings.footerText || '';
@@ -1504,6 +1661,7 @@ const App = {
             smtpPass: this.dom.smtpPass.value.trim(),
             senderEmail: this.dom.senderEmail.value.trim(),
             senderName: this.dom.senderName.value.trim(),
+            brandColor: document.getElementById('brandColorPicker')?.value || '',
             footerText: (document.getElementById('footerTextInput')?.value || '').trim(),
             loginAnimationEnabled: document.getElementById('loginAnimationEnabled')?.checked ? '1' : '0',
             loginAnimation: document.getElementById('loginAnimationSelect')?.value || 'constellations',
@@ -1521,6 +1679,12 @@ const App = {
             const footerEl = document.getElementById('appFooterText');
             if (footerEl) {
                 this._setFooterText(footerEl, fields.footerText);
+            }
+            // Apply brand color
+            if (fields.brandColor) {
+                this.applyBrandColor(fields.brandColor);
+            } else {
+                this.resetBrandColor();
             }
             this.closeSettings();
             this.showToast('Settings saved successfully', 'success');
@@ -1556,6 +1720,12 @@ const App = {
             console.warn('Failed to load settings:', err);
         }
 
+        // Apply brand color (read from cache since `settings` is block-scoped)
+        const savedBrandColor = this._settingsCache?.brandColor;
+        if (savedBrandColor) {
+            this.applyBrandColor(savedBrandColor);
+        }
+
         // Load custom logo
         this.loadCustomLogo();
     },
@@ -1565,6 +1735,97 @@ const App = {
      */
     getSetting(key) {
         return this._settingsCache[key] || '';
+    },
+
+    /** Convert hex to HSL, derive full brand palette, apply as CSS vars */
+    applyBrandColor(hex) {
+        if (!hex) return;
+        const ri = parseInt(hex.slice(1,3),16)/255;
+        const gi = parseInt(hex.slice(3,5),16)/255;
+        const bi = parseInt(hex.slice(5,7),16)/255;
+        const max = Math.max(ri,gi,bi), min = Math.min(ri,gi,bi);
+        let h, s, l = (max+min)/2;
+        if (max === min) { h = s = 0; }
+        else {
+            const d = max - min;
+            s = l > 0.5 ? d/(2-max-min) : d/(max+min);
+            switch(max){
+                case ri: h = ((gi-bi)/d + (gi<bi?6:0))/6; break;
+                case gi: h = ((bi-ri)/d + 2)/6; break;
+                case bi: h = ((ri-gi)/d + 4)/6; break;
+            }
+        }
+        h = Math.round(h*360);
+        const sat = Math.round(s * 100);
+        const hsl = (ss, ll) => `hsl(${h}, ${ss}%, ${ll}%)`;
+
+        // Header/footer gradient (darker shades)
+        const root = document.documentElement;
+        root.style.setProperty('--brand-grad-light', hsl(Math.min(sat, 70), 35));
+        root.style.setProperty('--brand-grad-mid', hsl(Math.min(sat, 80), 25));
+        root.style.setProperty('--brand-grad-dark', hsl(Math.min(sat, 75), 17));
+
+        // Full brand scale (50-950) — used by buttons, badges, accents, etc.
+        // Darkened to sit closer to the header/footer gradient tones
+        const sc = Math.min(sat, 85);
+        root.style.setProperty('--brand-50',  hsl(sc, 94));
+        root.style.setProperty('--brand-100', hsl(sc, 87));
+        root.style.setProperty('--brand-200', hsl(sc, 76));
+        root.style.setProperty('--brand-300', hsl(sc, 62));
+        root.style.setProperty('--brand-400', hsl(sc, 50));
+        root.style.setProperty('--brand-500', hsl(sc, 40));
+        root.style.setProperty('--brand-600', hsl(sc, 33));
+        root.style.setProperty('--brand-700', hsl(sc, 26));
+        root.style.setProperty('--brand-800', hsl(sc, 19));
+        root.style.setProperty('--brand-900', hsl(sc, 12));
+        root.style.setProperty('--brand-950', hsl(sc, 6));
+
+        // RGB triplet of the 500-level accent for rgba() usage in CSS
+        // Convert hsl(h, sc, 50%) to RGB
+        const hslToRgb = (hh, ss, ll) => {
+            hh /= 360; ss /= 100; ll /= 100;
+            let rr, gg, bb;
+            if (ss === 0) { rr = gg = bb = ll; }
+            else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1; if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                const q = ll < 0.5 ? ll * (1 + ss) : ll + ss - ll * ss;
+                const p = 2 * ll - q;
+                rr = hue2rgb(p, q, hh + 1/3);
+                gg = hue2rgb(p, q, hh);
+                bb = hue2rgb(p, q, hh - 1/3);
+            }
+            return [Math.round(rr*255), Math.round(gg*255), Math.round(bb*255)];
+        };
+        const [r5, g5, b5] = hslToRgb(h, sc, 40);
+        const [r6, g6, b6] = hslToRgb(h, sc, 33);
+        root.style.setProperty('--brand-500-rgb', `${r5},${g5},${b5}`);
+        root.style.setProperty('--brand-600-rgb', `${r6},${g6},${b6}`);
+        const [r2, g2, b2] = hslToRgb(h, sc, 76);
+        const [r3, g3, b3] = hslToRgb(h, sc, 62);
+        const [r4, g4, b4] = hslToRgb(h, sc, 50);
+        root.style.setProperty('--brand-200-rgb', `${r2},${g2},${b2}`);
+        root.style.setProperty('--brand-300-rgb', `${r3},${g3},${b3}`);
+                const [r7, g7, b7] = hslToRgb(h, sc, 26);
+        root.style.setProperty('--brand-700-rgb', `${r7},${g7},${b7}`);
+        root.style.setProperty('--brand-400-rgb', `${r4},${g4},${b4}`);
+    },
+
+    /** Reset brand color to defaults */
+    resetBrandColor() {
+        const root = document.documentElement;
+        const props = [
+            '--brand-grad-light','--brand-grad-mid','--brand-grad-dark',
+            '--brand-50','--brand-100','--brand-200','--brand-300','--brand-400',
+            '--brand-500','--brand-600','--brand-700','--brand-800','--brand-900','--brand-950',
+            '--brand-500-rgb','--brand-600-rgb'
+        ];
+        props.forEach(p => root.style.removeProperty(p));
     },
 
     async loadCustomLogo() {
@@ -2127,14 +2388,28 @@ const App = {
         [6,182,212],[16,185,129],[244,63,94],[168,85,247],
         [20,184,166],[99,102,241],[251,146,60],[52,211,153]
     ],
+    /** Read live brand-shade RGB values from :root CSS vars for animation palettes */
+    _brandParticlePalette() {
+        const root = document.documentElement;
+        const get = (level) => {
+            const v = getComputedStyle(root).getPropertyValue('--brand-' + level + '-rgb').trim();
+            if (!v) return null;
+            const parts = v.split(',').map(n => parseInt(n.trim(), 10));
+            return parts.length === 3 && parts.every(n => !isNaN(n)) ? parts : null;
+        };
+        const shades = ['200','300','400','500','600','700','800']
+            .map(get).filter(Boolean);
+        return shades.length ? shades : this._particleColors;
+    },
 
     _createPlasmaParticles(w, h, count) {
         const particles = [];
         const cx = w / 2, cy = h / 2;
+        const palette = this._brandParticlePalette();
         for (let i = 0; i < count; i++) {
             const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
             const radius = 15 + Math.random() * (Math.min(cx, cy) * 0.85);
-            const col = this._particleColors[Math.floor(Math.random() * this._particleColors.length)];
+            const col = palette[Math.floor(Math.random() * palette.length)];
             particles.push({
                 x: cx + Math.cos(angle) * radius,
                 y: cy + Math.sin(angle) * radius,
@@ -2161,8 +2436,8 @@ const App = {
         // Soft radial background glow
         const cx = w / 2, cy = h / 2;
         const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(w, h) * 0.5);
-        bgGrad.addColorStop(0, `rgba(99,102,241,${0.04 + 0.02 * Math.sin(time * 0.5)})`);
-        bgGrad.addColorStop(0.5, `rgba(139,92,246,${0.02 + 0.01 * Math.sin(time * 0.7)})`);
+        const _bp = this._brandParticlePalette(); const _bc1 = _bp[2] || [99,102,241]; const _bc2 = _bp[4] || [139,92,246]; bgGrad.addColorStop(0, `rgba(${_bc1[0]},${_bc1[1]},${_bc1[2]},${0.05 + 0.02 * Math.sin(time * 0.5)})`);
+        bgGrad.addColorStop(0.5, `rgba(${_bc2[0]},${_bc2[1]},${_bc2[2]},${0.03 + 0.01 * Math.sin(time * 0.7)})`);
         bgGrad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, w, h);
@@ -2408,14 +2683,15 @@ const App = {
         }, 500);
     },
 
-    // Override showHistory to show loading animation
+    // Show history — lightweight inline loading (no full-screen overlay
+    // so background transcription indicator stays accessible)
     showHistory() {
         this.showSection('history');
-        this.showLoadingAnimation('Loading History...', 'Fetching your transcriptions');
-        History.load().then(() => {
-            this.hideLoadingAnimation();
-        }).catch(() => {
-            this.hideLoadingAnimation();
+        const tbody = document.getElementById('historyTableBody');
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 t-muted" style="padding:40px;font-size:14px;">Loading history...</td></tr>';
+        History.load().catch((err) => {
+            console.error('History load error:', err);
+            if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 t-muted" style="padding:40px;">Failed to load history. Please try again.</td></tr>';
         });
     },
 
@@ -2484,8 +2760,15 @@ const App = {
     setWfLearningSource(source) {
         document.getElementById('wfLearnTabText')?.classList.toggle('active', source === 'text');
         document.getElementById('wfLearnTabYoutube')?.classList.toggle('active', source === 'youtube');
-        document.getElementById('wfLearnTextPanel').style.display = source === 'text' ? '' : 'none';
-        document.getElementById('wfLearnYoutubePanel').style.display = source === 'youtube' ? '' : 'none';
+        const textP = document.getElementById('wfLearnTextPanel');
+        const ytP   = document.getElementById('wfLearnYoutubePanel');
+        if (source === 'text') {
+            if (ytP)   { ytP.style.opacity = '0'; setTimeout(() => { ytP.style.display = 'none'; }, 350); }
+            if (textP) { textP.style.display = ''; requestAnimationFrame(() => { textP.style.opacity = '1'; }); }
+        } else {
+            if (textP) { textP.style.opacity = '0'; setTimeout(() => { textP.style.display = 'none'; }, 350); }
+            if (ytP)   { ytP.style.display = ''; requestAnimationFrame(() => { ytP.style.opacity = '1'; }); }
+        }
         this._wfLearningSource = source;
     },
     _wfLearningSource: 'text',
@@ -2601,12 +2884,48 @@ const App = {
 
     viewBgTranscriptionResult() {
         this.hideFloatingIndicator();
-        if (this._bgResult && this._bgResult.transcriptionId) {
-            History.viewTranscript(this._bgResult.transcriptionId);
-        } else {
-            // Show results section
+        const id = this._bgResult?.transcriptionId || this.transcriptionId;
+        if (!id) {
             this.showSection('results');
+            return;
         }
+        // Show full-screen brand transition then navigate to report
+        this._showReportTransition(id);
+    },
+
+    _showReportTransition(transcriptionId) {
+        // Build the full-screen overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'reportTransitionOverlay';
+        overlay.innerHTML = `
+            <div class="rt-content">
+                <div class="rt-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                <h2 class="rt-title">Loading Transcription Report</h2>
+                <div class="rt-dots"><span></span><span></span><span></span></div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        // Force reflow then add active class for animation
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
+        });
+
+        // Navigate after 2.5s
+        setTimeout(() => {
+            overlay.classList.add('fade-out');
+            setTimeout(() => {
+                window.location.href = '/api/report.php?id=' + transcriptionId;
+            }, 500);
+        }, 2500);
     },
 
     // =====================================================
@@ -2615,12 +2934,12 @@ const App = {
     async _autoSendWorkflowEmail(transcriptionId) {
         try {
             const senderEmail = this.getSetting('senderEmail');
-            const senderName = this.getSetting('senderName') || 'Transcribe AI';
+            const senderName = this.getSetting('senderName') || 'JAI Transcribe';
             if (!senderEmail) return;
 
             const filename = this.currentFile?.name?.replace(/\.[^.]+$/, '') || 'transcript';
-            const pdfBase64 = await API.generatePdfBase64(this.transcript, this.analysis, filename, this.audioMode);
 
+            // Email body links to api/report.php (signed URL) — no PDF attachment.
             let htmlBody = '';
             if (this.audioMode === 'meeting') {
                 htmlBody = EmailTemplate.generate(this.transcript, this.analysis, filename);
@@ -2636,8 +2955,7 @@ const App = {
                 to: [this._workflowEmailAddress],
                 subject: `Transcription: ${this.analysis?.title || filename}`,
                 html: htmlBody,
-                pdf_base64: pdfBase64,
-                pdf_filename: `${filename}_transcript.pdf`,
+                transcription_id: transcriptionId || null,
             });
 
             // Log the email

@@ -282,9 +282,9 @@ body::after {
     gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.8);
+    border: 1px solid transparent;
+    background: transparent;
+    color: rgba(255,255,255,0.82);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     font-size: 13px;
@@ -307,11 +307,9 @@ body::after {
 }
 
 .header-nav-btn:hover {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.10);
     color: #ffffff;
-    border-color: rgba(255,255,255,0.25);
-    transform: scale(1.08);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    border-color: rgba(255,255,255,0.18);
 }
 
 .header-nav-btn svg {

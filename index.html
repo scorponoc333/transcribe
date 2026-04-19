@@ -1032,28 +1032,33 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
-            <input type="hidden" id="userModalId">
-            <div class="form-group-compact">
-                <label for="userModalName">Full Name</label>
-                <input type="text" id="userModalName" class="form-input form-input-sm" placeholder="John Doe">
+            <div class="modal-body" style="padding:20px">
+                <input type="hidden" id="userModalId">
+                <div class="form-group-compact mb-3">
+                    <label for="userModalName">Full Name</label>
+                    <input type="text" id="userModalName" class="form-input" placeholder="John Doe">
+                </div>
+                <div class="form-group-compact mb-3">
+                    <label for="userModalEmail">Email</label>
+                    <input type="email" id="userModalEmail" class="form-input" placeholder="john@company.com">
+                </div>
+                <div class="form-group-compact mb-3">
+                    <label for="userModalRole">Role</label>
+                    <select id="userModalRole" class="form-input">
+                        <option value="user">User</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group-compact mb-4" id="userModalPasswordGroup">
+                    <label for="userModalPassword">Password</label>
+                    <input type="password" id="userModalPassword" class="form-input" placeholder="Minimum 8 characters">
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button class="btn-secondary btn-sm" onclick="Users.closeModal()">Cancel</button>
+                    <button class="btn-primary btn-sm" onclick="Users.saveUser()">Save User</button>
+                </div>
             </div>
-            <div class="form-group-compact">
-                <label for="userModalEmail">Email</label>
-                <input type="email" id="userModalEmail" class="form-input form-input-sm" placeholder="john@company.com">
-            </div>
-            <div class="form-group-compact">
-                <label for="userModalRole">Role</label>
-                <select id="userModalRole" class="form-input form-input-sm">
-                    <option value="user">User</option>
-                    <option value="manager">Manager</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-            <div class="form-group-compact" id="userModalPasswordGroup">
-                <label for="userModalPassword">Password</label>
-                <input type="password" id="userModalPassword" class="form-input form-input-sm" placeholder="Minimum 8 characters">
-            </div>
-            <button class="btn-primary w-full" style="margin-top:12px" onclick="Users.saveUser()">Save User</button>
         </div>
     </div>
 
@@ -1322,7 +1327,7 @@
 
     <!-- ==================== EMAIL MODAL ==================== -->
     <div id="emailModal" class="modal-overlay">
-        <div class="modal glass email-modal">
+        <div class="modal glass" style="max-width:520px">
             <div class="modal-header">
                 <h2>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-3px;margin-right:6px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -1332,39 +1337,39 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
-
-            <div class="email-form-grid">
-                <div class="form-group form-row">
+            <div class="modal-body" style="padding:20px">
+                <div class="form-group-compact mb-3">
                     <label for="emailFrom">From</label>
                     <input type="text" id="emailFrom" class="form-input" placeholder="Display Name <email@domain.com>">
                 </div>
-                <div class="form-group form-row">
+                <div class="form-group-compact mb-3">
                     <label for="emailTo">To</label>
                     <input type="text" id="emailTo" class="form-input" placeholder="recipient@email.com (comma-separate for multiple)">
                 </div>
-                <div class="form-group form-row">
+                <div class="form-group-compact mb-3">
                     <label for="emailCc">CC</label>
                     <input type="text" id="emailCc" class="form-input" placeholder="Optional">
                 </div>
-                <div class="form-group form-row">
+                <div class="form-group-compact mb-3">
                     <label for="emailBcc">BCC</label>
                     <input type="text" id="emailBcc" class="form-input" placeholder="Optional">
                 </div>
-                <div class="form-group form-row">
+                <div class="form-group-compact mb-3">
                     <label for="emailSubject">Subject</label>
                     <input type="text" id="emailSubject" class="form-input" placeholder="Transcription | ...">
                 </div>
+                <div class="email-attachment-info mb-3" style="margin-top:0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    <span>PDF report will be attached automatically</span>
+                </div>
+                <div class="flex gap-3 justify-end">
+                    <button id="emailCancelBtn" class="btn-secondary btn-sm">Cancel</button>
+                    <button id="sendEmailSubmit" class="btn-primary btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        Send Email
+                    </button>
+                </div>
             </div>
-
-            <div class="email-attachment-info">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                <span>PDF report will be attached automatically</span>
-            </div>
-
-            <button id="sendEmailSubmit" class="btn-primary w-full" style="background:linear-gradient(135deg,var(--brand-600),#7c3aed)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                Send Email
-            </button>
         </div>
     </div>
 
@@ -1916,14 +1921,34 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.12);
     }
     .rs-title {
-        display: flex; align-items: center; gap: 8px;
+        display: flex; align-items: center; justify-content: space-between; gap: 8px;
         font-size: 13px; font-weight: 800; letter-spacing: 1.2px;
         text-transform: uppercase;
         color: #ffffff;
         margin: 0 0 12px;
         text-shadow: 0 1px 4px rgba(0,0,0,0.18);
     }
+    .rs-title .rs-title-label { display: flex; align-items: center; gap: 8px; }
     .rs-title svg { stroke: #ffffff; opacity: 0.95; flex-shrink: 0; }
+    .rs-close {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 26px; height: 26px;
+        padding: 0;
+        border: 1px solid rgba(255,255,255,0.22);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.08);
+        color: #ffffff;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .rs-close:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.35); transform: scale(1.05); }
+    .rs-close svg { opacity: 0.95; }
+    #reportsSidebar.rs-closing {
+        opacity: 0;
+        transform: translateX(12px);
+        transition: opacity 1s ease, transform 1s ease;
+        pointer-events: none;
+    }
     .rs-search-wrap { position: relative; }
     .rs-search {
         width: 100%;
@@ -2230,8 +2255,13 @@
 <aside id="reportsSidebar" aria-label="Reports Sidebar">
     <div class="rs-header">
         <div class="rs-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-            All Reports
+            <span class="rs-title-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                All Reports
+            </span>
+            <button type="button" class="rs-close" id="rsCloseBtn" aria-label="Close sidebar" title="Close">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
         </div>
         <div class="rs-search-wrap">
             <svg class="rs-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -2284,6 +2314,22 @@
             // Use custom logo if present
             const customLogo = document.querySelector('#headerLogo')?.src;
             if (customLogo) document.getElementById('reportOpenLogo').src = customLogo;
+
+            // Close button — 1s fade out, then hide + persist closed state
+            const closeBtn = document.getElementById('rsCloseBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    const sb = document.getElementById('reportsSidebar');
+                    if (!sb) return;
+                    sb.classList.add('rs-closing');
+                    document.body.classList.remove('has-reports-sidebar');
+                    setTimeout(() => {
+                        sb.style.display = 'none';
+                        sb.classList.remove('rs-closing');
+                        try { localStorage.setItem('jaiReportsSidebarClosed', '1'); } catch (e) {}
+                    }, 1000);
+                });
+            }
 
             // Filters
             document.querySelectorAll('#reportsSidebar .rs-filter').forEach(btn => {
@@ -2391,7 +2437,7 @@
             const c2 = get('--brand-600', '#a01616');
             const c3 = get('--brand-grad-mid', '#4b0808');
             const c4 = get('--brand-grad-dark', '#2a0404');
-            overlay.style.background = ;
+            overlay.style.background = 'linear-gradient(165deg, ' + c1 + ' 0%, ' + c2 + ' 35%, ' + c3 + ' 70%, ' + c4 + ' 100%)';
 
             // Phase 1: zoom in (1s)
             overlay.classList.remove('phase-out');
