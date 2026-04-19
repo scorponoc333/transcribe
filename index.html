@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=2026041a7">
-    <link rel="stylesheet" href="css/ai-loading.css?v=2026041a7">
+    <link rel="stylesheet" href="css/style.css?v=2026041a8">
+    <link rel="stylesheet" href="css/ai-loading.css?v=2026041a8">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -158,6 +158,11 @@
                 <span>Transcribe</span>
                 <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
+            <button class="offcanvas-item" data-target="reportPagesBtn">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span>Reports</span>
+                <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
             <button class="offcanvas-item" data-target="historyBtn">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 <span>History</span>
@@ -183,16 +188,14 @@
                 <span>Feedback</span>
                 <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
-            <button class="offcanvas-item" data-target="settingsBtn">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                <span>Settings</span>
-                <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-        </nav>
+</nav>
         <div class="offcanvas-foot">
             <button id="offcanvasSignOut" class="offcanvas-signout-btn" type="button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 <span>Sign Out</span>
+            </button>
+            <button id="offcanvasSettings" class="offcanvas-gear-btn" type="button" aria-label="Settings" title="Settings">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </button>
         </div>
     </aside>
@@ -229,6 +232,12 @@
                 if (target) target.click();
                 closeMobileMenu();
             });
+        });
+        // Gear cog -> Settings
+        document.getElementById('offcanvasSettings')?.addEventListener('click', () => {
+            const t = document.getElementById('settingsBtn');
+            if (t) t.click();
+            closeMobileMenu();
         });
     })();
     </script>
@@ -1939,18 +1948,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=2026041a7"></script>
-    <script src="js/api.js?v=2026041a7"></script>
-    <script src="js/pdf.js?v=2026041a7"></script>
-    <script src="js/email-template.js?v=2026041a7"></script>
-    <script src="js/autocomplete.js?v=2026041a7"></script>
-    <script src="js/history.js?v=2026041a7"></script>
-    <script src="js/assembler.js?v=2026041a7"></script>
-    <script src="js/analytics.js?v=2026041a7"></script>
-    <script src="js/contacts.js?v=2026041a7"></script>
-    <script src="js/users.js?v=2026041a7"></script>
-    <script src="js/app.js?v=2026041a7"></script>
-    <script src="js/upload-particles.js?v=2026041a7"></script>
+    <script src="js/ai-loading.js?v=2026041a8"></script>
+    <script src="js/api.js?v=2026041a8"></script>
+    <script src="js/pdf.js?v=2026041a8"></script>
+    <script src="js/email-template.js?v=2026041a8"></script>
+    <script src="js/autocomplete.js?v=2026041a8"></script>
+    <script src="js/history.js?v=2026041a8"></script>
+    <script src="js/assembler.js?v=2026041a8"></script>
+    <script src="js/analytics.js?v=2026041a8"></script>
+    <script src="js/contacts.js?v=2026041a8"></script>
+    <script src="js/users.js?v=2026041a8"></script>
+    <script src="js/app.js?v=2026041a8"></script>
+    <script src="js/upload-particles.js?v=2026041a8"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -3814,5 +3823,36 @@
     tick();
 })();
 </script>
+
+<style id="v361OffcanvasFoot">
+.offcanvas-foot {
+    display: flex !important;
+    gap: 10px;
+    align-items: stretch;
+}
+.offcanvas-signout-btn {
+    flex: 1 1 auto !important;
+    justify-content: center;
+}
+.offcanvas-gear-btn {
+    flex: 0 0 auto;
+    width: 52px;
+    min-height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.offcanvas-gear-btn:hover {
+    background: rgba(255,255,255,0.14);
+    transform: rotate(30deg);
+    color: #fff;
+}
+</style>
 </body>
 </html>
