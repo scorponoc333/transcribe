@@ -4571,10 +4571,7 @@ function showQuizCelebration(score, total) {
                 </div>
                 <div id="celebrationAISummary" class="celebration-ai-summary"></div>
                 <div class="celebration-actions" style="flex-direction:column;gap:12px;align-items:stretch;">
-                    <button class="quiz-btn-retake quiz-btn-view-report" onclick="viewQuizReportSlideUp()" style="width:100%;justify-content:center;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                        View Report
-                    </button>
+                    <button class="quiz-btn-retake quiz-btn-view-report" onclick="viewQuizReportSlideUp()" style="width:100%;justify-content:center;">View Report</button>
                     <button class="quiz-btn-close" onclick="closeCelebration(); setTimeout(() => startPopQuiz(), 600);" style="width:100%;">Try Again</button>
                 </div>
             </div>
@@ -6688,5 +6685,30 @@ function copyTranscript() {
     }
 }
 </style>
+
+<script id="v385ViewQuizReport">
+/* v3.85 — define the missing viewQuizReportSlideUp handler */
+function viewQuizReportSlideUp() {
+    const attemptId = window._lastQuizAttemptId;
+    if (!attemptId) {
+        // Fallback: no captured id (save response didn't land yet) —
+        // navigate to the learning report instead so the user isn't stuck.
+        window.location.href = '/api/report.php?id=' + (typeof TRANSCRIPTION_ID !== 'undefined' ? TRANSCRIPTION_ID : '');
+        return;
+    }
+    const url = '/api/quiz-report.php?id=' + encodeURIComponent(attemptId);
+    const frame = document.createElement('iframe');
+    frame.src = url;
+    frame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;border:0;background:#fff;z-index:99997;opacity:0;transition:opacity 0.5s ease;pointer-events:none;';
+    document.body.appendChild(frame);
+    setTimeout(() => { frame.style.opacity = '1'; }, 350);
+    const ov = document.querySelector('.celebration-overlay');
+    if (ov) {
+        ov.style.transition = 'transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease 1.2s';
+        ov.style.transform = 'translateY(-110vh)';
+    }
+    setTimeout(() => { window.location.href = url; }, 1400);
+}
+</script>
 </body>
 </html>
