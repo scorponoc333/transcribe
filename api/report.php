@@ -2384,9 +2384,6 @@ $logged = !!$canManageShare;
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 <span>Sign Out</span>
             </button>
-            <button type="button" id="rpInlineMenu" class="rp-inline-menu" aria-label="Menu" onclick="rpOpenOffcanvas()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            </button>
 <?php else: ?>
             <!-- Public-link viewer — minimal toolbar -->
             <a href="https://jasonai.ca/" class="btn" title="Visit Jason AI">
@@ -5956,32 +5953,394 @@ function copyTranscript() {
 })();
 </script>
 
-<!-- ═══════ v3.56 — MOBILE: hamburger button ═══════ -->
-<?php if ($logged): ?>
-<button type="button" id="rpMobileMenu" class="rp-mobile-menu-btn no-print" aria-label="Menu" onclick="rpOpenOffcanvas()">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+
+<!-- v3.89 — unified off-canvas (matches index.html) -->
+<style id="v389Offcanvas">
+.offcanvas-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 8, 20, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 199;
+}
+.offcanvas-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ─── Drawer ────────────────────────────────────────────────────── */
+.offcanvas {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    max-width: 88vw;
+    height: 100vh;
+    height: 100dvh;
+    background: linear-gradient(180deg, var(--brand-grad-light) 0%, var(--brand-grad-mid) 50%, var(--brand-grad-dark) 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+        -24px 0 64px rgba(0, 0, 0, 0.55),
+        -2px 0 8px rgba(var(--brand-400-rgb), 0.18);
+    transform: translateX(105%);
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.offcanvas.open {
+    transform: translateX(0);
+}
+
+/* Subtle ambient grid behind everything */
+.offcanvas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(var(--brand-400-rgb), 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--brand-400-rgb), 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    mask-image: radial-gradient(ellipse at top, rgba(0, 0, 0, 0.6), transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at top, rgba(0, 0, 0, 0.6), transparent 70%);
+}
+.offcanvas > * { position: relative; z-index: 1; }
+
+/* ─── Header (logo + close) ────────────────────────────────────── */
+.offcanvas-header {
+    padding: 28px 24px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+.offcanvas-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(var(--brand-300-rgb), 0.55), transparent);
+}
+.offcanvas-logo {
+    height: 39px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1) drop-shadow(0 0 14px rgba(var(--brand-300-rgb), 0.45));
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.5s ease 0.5s, transform 0.5s ease 0.5s;
+}
+.offcanvas.open .offcanvas-logo {
+    opacity: 0.96;
+    transform: translateY(0);
+}
+.offcanvas-close {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.8);
+    transition: opacity 0.5s ease 0.55s, transform 0.5s ease 0.55s, background 0.2s, border-color 0.2s;
+}
+.offcanvas.open .offcanvas-close {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+}
+.offcanvas-close:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ─── Menu items ───────────────────────────────────────────────── */
+.offcanvas-nav {
+    padding: 20px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+.offcanvas-item {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.92);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    opacity: 0;
+    transform: translateX(28px);
+}
+.offcanvas-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    stroke: var(--brand-300);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px rgba(var(--brand-300-rgb), 0.35));
+}
+.offcanvas-item span {
+    flex: 1;
+    letter-spacing: 0.2px;
+}
+.offcanvas-item .offcanvas-arrow {
+    width: 14px;
+    height: 14px;
+    stroke: rgba(255, 255, 255, 0.4);
+    filter: none;
+    stroke-width: 2.5;
+}
+.offcanvas-item:hover,
+.offcanvas-item:active {
+    background: rgba(255, 255, 255, 0.13);
+    border-color: rgba(var(--brand-300-rgb), 0.4);
+    transform: translateX(2px);
+}
+.offcanvas-item:hover .offcanvas-arrow {
+    stroke: #fff;
+    transform: translateX(2px);
+}
+
+/* ─── Stagger items in when drawer opens ───────────────────────── */
+.offcanvas.open .offcanvas-item {
+    animation: jai-offcanvas-item-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.offcanvas.open .offcanvas-item:nth-child(1) { animation-delay: 0.45s; }
+.offcanvas.open .offcanvas-item:nth-child(2) { animation-delay: 0.55s; }
+.offcanvas.open .offcanvas-item:nth-child(3) { animation-delay: 0.65s; }
+.offcanvas.open .offcanvas-item:nth-child(4) { animation-delay: 0.75s; }
+.offcanvas.open .offcanvas-item:nth-child(5) { animation-delay: 0.85s; }
+.offcanvas.open .offcanvas-item:nth-child(6) { animation-delay: 0.95s; }
+.offcanvas.open .offcanvas-item:nth-child(7) { animation-delay: 1.05s; }
+@keyframes jai-offcanvas-item-in {
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Glare sweep across each item as it lands ─────────────────── */
+.offcanvas.open .offcanvas-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 78%;
+    height: 100%;
+    background: linear-gradient(
+        100deg,
+        transparent 22%,
+        rgba(255, 255, 255, 0.10) 38%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0.10) 62%,
+        transparent 78%
+    );
+    transform: skewX(-22deg);
+    pointer-events: none;
+    z-index: 2;
+    mix-blend-mode: screen;
+    animation: jai-offcanvas-glare 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.offcanvas.open .offcanvas-item:nth-child(1)::after { animation-delay: 0.65s; }
+.offcanvas.open .offcanvas-item:nth-child(2)::after { animation-delay: 0.75s; }
+.offcanvas.open .offcanvas-item:nth-child(3)::after { animation-delay: 0.85s; }
+.offcanvas.open .offcanvas-item:nth-child(4)::after { animation-delay: 0.95s; }
+.offcanvas.open .offcanvas-item:nth-child(5)::after { animation-delay: 1.05s; }
+.offcanvas.open .offcanvas-item:nth-child(6)::after { animation-delay: 1.15s; }
+.offcanvas.open .offcanvas-item:nth-child(7)::after { animation-delay: 1.25s; }
+@keyframes jai-offcanvas-glare {
+    0%   { left: -120%; opacity: 0; }
+    18%  { opacity: 1; }
+    82%  { opacity: 1; }
+    100% { left: 140%; opacity: 0; }
+}
+
+/* ─── Footer ───────────────────────────────────────────────────── */
+.offcanvas-foot {
+    padding: 18px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    opacity: 0;
+    transition: opacity 0.5s ease 1.3s;
+}
+.offcanvas-foot::before {
+    /* v3.49 — pulsating green dot was overlapping Sign Out; hidden. */
+    display: none !important;
+}
+.offcanvas-foot-version { color: rgba(255, 255, 255, 0.55); }
+.offcanvas.open .offcanvas-foot { opacity: 1; }
+
+@keyframes jai-pulse-dot {
+    0%, 100% { opacity: 0.6; transform: scale(0.85); }
+    50%      { opacity: 1;   transform: scale(1.1); }
+}
+
+/* ─── Mobile polish: tighten paddings/sizes elsewhere ─────────── */
+@media (max-width: 768px) {
+    main { padding: 16px !important; }
+    .upload-zone { padding: 50px 24px !important; border-radius: 22px !important; }
+    .upload-icon svg { width: 56px !important; height: 56px !important; }
+    .upload-zone h2 { font-size: 18px !important; }
+    .upload-zone p { font-size: 14px !important; }
+    .format-badge { font-size: 11px !important; padding: 5px 12px !important; }
+
+
+/* Hamburger: mobile-only, plain white glyph, no backdrop box */
+.unified-menu-btn {
+    display: none;
+    background: transparent;
+    border: 0;
+    color: #ffffff;
+    width: 44px; height: 44px;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    margin-left: auto;
+}
+.unified-menu-btn:hover { opacity: 0.85; }
+.unified-menu-btn svg { stroke: #ffffff; }
+@media (max-width: 768px) {
+    .unified-menu-btn { display: inline-flex !important; }
+    /* Hide every other topbar action — the off-canvas has them all */
+    .topbar .topbar-actions > *:not(.unified-menu-btn) { display: none !important; }
+}
+/* Kill the old rp-* hamburger + drawer from prior versions */
+.rp-mobile-menu-btn,
+#rpMobileMenu,
+#rpInlineMenu,
+.rp-inline-menu { display: none !important; }
+</style>
+
+<button type="button" id="unifiedMenuBtn" class="unified-menu-btn no-print" aria-label="Menu">
+    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
 
-<!-- ═══════ v3.56 — MOBILE: off-canvas drawer ═══════ -->
-<div id="rpOffcanvasBackdrop" class="rp-offcanvas-backdrop" onclick="rpCloseOffcanvas()"></div>
-<aside id="rpOffcanvas" class="rp-offcanvas" aria-hidden="true">
-    <div class="rp-oc-head">
-        <img src="<?= e($logoPath) ?>" alt="Logo" class="rp-oc-logo">
-        <button type="button" class="rp-oc-close" onclick="rpCloseOffcanvas()" aria-label="Close menu">
+<div id="mobileOffcanvasBackdrop" class="offcanvas-backdrop" onclick="closeMobileMenu()"></div>
+<aside id="mobileOffcanvas" class="offcanvas" aria-hidden="true">
+    <div class="offcanvas-header">
+        <img id="offcanvasLogo" src="<?= e($logoPath) ?>" alt="JAI" class="offcanvas-logo">
+        <button class="offcanvas-close" onclick="closeMobileMenu()" aria-label="Close menu">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
     </div>
-    <nav class="rp-oc-nav">
-        <a class="rp-oc-item" href="/index.html"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg><span>Transcribe</span></a>
-        <a class="rp-oc-item" href="/index.html#history"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>History</span></a>
-        <a class="rp-oc-item" href="/index.html#reports"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>All Reports</span></a>
-        <a class="rp-oc-item" href="/index.html#analytics"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span>Analytics</span></a>
-        <a class="rp-oc-item" href="/index.html#contacts"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Contacts</span></a>
-        <a class="rp-oc-item" href="/index.html#settings"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/></svg><span>Settings</span></a>
-        <a class="rp-oc-item" href="/api/logout.php"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Sign Out</span></a>
+    <nav class="offcanvas-nav">
+        <a class="offcanvas-item" href="/index.html">
+            <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            <span>Transcribe</span>
+            <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a class="offcanvas-item" href="/index.html#reports">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Reports</span>
+            <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a class="offcanvas-item" href="/index.html#history">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>History</span>
+            <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a class="offcanvas-item" href="/index.html#analytics">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Analytics</span>
+            <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a class="offcanvas-item" href="/index.html#contacts">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Contacts</span>
+            <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a class="offcanvas-item offcanvas-item-admin" href="/index.html#users" style="display:none">
+            <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Users</span>
+            <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a class="offcanvas-item" href="/index.html#feedback">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Feedback</span>
+            <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
     </nav>
+    <div class="offcanvas-foot">
+        <button id="offcanvasSignOut" class="offcanvas-signout-btn" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Sign Out</span>
+        </button>
+        <button id="offcanvasSettings" class="offcanvas-gear-btn" type="button" aria-label="Settings" title="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+    </div>
 </aside>
-<?php endif; /* $logged */ ?>
+
+<script>
+(function(){
+    const offcanvas = document.getElementById('mobileOffcanvas');
+    const backdrop  = document.getElementById('mobileOffcanvasBackdrop');
+    window.openMobileMenu = function () {
+        offcanvas.classList.add('open');
+        backdrop.classList.add('open');
+        offcanvas.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        
+            // Sync admin-only Users row visibility from localStorage role hint
+            try {
+                const role = (localStorage.getItem('user_role') || '').toLowerCase();
+                const ocU = document.querySelector('.offcanvas-item-admin');
+                if (ocU) ocU.style.display = (role === 'admin' || role === 'owner') ? '' : 'none';
+            } catch (e) {}
+    };
+    window.closeMobileMenu = function () {
+        offcanvas.classList.remove('open');
+        backdrop.classList.remove('open');
+        offcanvas.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    };
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && offcanvas.classList.contains('open')) closeMobileMenu();
+    });
+    document.getElementById('unifiedMenuBtn')?.addEventListener('click', openMobileMenu);
+    
+            // Sign out
+            document.getElementById('offcanvasSignOut')?.addEventListener('click', async () => {
+                try { await fetch('/api/auth.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ action: 'logout' }) }); }
+                catch (e) {}
+                window.location.href = '/login.php';
+            });
+            // Gear -> Settings
+            document.getElementById('offcanvasSettings')?.addEventListener('click', () => {
+                window.location.href = '/index.html#settings';
+            });
+})();
+</script>
+
 
 <!-- ═══════ v3.56 — MOBILE: floating bottom action bar ═══════ -->
 <div id="rpBottomBar" class="rp-bottom-bar no-print" aria-hidden="true">

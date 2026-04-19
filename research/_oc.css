@@ -1,0 +1,257 @@
+.offcanvas-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 8, 20, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 199;
+}
+.offcanvas-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ─── Drawer ────────────────────────────────────────────────────── */
+.offcanvas {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    max-width: 88vw;
+    height: 100vh;
+    height: 100dvh;
+    background: linear-gradient(180deg, var(--brand-grad-light) 0%, var(--brand-grad-mid) 50%, var(--brand-grad-dark) 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+        -24px 0 64px rgba(0, 0, 0, 0.55),
+        -2px 0 8px rgba(var(--brand-400-rgb), 0.18);
+    transform: translateX(105%);
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.offcanvas.open {
+    transform: translateX(0);
+}
+
+/* Subtle ambient grid behind everything */
+.offcanvas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(var(--brand-400-rgb), 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--brand-400-rgb), 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    mask-image: radial-gradient(ellipse at top, rgba(0, 0, 0, 0.6), transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at top, rgba(0, 0, 0, 0.6), transparent 70%);
+}
+.offcanvas > * { position: relative; z-index: 1; }
+
+/* ─── Header (logo + close) ────────────────────────────────────── */
+.offcanvas-header {
+    padding: 28px 24px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+.offcanvas-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(var(--brand-300-rgb), 0.55), transparent);
+}
+.offcanvas-logo {
+    height: 39px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1) drop-shadow(0 0 14px rgba(var(--brand-300-rgb), 0.45));
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.5s ease 0.5s, transform 0.5s ease 0.5s;
+}
+.offcanvas.open .offcanvas-logo {
+    opacity: 0.96;
+    transform: translateY(0);
+}
+.offcanvas-close {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.8);
+    transition: opacity 0.5s ease 0.55s, transform 0.5s ease 0.55s, background 0.2s, border-color 0.2s;
+}
+.offcanvas.open .offcanvas-close {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+}
+.offcanvas-close:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ─── Menu items ───────────────────────────────────────────────── */
+.offcanvas-nav {
+    padding: 20px 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+.offcanvas-item {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.92);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    opacity: 0;
+    transform: translateX(28px);
+}
+.offcanvas-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    stroke: var(--brand-300);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px rgba(var(--brand-300-rgb), 0.35));
+}
+.offcanvas-item span {
+    flex: 1;
+    letter-spacing: 0.2px;
+}
+.offcanvas-item .offcanvas-arrow {
+    width: 14px;
+    height: 14px;
+    stroke: rgba(255, 255, 255, 0.4);
+    filter: none;
+    stroke-width: 2.5;
+}
+.offcanvas-item:hover,
+.offcanvas-item:active {
+    background: rgba(255, 255, 255, 0.13);
+    border-color: rgba(var(--brand-300-rgb), 0.4);
+    transform: translateX(2px);
+}
+.offcanvas-item:hover .offcanvas-arrow {
+    stroke: #fff;
+    transform: translateX(2px);
+}
+
+/* ─── Stagger items in when drawer opens ───────────────────────── */
+.offcanvas.open .offcanvas-item {
+    animation: jai-offcanvas-item-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.offcanvas.open .offcanvas-item:nth-child(1) { animation-delay: 0.45s; }
+.offcanvas.open .offcanvas-item:nth-child(2) { animation-delay: 0.55s; }
+.offcanvas.open .offcanvas-item:nth-child(3) { animation-delay: 0.65s; }
+.offcanvas.open .offcanvas-item:nth-child(4) { animation-delay: 0.75s; }
+.offcanvas.open .offcanvas-item:nth-child(5) { animation-delay: 0.85s; }
+.offcanvas.open .offcanvas-item:nth-child(6) { animation-delay: 0.95s; }
+.offcanvas.open .offcanvas-item:nth-child(7) { animation-delay: 1.05s; }
+@keyframes jai-offcanvas-item-in {
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Glare sweep across each item as it lands ─────────────────── */
+.offcanvas.open .offcanvas-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 78%;
+    height: 100%;
+    background: linear-gradient(
+        100deg,
+        transparent 22%,
+        rgba(255, 255, 255, 0.10) 38%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0.10) 62%,
+        transparent 78%
+    );
+    transform: skewX(-22deg);
+    pointer-events: none;
+    z-index: 2;
+    mix-blend-mode: screen;
+    animation: jai-offcanvas-glare 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.offcanvas.open .offcanvas-item:nth-child(1)::after { animation-delay: 0.65s; }
+.offcanvas.open .offcanvas-item:nth-child(2)::after { animation-delay: 0.75s; }
+.offcanvas.open .offcanvas-item:nth-child(3)::after { animation-delay: 0.85s; }
+.offcanvas.open .offcanvas-item:nth-child(4)::after { animation-delay: 0.95s; }
+.offcanvas.open .offcanvas-item:nth-child(5)::after { animation-delay: 1.05s; }
+.offcanvas.open .offcanvas-item:nth-child(6)::after { animation-delay: 1.15s; }
+.offcanvas.open .offcanvas-item:nth-child(7)::after { animation-delay: 1.25s; }
+@keyframes jai-offcanvas-glare {
+    0%   { left: -120%; opacity: 0; }
+    18%  { opacity: 1; }
+    82%  { opacity: 1; }
+    100% { left: 140%; opacity: 0; }
+}
+
+/* ─── Footer ───────────────────────────────────────────────────── */
+.offcanvas-foot {
+    padding: 18px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    opacity: 0;
+    transition: opacity 0.5s ease 1.3s;
+}
+.offcanvas-foot::before {
+    /* v3.49 — pulsating green dot was overlapping Sign Out; hidden. */
+    display: none !important;
+}
+.offcanvas-foot-version { color: rgba(255, 255, 255, 0.55); }
+.offcanvas.open .offcanvas-foot { opacity: 1; }
+
+@keyframes jai-pulse-dot {
+    0%, 100% { opacity: 0.6; transform: scale(0.85); }
+    50%      { opacity: 1;   transform: scale(1.1); }
+}
+
+/* ─── Mobile polish: tighten paddings/sizes elsewhere ─────────── */
+@media (max-width: 768px) {
+    main { padding: 16px !important; }
+    .upload-zone { padding: 50px 24px !important; border-radius: 22px !important; }
+    .upload-icon svg { width: 56px !important; height: 56px !important; }
+    .upload-zone h2 { font-size: 18px !important; }
+    .upload-zone p { font-size: 14px !important; }
+    .format-badge { font-size: 11px !important; padding: 5px 12px !important; }
+
