@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260419q">
-    <link rel="stylesheet" href="css/ai-loading.css?v=20260419q">
+    <link rel="stylesheet" href="css/style.css?v=20260419r">
+    <link rel="stylesheet" href="css/ai-loading.css?v=20260419r">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -146,7 +146,7 @@
     <div id="mobileOffcanvasBackdrop" class="offcanvas-backdrop" onclick="closeMobileMenu()"></div>
     <aside id="mobileOffcanvas" class="offcanvas" aria-hidden="true">
         <div class="offcanvas-header">
-            <img src="img/logo.png" alt="JAI" class="offcanvas-logo">
+            <img id="offcanvasLogo" src="img/logo.png" alt="JAI" class="offcanvas-logo">
             <button class="offcanvas-close" onclick="closeMobileMenu()" aria-label="Close menu">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -189,8 +189,10 @@
             </button>
         </nav>
         <div class="offcanvas-foot">
-            <span>JAI Transcribe</span>
-            <span class="offcanvas-foot-version">v1.0</span>
+            <button id="offcanvasSignOut" class="offcanvas-signout-btn" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Sign Out</span>
+            </button>
         </div>
     </aside>
 
@@ -1936,18 +1938,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=20260419q"></script>
-    <script src="js/api.js?v=20260419q"></script>
-    <script src="js/pdf.js?v=20260419q"></script>
-    <script src="js/email-template.js?v=20260419q"></script>
-    <script src="js/autocomplete.js?v=20260419q"></script>
-    <script src="js/history.js?v=20260419q"></script>
-    <script src="js/assembler.js?v=20260419q"></script>
-    <script src="js/analytics.js?v=20260419q"></script>
-    <script src="js/contacts.js?v=20260419q"></script>
-    <script src="js/users.js?v=20260419q"></script>
-    <script src="js/app.js?v=20260419q"></script>
-    <script src="js/upload-particles.js?v=20260419q"></script>
+    <script src="js/ai-loading.js?v=20260419r"></script>
+    <script src="js/api.js?v=20260419r"></script>
+    <script src="js/pdf.js?v=20260419r"></script>
+    <script src="js/email-template.js?v=20260419r"></script>
+    <script src="js/autocomplete.js?v=20260419r"></script>
+    <script src="js/history.js?v=20260419r"></script>
+    <script src="js/assembler.js?v=20260419r"></script>
+    <script src="js/analytics.js?v=20260419r"></script>
+    <script src="js/contacts.js?v=20260419r"></script>
+    <script src="js/users.js?v=20260419r"></script>
+    <script src="js/app.js?v=20260419r"></script>
+    <script src="js/upload-particles.js?v=20260419r"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -3202,5 +3204,54 @@
 }
 </style>
 
+
+<style id="offcanvasBrandingFx">
+.offcanvas-signout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-700) 55%, var(--brand-grad-mid) 100%);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 6px 20px rgba(var(--brand-500-rgb), 0.28), inset 0 1px 0 rgba(255,255,255,0.14);
+}
+.offcanvas-signout-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(var(--brand-500-rgb), 0.4), inset 0 1px 0 rgba(255,255,255,0.18);
+}
+.offcanvas-signout-btn:active { transform: translateY(0); }
+.offcanvas-signout-btn svg { stroke: #fff; flex-shrink: 0; }
+</style>
+<script>
+(function () {
+    // Sync off-canvas logo with the live header logo (which already
+    // handles custom-logo.png / settings-driven branding).
+    function syncOffcanvasLogo() {
+        const hdr = document.getElementById('headerLogo');
+        const oc  = document.getElementById('offcanvasLogo');
+        if (hdr && oc && hdr.src) oc.src = hdr.src;
+    }
+    document.addEventListener('DOMContentLoaded', syncOffcanvasLogo);
+    // Also when the mobile menu opens, re-sync (in case headerLogo updated).
+    document.getElementById('hamburgerBtn')?.addEventListener('click', () => setTimeout(syncOffcanvasLogo, 20));
+
+    // Off-canvas sign out — delegate to the existing logoutBtn so we
+    // reuse App.logout() without having to hoist that method.
+    document.getElementById('offcanvasSignOut')?.addEventListener('click', () => {
+        document.getElementById('logoutBtn')?.click();
+    });
+})();
+</script>
 </body>
 </html>

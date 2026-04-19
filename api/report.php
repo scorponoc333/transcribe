@@ -4011,7 +4011,7 @@ function startEditTitle() {
             if (!r.ok) throw new Error(d.error || 'Failed');
             h1.textContent = newTitle;
         } catch (err) {
-            alert('Could not save title: ' + err.message);
+            jaiToast(err.message || 'Could not save the title. Please try again.', { kind: 'error', title: 'Could not save title' });
             h1.textContent = currentTitle;
         }
         h1.dataset.editing = '';
@@ -5535,5 +5535,89 @@ function copyTranscript() {
     }
 }
 </style>
+
+<style id="jaiToastFx">
+#jaiToast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 99999;
+    min-width: 320px;
+    max-width: 440px;
+    background: linear-gradient(135deg, var(--brand-600), var(--brand-700), var(--brand-grad-mid));
+    color: #fff;
+    border-radius: 12px;
+    padding: 16px 44px 16px 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 2px 6px rgba(var(--brand-500-rgb),0.3);
+    border: 1px solid rgba(255,255,255,0.18);
+    transform: translateX(calc(100% + 40px));
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+}
+#jaiToast.show { transform: translateX(0); opacity: 1; }
+#jaiToast .jt-title {
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.9;
+}
+#jaiToast .jt-msg { color: rgba(255,255,255,0.95); }
+#jaiToast .jt-close {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.14);
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    transition: background 0.2s;
+}
+#jaiToast .jt-close:hover { background: rgba(255,255,255,0.28); }
+#jaiToast.error {
+    background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+    border-color: rgba(255,255,255,0.22);
+}
+#jaiToast.success {
+    background: linear-gradient(135deg, #047857, #064e3b);
+}
+</style>
+<div id="jaiToast" role="status" aria-live="polite">
+    <button class="jt-close" aria-label="Close" onclick="jaiCloseToast()">&times;</button>
+    <div class="jt-title" id="jaiToastTitle">Notice</div>
+    <div class="jt-msg" id="jaiToastMsg"></div>
+</div>
+<script>
+(function () {
+    window.jaiToast = function (msg, opts) {
+        opts = opts || {};
+        const el = document.getElementById('jaiToast');
+        if (!el) return;
+        el.classList.remove('error', 'success');
+        if (opts.kind === 'error')   el.classList.add('error');
+        if (opts.kind === 'success') el.classList.add('success');
+        document.getElementById('jaiToastTitle').textContent = opts.title || ({
+            error:   'Error',
+            success: 'Success',
+        }[opts.kind] || 'Notice');
+        document.getElementById('jaiToastMsg').textContent = msg || '';
+        el.classList.add('show');
+        clearTimeout(el._dismissTimer);
+        el._dismissTimer = setTimeout(() => el.classList.remove('show'), opts.duration || 4500);
+    };
+    window.jaiCloseToast = function () {
+        const el = document.getElementById('jaiToast');
+        if (el) el.classList.remove('show');
+    };
+})();
+</script>
 </body>
 </html>
