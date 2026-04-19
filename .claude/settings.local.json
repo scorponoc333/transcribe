@@ -92,7 +92,23 @@
       "Bash(C:/xampp/php/php.exe -l api/ai-costs.php)",
       "Bash(php -r \"echo ''PHP OK'';\")",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(ssh -i /c/Users/User/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 root@165.22.237.23 \"echo CONNECTED && uname -a && lsb_release -a 2>/dev/null\")",
+      "Bash(ssh -i /c/Users/User/.ssh/id_ed25519 root@165.22.237.23 'set -e:*)",
+      "WebFetch(domain:docs.kie.ai)",
+      "WebFetch(domain:kie.ai)",
+      "Bash(pandoc --track-changes=all \"G:/My Drive/copy.docx\" -t plain)",
+      "Bash(python \"C:/Users/User/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/20438955-eda8-44f3-9558-f916db350bc0/f76f3958-ee25-44fc-b29a-2c5868003471/skills/docx/scripts/office/unpack.py\" \"G:/My Drive/copy.docx\" \"C:/xampp/htdocs/transcribe/copy_unpacked/\")",
+      "Bash(pip install:*)",
+      "Bash(python -c ':*)",
+      "Bash(mkdir -p \"C:/Users/User/.claude/skills/landing-page-base/source\")",
+      "Bash(cp -r C:/xampp/htdocs/ai-page-builder/sites/solidtech/. \"C:/Users/User/.claude/skills/landing-page-base/source/\")",
+      "Read(//c/Users/User/.claude/skills/landing-page-base/**)",
+      "Bash(scp Z:/www/transcribe.jasonhogan.ca/public_html/css/style.css Z:/www/transcribe.jasonhogan.ca/public_html/index.html deploy@165.22.237.23:/tmp/)",
+      "Bash(ssh deploy@165.22.237.23 ':*)",
+      "Bash(scp Z:/www/transcribe.jasonhogan.ca/public_html/css/style.css Z:/www/transcribe.jasonhogan.ca/public_html/index.html Z:/www/transcribe.jasonhogan.ca/public_html/api/report.php Z:/www/transcribe.jasonhogan.ca/public_html/api/update-title.php deploy@165.22.237.23:/tmp/)",
+      "Bash(scp Z:/www/transcribe.jasonhogan.ca/public_html/css/style.css Z:/www/transcribe.jasonhogan.ca/public_html/index.html Z:/www/transcribe.jasonhogan.ca/public_html/js/app.js deploy@165.22.237.23:/tmp/)",
+      "Bash(scp Z:/www/transcribe.jasonhogan.ca/public_html/js/app.js Z:/www/transcribe.jasonhogan.ca/public_html/index.html deploy@165.22.237.23:/tmp/)"
     ]
   }
 }

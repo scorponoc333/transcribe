@@ -1,8 +1,168 @@
+**Active Plan:** C:/Users/User/.claude/plans/i-need-to-come-pure-toucan.md
+
 # Jasonai Platform — Session Handoff
 
 > **For Claude Code:** If you're a new session picking this up, read this file FIRST,
 > then read the memory files at `C:\Users\User\.claude\projects\C--xampp-htdocs-transcribe\memory\MEMORY.md`
 > for full context. This file tells you WHERE WE ARE. Memory tells you WHO Jason is and WHAT we're building.
+
+## Last updated: 2026-04-19 (late late night, post-hub-deploy)
+
+## 2026-04-19 session snapshot #4 — HUB LIVE AT https://app.jasonai.ca/ — READ FIRST IF RESUMING
+
+### What shipped
+Hub MVP deployed to SG subdomain `app.jasonai.ca`. Auth + dashboard + app catalog (9 apps) + admin + welcome wizard + settings all live. SSO cookies configured for cross-subdomain with `Domain=.jasonai.ca` + `SameSite=None`. CORS wired so landing page + tools can call the hub with credentials.
+
+### Hub deploy specifics
+- **URL**: https://app.jasonai.ca/ (200, served from SG + Cloudflare-proxied)
+- **SG docroot**: `/home/customer/www/app.jasonai.ca/public_html/` (new subdomain, docroot auto-created by SG)
+- **DB**: same as landing — `dbgxecucfghbgg` on SG localhost. Schema imported: 12 `research_*` tables coexist with the 2 `jasonai_blog_*` tables. No collisions.
+- **Owner seeded**: uid=1, email `jasonhogan333@gmail.com`, password `!pending-set-password`. **Password reset link was sent to Jason's inbox** (reset_token generated, expires ~1hr from deploy).
+- **Config**: `/home/customer/www/app.jasonai.ca/public_html/config.php`, chmod 600, includes `cookie_domain='.jasonai.ca'` + `jwt_secret` shared with transcribe.
+
+### Pre-deploy code fixes that landed in `C:\xampp\htdocs\jasonai-hub\`
+- `api/db.php` — config-loader refactor (reads `db_host`/`db_name`/`db_user`/`db_pass` from config)
+- `api/_bootstrap.php` — CORS block allowing `*.jasonai.ca` + localhost origins, handles OPTIONS preflight with full preflight headers + `Vary: Origin`
+- `api/auth.php` — new `auth_cookie_params()` helper. When `config.cookie_domain` set, cookies use `Domain=.jasonai.ca` + `SameSite=None + Secure`. On localhost: no domain + `SameSite=Lax`. Applied to `research_sid` session cookie AND `jasonai_jwt` JWT cookie.
+- `api/schema.sql` — owner seed email corrected to `jasonhogan333@gmail.com`
+- `config.example.php` — rewritten with `db_*`, `cookie_domain`, `landing_url`, hub-specific defaults
+
+### Live verification (passed)
+- https://app.jasonai.ca/ → 200 (index.html dashboard shell)
+- /auth.html, /admin.html, /reset.html → 200
+- /api/auth.php?action=me → `{"success":true,"user":null}`
+- /api/apps.php → JSON with 9 apps, Transcribe first
+- POST /api/auth.php?action=register (throwaway email) → `{"success":true,"message":"Account created..."}` + row inserted in DB
+- POST /api/auth.php?action=reset-request for `jasonhogan333@gmail.com` → success + `reset_token` column populated in `research_users`
+- OPTIONS preflight from `Origin: https://jasonai.ca` → 204 with all ACAO/ACAC/ACAM headers
+- GET from `Origin: https://jasonai.ca` (cache-busted) → CORS headers present + `Vary: Origin` to keep CF cache correct
+
+### Jason's to-do on his side
+1. **Check jasonhogan333@gmail.com inbox** for the password reset email from `hello@jasonai.ca`. Click the link to set his real password and log in to the hub.
+2. (Later) Set up **Stripe** products/prices + paste real secrets into hub `config.php`. Stripe keys are stubs right now; checkout endpoints will 500 until replaced.
+
+### Side deliverables this session
+- New SiteGround SSH skill: `/siteground-ssh-setup` (reusable for future SG sites)
+- WP backup dir (417MB) deleted from SG as confirmed abandoned
+- Memory updated: [jasonai_landing_deployment.md](memory/jasonai_landing_deployment.md), [jason_custom_skills.md](memory/jason_custom_skills.md)
+
+### Outstanding (next sprint's options)
+1. **Seat-cap enforcement on transcribe** — 402 + upsell modal, with upgrade URL now pointing at the real live hub at `app.jasonai.ca/?upgrade=<slug>` (not dead anymore). Medium sprint.
+2. **First tool fork** — use `/base-fork` to spin up e.g. invoice.jasonai.ca. Gives you a second live tool besides transcribe.
+3. **Stripe wiring** — create products/prices in Stripe, replace config stubs, test checkout flow end-to-end. Unblocks actual paid signups.
+4. **Hub polish** — welcome wizard tested + onboarding UX, admin panel live testing, app detail pages.
+5. **Transcribe sub-app SSO exchange** — wire `/api/sso-exchange.php` on transcribe so clicking a tile on the hub deep-links with a short JWT and auto-logs the user in. Right now hub tile opens transcribe but user has to log in again.
+6. **301 redirect** `transcribe.jasonhogan.ca → transcribe.jasonai.ca` — still deferred.
+
+---
+
+## Last updated: 2026-04-19 (deeply late night, post-landing-deploy)
+
+## 2026-04-19 session snapshot #3 — LANDING PAGE LIVE AT https://jasonai.ca/ — READ FIRST IF RESUMING
+
+### What shipped
+`https://jasonai.ca/` now serves the Jason AI landing page from SiteGround. 9 tool tiles (Transcribe first), state-aware CTAs, blog infra wired, hub-sign-in link points at `app.jasonai.ca` (not yet deployed → graceful stub).
+
+### SiteGround deploy specifics
+- **SSH**: `ssh.jasonai.ca:18765`, user `u2721-vn2sjvqllhhc`, key `C:\Users\User\.ssh\jasonai_sg` (ed25519). Imported via SG Site Tools → SSH Keys Manager. Cloudflare `ssh` A record is **DNS-only** (unproxied) — required for port 18765 reachability.
+- **Document root**: `/home/customer/www/jasonai.ca/public_html/` (same as `~/public_html`).
+- **PHP**: 8.2.30 (ZTS).
+- **Site IP**: `35.208.47.198` (Cloudflare-proxied A record on `jasonai.ca` and `www.jasonai.ca`). No DNS cutover needed — root already pointed at SG.
+- **MySQL**: reused the pre-existing `dbgxecucfghbgg` (DB that WP used). Dropped 73 `rmd_*` WP tables. Added `jasonai_blog_posts` + `jasonai_blog_related`. User `u8hbcleq7git2` / `akccwmad5l5e`, host `127.0.0.1`.
+- **Server config**: `/home/customer/www/jasonai.ca/public_html/config.php` (chmod 600, never FTP'd — written server-side only). Contains OpenRouter + Fal.ai + EmailIt + JWT secret + DB creds.
+- **WP backup**: **DELETED** — `public_html_wp_backup_20260419_195618/` cleared after Jason confirmed the WordPress install was abandoned. 417MB freed.
+
+### Pre-deploy code fixes landed in `C:\xampp\htdocs\jasonai-landing\`
+- `api/blog.php` — Fal.ai key now read from `$cfg['fal_api_key']` (was hardcoded `F:/home/...` Windows path)
+- `api-shared/db.php` — reads DB creds from config.php (was hardcoded root/empty)
+- 5 HTML sign-in links → `https://app.jasonai.ca/auth.html` (with localhost override in `js/loader.js`)
+- `apps/apps.js` — admin bar localhost-only, HUB_BASE constant added
+- `blog/blog.js` — admin bar localhost-only (prod hub not live yet)
+- `tools/tools-data.json` — all 9 `appUrl` entries → `https://{slug}.jasonai.ca`
+- `config.example.php` — new template with `fal_api_key`, `db_*`, `hub_url` keys
+- Local `config.php` — added `fal_api_key` + `db_*` for dev parity (NEVER ships)
+
+### Live URLs verified (all 200)
+- https://jasonai.ca/
+- https://jasonai.ca/apps/
+- https://jasonai.ca/blog/
+- https://jasonai.ca/tools/?tool=transcribe
+- https://jasonai.ca/api/tools.php (JSON, 9 tools)
+- https://jasonai.ca/api/blog.php (JSON, 0 posts)
+- https://jasonai.ca/img/tool-transcribe.jpg (58KB Fal image)
+
+### Outstanding / next sprint
+1. **Hub `app.jasonai.ca` deploy** — landing's Sign in + CTA all point here; currently 404. Priority.
+2. **Remaining tool subdomains** — tools-data.json points at `https://{slug}.jasonai.ca`; only `transcribe.jasonai.ca` is live. Rest 404 until those forks ship.
+3. **Blog admin** — shipped with admin UI gated to localhost-only. Hub-session-based admin validation will come when hub is live.
+4. **FTP via `ftp.jasonai.ca`** — currently Cloudflare-proxied so it doesn't work externally. Left as-is; SSH covers deploy. Toggle to DNS-only later if FTP ever needed.
+5. **Seat-cap enforcement** on transcribe (HANDOFF item from snapshot #2) — still outstanding.
+6. **Stripe webhook URL** on transcribe — still `transcribe.jasonhogan.ca`; flip to `transcribe.jasonai.ca` when canonical.
+
+### Skill added
+- `C:\Users\User\.claude\skills\siteground-ssh-setup\` — reusable skill for wiring SSH access to any SG site. Generates keypair, gives Jason the public key + Cloudflare DNS-unproxy instructions.
+
+---
+
+## Last updated: 2026-04-19 (very late night, post-migration)
+
+## 2026-04-19 session snapshot #2 — transcribe migrated + landing wired — READ FIRST IF RESUMING
+
+### What shipped this session
+Transcribe is now reachable at **both** `transcribe.jasonhogan.ca` AND `transcribe.jasonai.ca` (dual-host, not cutover). Same droplet (165.22.237.23), same nginx server block, cert covers both. App is host-aware — any endpoint that used to hardcode `transcribe.jasonhogan.ca` now reads `$_SERVER['HTTP_HOST']`.
+
+**Migration artifacts:**
+- DNS: Cloudflare A record `transcribe.jasonai.ca → 165.22.237.23`, DNS-only (unproxied). Added manually by Jason (cloud.env token didn't have Zone:DNS:Edit scope).
+- Nginx: `/etc/nginx/sites-available/transcribe.jasonhogan.ca` — `server_name` on both :80 and :443 blocks now lists both hosts. Backup: `.bak_1776622988`.
+- Cert: `certbot --nginx --expand` — one cert now covers both hostnames, expires 2026-07-18.
+- App URL fixes (7 files edited, backups tagged `.bak_1776622662`):
+  - `api/stripe-checkout.php` — successUrl + cancelUrl now use HTTP_HOST
+  - `api/stripe-success.php` — Sign In link relativized
+  - `api/feedback.php` — email footer uses HTTP_HOST
+  - `api/ai-chat.php` + `api/classify-content.php` — OpenRouter HTTP-Referer uses HTTP_HOST
+  - `api/send-smtp.php` — fallback default flipped to transcribe.jasonai.ca
+  - `js/email-template.js` — heroBase flipped to transcribe.jasonai.ca (canonical for outbound emails)
+
+**Landing + hub integration:**
+- Fal.ai image generated: `C:\xampp\htdocs\jasonai-landing\img\tool-transcribe.jpg` (cinematic navy/cyan, microphone + waveform)
+- `tools-data.json` — Transcribe inserted as first entry (color `#0d9488`, icon `fa-microphone-lines`, appUrl `https://transcribe.jasonai.ca`)
+- `index.html` carousel — Transcribe tile added as first (+ duplicate loop)
+- `js/landing.js` — apps array prepended with Transcribe
+- `tools/tools.js` — **3-state CTA** wired for ALL tools (not just Transcribe). Calls hub `/api/auth.php?action=me` + `/api/apps.php` to decide: Start Free Trial / Open {Tool} / Add to Plan. Uses HUB_BASE constant that flips to `app.jasonai.ca` when not on localhost.
+- Hub: `C:\xampp\htdocs\jasonai-hub\api\apps.json` — Transcribe entry added (first). Cover at `app-assets/transcribe-cover.jpg` (reuses Fal image — first tool to have a cover; others still missing).
+
+### Outstanding / still TODO
+
+1. **Stripe webhook URL** — when canonical URL flips, Jason must update Stripe Dashboard → Developers → Webhooks endpoint from `transcribe.jasonhogan.ca` to `transcribe.jasonai.ca`. Both work right now.
+2. **Seat-cap enforcement** (HANDOFF item 5, deferred this session) — `api/users.php` + new `organizations.seats_included`/`seats_used` migration + 402 handler + upsell modal. Next session.
+3. **301 redirect** `transcribe.jasonhogan.ca → transcribe.jasonai.ca` — add after a couple weeks of dual-host so any bookmarks/email links land.
+4. **Landing page deploy to SiteGround** — still local. HANDOFF item 6.
+5. **Hub `app.jasonai.ca` deploy** — still localhost only. CTA's HUB_BASE auto-detects, so nothing to change once deployed.
+6. **Stripe products** — still stubbed; `Add to Plan` CTA points at `app.jasonai.ca/?upgrade=<slug>` which is a dead link for now.
+7. **Transcribe SSO token** — CTA currently deep-links to tool appUrl without a short-TTL JWT. The cross-subdomain session exchange described in `memory/jasonai_seats_and_billing.md` section "Cross-subdomain session (SSO)" is not wired yet.
+
+### Test accounts (unchanged from session #1)
+- Jason: jasonhogan333@gmail.com / JasonTest2026! (uid=1, admin + is_super_admin=1, org=1)
+- Acme Admin: uid=4, admin, org=2
+- Kur: uid=6, manager, org=1
+- Richard: uid=5, editor, org=1
+
+### Critical file paths touched
+- `C:\xampp\htdocs\jasonai-landing\img\tool-transcribe.jpg`
+- `C:\xampp\htdocs\jasonai-landing\tools\tools-data.json`
+- `C:\xampp\htdocs\jasonai-landing\tools\tools.js`
+- `C:\xampp\htdocs\jasonai-landing\index.html`
+- `C:\xampp\htdocs\jasonai-landing\js\landing.js`
+- `C:\xampp\htdocs\jasonai-hub\api\apps.json`
+- `C:\xampp\htdocs\jasonai-hub\app-assets\transcribe-cover.jpg`
+- Droplet `/var/www/transcribe/api/{stripe-checkout,stripe-success,feedback,ai-chat,classify-content,send-smtp}.php`
+- Droplet `/var/www/transcribe/js/email-template.js`
+- Droplet `/etc/nginx/sites-available/transcribe.jasonhogan.ca`
+
+### Plan file reference
+- `C:\Users\User\.claude\plans\here-is-a-chat-lovely-lynx.md` — migration + landing plan (COMPLETE — can archive after next session)
+
+---
 
 ## Last updated: 2026-04-19 (late night)
 
@@ -80,7 +240,7 @@ All committed locally as v3.114. Cache version: `?v=2026041bc`.
 
 ## What is this project?
 
-Jason Hogan (me@jasonhogan.ca) is building **Jasonai** — a suite of AI-powered productivity tools sold as a SaaS bundle at **jasonai.ca**. Each tool is a fork of a shared base template. The master plan is documented in memory at `jasonai_master_plan.md`.
+Jason Hogan (jasonhogan333@gmail.com) is building **Jasonai** — a suite of AI-powered productivity tools sold as a SaaS bundle at **jasonai.ca**. Each tool is a fork of a shared base template. The master plan is documented in memory at `jasonai_master_plan.md`.
 
 ## Current status
 
@@ -95,7 +255,7 @@ Jason Hogan (me@jasonhogan.ca) is building **Jasonai** — a suite of AI-powered
 - [x] **Multi-tenancy** — user_id on every table, tenant-scoped queries on all 17 endpoints
 
 - [x] **User auth** — register/login/verify/reset at `api/auth.php`, session cookies + JWT SSO
-  - Owner account: me@jasonhogan.ca (id=1, enterprise tier)
+  - Owner account: jasonhogan333@gmail.com (id=1, enterprise tier)
   - Test password set: `JasonTest2026!`
 
 - [x] **Usage metering** — monthly credit tracking per user, tier caps (200/600/2000), `api/usage.php`
@@ -278,3 +438,8 @@ If you're a new Claude Code session, do this:
 - Security: rotate API keys, audit data, multiple AI models, Claude manages DNS via API
 - Jason does NOT touch DNS dashboards — Claude manages everything via API
 - Cost protection on every public-facing AI endpoint (cheap model, caps, stealth cutoff)
+
+## Live Log
+- [2026-04-19 14:00] [target=droplet] session-switch installed. Hooks wired. Pre-edit guard active on .html/.css/.js/.php/.assets/js/api. Active plan pinned. Ready for fresh session to pitch resumable threads.
+- [2026-04-19 13:26] [target=droplet] Hey Jason — on **transcribe**, active target is the **droplet (165.22.237.23:/var/www/transcribe/)**. Session-switch briefing is now wiring correctly. Here's what's on deck: 1...
+- [2026-04-19 13:27] [target=droplet] Two flags before touching that file: 1. **Target mismatch** — active target is the **droplet**, but `C:\xampp\htdocs\transcribe\index.html` is the local/stale copy. Editing he...
