@@ -47,20 +47,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=2026041a5">
-    <link rel="stylesheet" href="css/ai-loading.css?v=2026041a5">
+    <link rel="stylesheet" href="css/style.css?v=2026041a6">
+    <link rel="stylesheet" href="css/ai-loading.css?v=2026041a6">
 </head>
 
 <body class="font-sans min-h-screen">
 
     <!-- ==================== HEADER ==================== -->
     <header class="header">
+        <canvas id="hdrMatrix" class="hdr-matrix" aria-hidden="true"></canvas>
         <nav class="mx-auto px-6 py-3 flex items-center justify-between" style="max-width:1200px">
             <div class="flex items-center gap-3">
-                <div class="hdr-logo-wrap">
-                    <canvas id="hdrConstellation" class="hdr-constellation" aria-hidden="true"></canvas>
-                    <img id="headerLogo" src="img/logo.png" alt="Logo" class="header-logo">
-                </div>
+                <img id="headerLogo" src="img/logo.png" alt="Logo" class="header-logo">
                 <script>
                 // Instantly swap to custom logo from localStorage before the default renders
                 (function(){
@@ -1941,18 +1939,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=2026041a5"></script>
-    <script src="js/api.js?v=2026041a5"></script>
-    <script src="js/pdf.js?v=2026041a5"></script>
-    <script src="js/email-template.js?v=2026041a5"></script>
-    <script src="js/autocomplete.js?v=2026041a5"></script>
-    <script src="js/history.js?v=2026041a5"></script>
-    <script src="js/assembler.js?v=2026041a5"></script>
-    <script src="js/analytics.js?v=2026041a5"></script>
-    <script src="js/contacts.js?v=2026041a5"></script>
-    <script src="js/users.js?v=2026041a5"></script>
-    <script src="js/app.js?v=2026041a5"></script>
-    <script src="js/upload-particles.js?v=2026041a5"></script>
+    <script src="js/ai-loading.js?v=2026041a6"></script>
+    <script src="js/api.js?v=2026041a6"></script>
+    <script src="js/pdf.js?v=2026041a6"></script>
+    <script src="js/email-template.js?v=2026041a6"></script>
+    <script src="js/autocomplete.js?v=2026041a6"></script>
+    <script src="js/history.js?v=2026041a6"></script>
+    <script src="js/assembler.js?v=2026041a6"></script>
+    <script src="js/analytics.js?v=2026041a6"></script>
+    <script src="js/contacts.js?v=2026041a6"></script>
+    <script src="js/users.js?v=2026041a6"></script>
+    <script src="js/app.js?v=2026041a6"></script>
+    <script src="js/upload-particles.js?v=2026041a6"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -3733,95 +3731,83 @@
 }
 </style>
 
-<style id="v356bHeaderStars">
-/* Wrapper (desktop = plain container, mobile = has constellation) */
-.hdr-logo-wrap { position: relative; display: inline-flex; align-items: center; }
-.hdr-constellation { display: none; }
+
+
+<style id="v359HeaderMatrix">
+.hdr-matrix { display: none; }
 @media (max-width: 768px) {
-    .hdr-constellation {
+    .header {
+        position: relative;
+        overflow: hidden;
+    }
+    .hdr-matrix {
         display: block;
         position: absolute;
-        left: -16px; right: -16px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: calc(100% + 32px);
-        height: 48px;
+        inset: 0;
+        width: 100%;
+        height: 100%;
         pointer-events: none;
-        opacity: 0.45;
         z-index: 0;
+        opacity: 0.28;
     }
-    .header-logo { position: relative; z-index: 1; }
+    .header > nav,
+    .header > .mx-auto {
+        position: relative;
+        z-index: 1;
+    }
 }
 </style>
 <script>
-/* v3.56b — mobile header constellation. Subtle, looped. */
+/* v3.59 — subtle matrix rain across the mobile header, behind logo + menu */
 (function () {
     if (!window.matchMedia('(max-width: 768px)').matches) return;
-    const cvs = document.getElementById('hdrConstellation');
+    const cvs = document.getElementById('hdrMatrix');
     if (!cvs) return;
+    const ctx = cvs.getContext('2d');
     const dpr = window.devicePixelRatio || 1;
+    const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ<>/';
+    let cols = 0, drops = [], cellW = 12 * dpr, cellH = 16 * dpr;
+    let W = 0, H = 0;
+
     function resize() {
         const rect = cvs.getBoundingClientRect();
-        cvs.width  = Math.max(1, Math.floor(rect.width  * dpr));
-        cvs.height = Math.max(1, Math.floor(rect.height * dpr));
+        W = Math.max(1, Math.floor(rect.width  * dpr));
+        H = Math.max(1, Math.floor(rect.height * dpr));
+        cvs.width = W;
+        cvs.height = H;
+        cols = Math.ceil(W / cellW);
+        drops = new Array(cols).fill(0).map(() => Math.random() * -H);
     }
     resize();
     window.addEventListener('resize', resize);
-    const ctx = cvs.getContext('2d');
-
-    // Precompute node positions
-    const NODES = 18;
-    const nodes = [];
-    function seed() {
-        nodes.length = 0;
-        for (let i = 0; i < NODES; i++) {
-            nodes.push({
-                x: Math.random() * cvs.width,
-                y: Math.random() * cvs.height,
-                vx: (Math.random() - 0.5) * 0.18 * dpr,
-                vy: (Math.random() - 0.5) * 0.12 * dpr,
-                r: (Math.random() * 1.2 + 0.5) * dpr,
-            });
-        }
-    }
-    seed();
-    window.addEventListener('resize', seed);
 
     let running = true;
-    document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) tick(); });
+    document.addEventListener('visibilitychange', () => {
+        running = !document.hidden;
+        if (running) tick();
+    });
 
     function tick() {
         if (!running) return;
-        ctx.clearRect(0, 0, cvs.width, cvs.height);
-        for (const n of nodes) {
-            n.x += n.vx; n.y += n.vy;
-            if (n.x < 0 || n.x > cvs.width)  n.vx *= -1;
-            if (n.y < 0 || n.y > cvs.height) n.vy *= -1;
-        }
-        // Edges
-        ctx.lineWidth = 0.5 * dpr;
-        for (let i = 0; i < nodes.length; i++) {
-            for (let j = i + 1; j < nodes.length; j++) {
-                const a = nodes[i], b = nodes[j];
-                const dx = a.x - b.x, dy = a.y - b.y;
-                const d = Math.sqrt(dx*dx + dy*dy);
-                const maxD = 70 * dpr;
-                if (d < maxD) {
-                    const alpha = (1 - d / maxD) * 0.55;
-                    ctx.strokeStyle = 'rgba(255,255,255,' + alpha.toFixed(3) + ')';
-                    ctx.beginPath();
-                    ctx.moveTo(a.x, a.y);
-                    ctx.lineTo(b.x, b.y);
-                    ctx.stroke();
-                }
+        // translucent overlay for trail fade
+        ctx.fillStyle = 'rgba(0, 8, 24, 0.18)';
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.font = 'bold ' + (13 * dpr) + "px 'Courier New', monospace";
+        ctx.textBaseline = 'top';
+
+        for (let i = 0; i < cols; i++) {
+            const ch = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+            const x = i * cellW;
+            const y = drops[i];
+            // Leading (brightest) glyph
+            ctx.fillStyle = 'rgba(220, 235, 255, 0.95)';
+            ctx.fillText(ch, x, y);
+            // Drop + reset
+            drops[i] += cellH * 0.55;
+            if (drops[i] > H + Math.random() * 40) {
+                drops[i] = -cellH * (Math.random() * 6 + 1);
             }
-        }
-        // Nodes
-        for (const n of nodes) {
-            ctx.fillStyle = 'rgba(255,255,255,0.85)';
-            ctx.beginPath();
-            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-            ctx.fill();
         }
         requestAnimationFrame(tick);
     }
