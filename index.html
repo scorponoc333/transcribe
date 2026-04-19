@@ -2158,9 +2158,10 @@
         transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
     }
     #reportOpenOverlay.phase-out {
-        opacity: 0;
-        transform: scale(1.35);
-        transition: transform 1s cubic-bezier(0.55, 0, 0.95, 0.45), opacity 0.8s ease;
+        /* Lift the curtain upward off the report underneath */
+        opacity: 1;
+        transform: translateY(-100vh);
+        transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease 1.2s;
     }
     #reportOpenCanvas {
         position: absolute; inset: 0; width: 100%; height: 100%;
@@ -2332,7 +2333,7 @@
 
 <!-- Report opening transition overlay -->
 <div id="reportOpenOverlay" aria-hidden="true">
-    <canvas id="reportOpenCanvas"></canvas>
+    <canvas id="reportOpenCanvas" style="opacity:0.55"></canvas>
     <div id="reportOpenContent">
         <img id="reportOpenLogo" src="/img/logo.png" alt="Jason AI">
         <div class="ro-eyebrow" id="reportOpenEyebrow">Opening Report</div>
@@ -2537,7 +2538,9 @@
                 // Now navigate. Because the exact same pixels are on-screen from
                 // the iframe, browser paint-holding keeps them visible during the
                 // top-window swap → no white flash, no "loading" state.
-                const navAfter = frameLoaded ? 950 : 1400;
+                // Slide-up takes 1.5s; navigate after it's nearly finished so
+                // the hand-off to the real report happens off-screen.
+                const navAfter = frameLoaded ? 1400 : 1700;
                 setTimeout(() => {
                     window.location.href = reportUrl;
                 }, navAfter);
@@ -2552,24 +2555,24 @@
             const resize = () => { sw = canvas.width = window.innerWidth; sh = canvas.height = window.innerHeight; };
             resize(); window.addEventListener('resize', resize);
 
-            const N = 180;
+            const N = 100;
             const sparks = [];
             for (let i = 0; i < N; i++) {
                 const ang = Math.random() * Math.PI * 2;
-                const sp = 0.15 + Math.random() * 0.6;
+                const sp = 0.06 + Math.random() * 0.22;
                 sparks.push({
                     x: Math.random()*sw, y: Math.random()*sh,
                     vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp,
                     r: 0.8 + Math.random() * 2.4,
-                    ph: Math.random()*Math.PI*2, phs: 0.04 + Math.random()*0.08,
+                    ph: Math.random()*Math.PI*2, phs: 0.02 + Math.random()*0.045,
                     life: Math.random()*300, maxLife: 250 + Math.random()*400
                 });
             }
             let stop = false;
             const draw = () => {
                 if (stop || !document.body.contains(canvas)) return;
-                ctx.fillStyle = 'rgba(0,0,0,0.08)';
-                ctx.fillRect(0, 0, sw, sh);
+                // Clear so the brand gradient behind the canvas shows through.
+                ctx.clearRect(0, 0, sw, sh);
                 for (const s of sparks) {
                     s.x += s.vx; s.y += s.vy; s.ph += s.phs; s.life++;
                     if (s.x < -10) s.x = sw+10; else if (s.x > sw+10) s.x = -10;
@@ -2580,7 +2583,7 @@
                     const flick = 0.55 + 0.45 * Math.sin(s.ph);
                     const a = fade * flick;
                     const gr = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r*5);
-                    gr.addColorStop(0, `rgba(255,255,255,${a*0.65})`);
+                    gr.addColorStop(0, `rgba(255,255,255,${a*0.45})`);
                     gr.addColorStop(1, 'rgba(255,255,255,0)');
                     ctx.fillStyle = gr;
                     ctx.beginPath(); ctx.arc(s.x, s.y, s.r*5, 0, Math.PI*2); ctx.fill();
