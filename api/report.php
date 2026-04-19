@@ -2717,7 +2717,7 @@ async function tbSignOut() {
     </style>
     <section id="jaiHeroSection">
         <canvas id="jaiHeroConstellation" class="no-print" aria-hidden="true"
-                style="position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;opacity:0.92;"></canvas>
+                style="position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;opacity:0.55;"></canvas>
         <div class="jaihero-inner" style="z-index:3;position:relative;">
             <img class="jaihero-logo" src="<?= e($logoPath) ?>" alt="Logo">
             <div class="jaihero-badge"><?= $modeInfo['label'] ?></div>
@@ -4823,7 +4823,7 @@ function copyTranscript() {
         }
 
         function makeSpark(randomLife) {
-            const speed = 0.08 + Math.random() * 0.35;
+            const speed = 0.035 + Math.random() * 0.16;
             const ang = Math.random() * Math.PI * 2;
             return {
                 x: Math.random() * w,
@@ -4832,7 +4832,7 @@ function copyTranscript() {
                 vy: Math.sin(ang) * speed,
                 r: 0.7 + Math.random() * 2.0,
                 ph: Math.random() * Math.PI * 2,
-                phs: 0.04 + Math.random() * 0.08,
+                phs: 0.02 + Math.random() * 0.045,
                 life: randomLife ? Math.random() * 300 : 0,
                 maxLife: 260 + Math.random() * 420
             };
