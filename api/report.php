@@ -2593,12 +2593,12 @@ async function tbSignOut() {
         }
         #jaiHeroSection .jaihero-logo {
             display: block;
-            height: 120px;
+            height: 156px;
             width: auto;
-            max-width: 520px;
+            max-width: 680px;
             aspect-ratio: 2.5 / 1;
             object-fit: contain;
-            margin: 0 auto 28px auto;
+            margin: 0 auto 14px auto;
             filter: brightness(0) invert(1);
             opacity: 0.95;
         }
