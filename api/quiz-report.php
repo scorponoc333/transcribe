@@ -418,14 +418,6 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     </div>
 
     
-    <!-- v3.57 — mobile-only stacked page actions below cover -->
-    <div class="qr-mob-actions">
-        <a href="/api/report.php?id=<?= (int) $attempt['transcription_id'] ?>" class="qmpa-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
-            <span>Back to Report</span>
-        </a>
-    </div>
-
 <!-- Summary -->
     <?php if ($correctQs || $wrongQs): ?>
     <div class="report-card">
@@ -1793,6 +1785,17 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
 @media print {
     .qr-mob-actions,
     .qr-mob-actions * { display: none !important; }
+}
+</style>
+
+<style id="v3104QrPrintLogo">
+@media print {
+    .qr-cover-logo {
+        height: 132px !important;
+        max-width: 360px !important;
+        margin-top: -50px !important;
+        margin-bottom: 18px !important;
+    }
 }
 </style>
 </body>
