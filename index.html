@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260419t">
-    <link rel="stylesheet" href="css/ai-loading.css?v=20260419t">
+    <link rel="stylesheet" href="css/style.css?v=20260419u">
+    <link rel="stylesheet" href="css/ai-loading.css?v=20260419u">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1938,18 +1938,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=20260419t"></script>
-    <script src="js/api.js?v=20260419t"></script>
-    <script src="js/pdf.js?v=20260419t"></script>
-    <script src="js/email-template.js?v=20260419t"></script>
-    <script src="js/autocomplete.js?v=20260419t"></script>
-    <script src="js/history.js?v=20260419t"></script>
-    <script src="js/assembler.js?v=20260419t"></script>
-    <script src="js/analytics.js?v=20260419t"></script>
-    <script src="js/contacts.js?v=20260419t"></script>
-    <script src="js/users.js?v=20260419t"></script>
-    <script src="js/app.js?v=20260419t"></script>
-    <script src="js/upload-particles.js?v=20260419t"></script>
+    <script src="js/ai-loading.js?v=20260419u"></script>
+    <script src="js/api.js?v=20260419u"></script>
+    <script src="js/pdf.js?v=20260419u"></script>
+    <script src="js/email-template.js?v=20260419u"></script>
+    <script src="js/autocomplete.js?v=20260419u"></script>
+    <script src="js/history.js?v=20260419u"></script>
+    <script src="js/assembler.js?v=20260419u"></script>
+    <script src="js/analytics.js?v=20260419u"></script>
+    <script src="js/contacts.js?v=20260419u"></script>
+    <script src="js/users.js?v=20260419u"></script>
+    <script src="js/app.js?v=20260419u"></script>
+    <script src="js/upload-particles.js?v=20260419u"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -3292,5 +3292,110 @@
     .learn-help-subtitle { display: none !important; }
 }
 </style>
+
+<style id="v345RowWipe">
+@media screen {
+/* Horizontal gradient wipe on list-table rows */
+.v345-row {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+    transition:
+        clip-path 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.35s ease;
+    transition-delay: var(--v345-delay, 0ms);
+}
+.v345-row.v345-assembled {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+}
+/* Brand-tinted highlight strip that sweeps along with the clip edge so
+   the reveal reads as a gradient wipe rather than a slide. Applied via
+   an inset shadow on the first cell (tr pseudo-elements are flaky). */
+.v345-row > td:first-child {
+    position: relative;
+}
+.v345-row > td:first-child::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(var(--brand-400-rgb, 96, 165, 250), 0.18) 45%,
+        rgba(var(--brand-400-rgb, 96, 165, 250), 0.35) 50%,
+        rgba(var(--brand-400-rgb, 96, 165, 250), 0.18) 55%,
+        transparent 100%);
+    transform: translateX(-110%);
+    pointer-events: none;
+    opacity: 0;
+    transition:
+        transform 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.2s ease;
+    transition-delay: var(--v345-delay, 0ms);
+}
+.v345-row.v345-assembled > td:first-child::before {
+    transform: translateX(110%);
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .v345-row { clip-path: none !important; opacity: 1 !important; }
+    .v345-row > td:first-child::before { display: none !important; }
+}
+}
+</style>
+<script>
+/* v3.45 — table row wipe across every list */
+(function () {
+    if (!window.MutationObserver) return;
+
+    const TBODIES = [
+        'historyTableBody',
+        'contactsTableBody',
+        'usersTableBody',
+        'rp2TableBody',
+        'activeUsersTableBody'
+    ];
+    const STAGGER_MS = 70;  // per-row delay — user said 'quickly'
+
+    function animateRows(tbody) {
+        // Skip if tbody currently shows a loading / empty state row
+        const rows = tbody.querySelectorAll(':scope > tr');
+        if (!rows.length) return;
+        // Don't animate a single placeholder row like 'Loading...' or
+        // 'No records yet'
+        if (rows.length === 1 && rows[0].cells.length === 1 && rows[0].cells[0].getAttribute('colspan')) {
+            return;
+        }
+        rows.forEach((tr, idx) => {
+            if (tr._v345Applied) return;
+            tr._v345Applied = true;
+            tr.classList.add('v345-row');
+            tr.style.setProperty('--v345-delay', (idx * STAGGER_MS) + 'ms');
+            // Trigger on the next two frames so the initial style takes effect
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                tr.classList.add('v345-assembled');
+            }));
+        });
+    }
+
+    function attach(tbody) {
+        if (!tbody || tbody._v345Observed) return;
+        tbody._v345Observed = true;
+        // Animate whatever's there now
+        animateRows(tbody);
+        // And anything that gets re-rendered later
+        new MutationObserver(() => animateRows(tbody)).observe(tbody, { childList: true });
+    }
+
+    function init() {
+        TBODIES.forEach(id => attach(document.getElementById(id)));
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
 </body>
 </html>
