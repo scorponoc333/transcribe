@@ -3067,13 +3067,27 @@
         };
         tryRoute(30);
     }
-    // Route on initial load
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', routeFromHash);
-    } else {
-        routeFromHash();
+    // On initial load: wait for App.init() to finish (it's async — awaits
+    // checkAuth + loadSettings, then calls showSection('upload') which would
+    // otherwise clobber our hash route). Use the app:ready event dispatched
+    // at the end of App.init(); fall back to a polling check if the event
+    // has already fired before we attached.
+    function routeOnceReady() {
+        if (window.App && window.App._initDone) { routeFromHash(); return; }
+        document.addEventListener('app:ready', routeFromHash, { once: true });
+        // Safety: if for any reason app:ready never fires within 4s, route anyway.
+        setTimeout(() => {
+            if (!window.App || !window.App._initDone) return;
+            // no-op: the once-listener above will catch it
+        }, 4000);
+        setTimeout(() => { routeFromHash(); }, 4500);
     }
-    // And on any subsequent hash change
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', routeOnceReady);
+    } else {
+        routeOnceReady();
+    }
+    // Subsequent hash changes (already-initialized page) can route immediately.
     window.addEventListener('hashchange', routeFromHash);
 })();
 </script>

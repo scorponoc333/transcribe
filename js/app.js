@@ -44,6 +44,12 @@ const App = {
         this.initAutocomplete();
         this.initWorkflowAutocomplete();
         this.loadCoverPages();
+
+        // Mark init as complete + fire event so the hash router can run
+        // AFTER all the async boot work (checkAuth, loadSettings) has
+        // finished and showSection('upload') above won't clobber it.
+        this._initDone = true;
+        try { document.dispatchEvent(new Event('app:ready')); } catch (e) {}
     },
 
     // ---- Auth ----
