@@ -5981,6 +5981,7 @@ function copyTranscript() {
         <a class="rp-oc-item" href="/api/logout.php"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Sign Out</span></a>
     </nav>
 </aside>
+<?php endif; /* $logged */ ?>
 
 <!-- ═══════ v3.56 — MOBILE: floating bottom action bar ═══════ -->
 <div id="rpBottomBar" class="rp-bottom-bar no-print" aria-hidden="true">
@@ -6019,7 +6020,6 @@ function copyTranscript() {
         </div>
     </div>
 </div>
-<?php endif; ?>
 
 <style id="v356ReportMobile">
 /* ─── Mobile-only stacked page actions below hero ─── */
@@ -6341,6 +6341,11 @@ function copyTranscript() {
 }
 </style>
 
+
+<script id="v386PublicFlag">
+window.rpIsLogged = <?= $logged ? 'true' : 'false' ?>;
+</script>
+
 <script>
 /* ═══════ v3.56 — mobile glue ═══════ */
 (function () {
@@ -6418,6 +6423,21 @@ function copyTranscript() {
         const note = document.getElementById('rpEmailMsg')?.value.trim();
         const btn = document.getElementById('rpEmailSendBtn');
         if (!to) { alert('Please enter a recipient email.'); return; }
+
+        // Public viewers can't call send-smtp.php (requires auth).
+        // Open their mail app instead with the URL pre-filled.
+        if (!window.rpIsLogged) {
+            const publicUrl = window.location.href;
+            const reportTitle = <?= json_encode($title) ?>;
+            const body = (note ? (note + '\n\n') : 'I thought you would find this report useful.\n\n')
+                + 'View the full report here:\n' + publicUrl;
+            const mailto = 'mailto:' + encodeURIComponent(to)
+                + '?subject=' + encodeURIComponent(subject || ('Transcription | ' + reportTitle))
+                + '&body=' + encodeURIComponent(body);
+            window.location.href = mailto;
+            rpShareClose();
+            return;
+        }
         if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
 
         // Pull the sender identity out of localStorage (same key the main

@@ -1448,6 +1448,20 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
         const note = document.getElementById('qrEmailMsg')?.value.trim();
         const btn = document.getElementById('qrEmailSendBtn');
         if (!to) { alert('Please enter a recipient email.'); return; }
+
+        // No session cookie -> use mailto: fallback so public viewers
+        // can share the quiz-report URL with no backend call.
+        const hasSession = /PHPSESSID=/.test(document.cookie) || /transcribe_session=/.test(document.cookie);
+        if (!hasSession) {
+            const quizUrl = window.location.href;
+            const body = (note ? (note + '\n\n') : 'Sharing a pop quiz report.\n\n') + 'Open the quiz report here:\n' + quizUrl;
+            const mailto = 'mailto:' + encodeURIComponent(to)
+                + '?subject=' + encodeURIComponent(subject || 'Pop Quiz Report')
+                + '&body=' + encodeURIComponent(body);
+            window.location.href = mailto;
+            qrShareClose();
+            return;
+        }
         if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
 
         let senderName = 'Jason AI', senderEmail = '';
