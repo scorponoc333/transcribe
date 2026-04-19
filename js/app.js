@@ -368,6 +368,8 @@ const App = {
             this.showAnalytics();
         });
         document.getElementById('analyticsBackBtn').addEventListener('click', () => this.showSection('upload'));
+        // Reports — More menu item
+        document.getElementById('reportPagesBtn')?.addEventListener('click', () => this.showReportPages());
 
         // "More" dropdown toggle
         document.getElementById('moreBtn')?.addEventListener('click', (e) => {
@@ -1389,6 +1391,7 @@ const App = {
             analytics: document.getElementById('analyticsSection'),
             contacts: document.getElementById('contactsSection'),
             users: document.getElementById('usersSection'),
+            reportPages: document.getElementById('reportPagesSection'),
         };
 
         Object.entries(sectionMap).forEach(([key, el]) => {
@@ -1404,17 +1407,19 @@ const App = {
             processing: 'transcribeBtn_nav',
             results:    'transcribeBtn_nav',
             error:      'transcribeBtn_nav',
-            history:    'moreBtn',
-            analytics:  'moreBtn',
-            contacts:   'moreBtn',
-            users:      'moreBtn',
+            history:     'moreBtn',
+            analytics:   'moreBtn',
+            contacts:    'moreBtn',
+            users:       'moreBtn',
+            reportPages: 'moreBtn',
         };
         // Dropdown item ids for sub-highlight inside the More menu
         const moreItemMap = {
-            history:    'historyBtn',
-            analytics:  'analyticsBtn',
-            contacts:   'contactsBtn',
-            users:      'usersBtn',
+            history:     'historyBtn',
+            analytics:   'analyticsBtn',
+            contacts:    'contactsBtn',
+            users:       'usersBtn',
+            reportPages: 'reportPagesBtn',
         };
         const activeBtnId = navMap[name];
         document.querySelectorAll('.header-nav-btn').forEach((b) => {
@@ -2726,6 +2731,13 @@ const App = {
 
     // Show history — lightweight inline loading (no full-screen overlay
     // so background transcription indicator stays accessible)
+    showReportPages() {
+        this.showSection('reportPages');
+        if (window.ReportPages && typeof window.ReportPages.load === 'function') {
+            try { window.ReportPages.load(); } catch (e) { console.error('ReportPages.load failed', e); }
+        }
+    },
+
     showHistory() {
         this.showSection('history');
         const tbody = document.getElementById('historyTableBody');

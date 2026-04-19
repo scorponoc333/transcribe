@@ -99,10 +99,10 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             History
                         </button>
-                        <a href="/api/report-pages.php" id="reportPagesLink" class="header-more-item" title="Reports">
+                        <button id="reportPagesBtn" class="header-more-item" title="Reports">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                             Reports
-                        </a>
+                        </button>
                         <button id="analyticsBtn" class="header-more-item" title="Analytics">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                             Analytics
@@ -923,7 +923,57 @@
         </div>
     </div>
 
-    <!-- ==================== FOOTER ==================== -->
+    
+        <!-- ---- REPORT PAGES SECTION (like History but with gradient search/filters from the All Reports panel) ---- -->
+        <section id="reportPagesSection" class="app-section">
+            <div class="page-header-bar flex items-center justify-between flex-wrap gap-4">
+                <h1 class="text-2xl font-bold t-heading">Report Pages</h1>
+                <button id="reportPagesBackBtn" class="btn-secondary btn-sm" type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    Back to Transcribe
+                </button>
+            </div>
+
+            <!-- Gradient toolbar (mirrors the All Reports sidebar header style) -->
+            <div class="rp2-toolbar">
+                <div class="rp2-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    All Reports
+                </div>
+                <div class="rp2-search-wrap">
+                    <svg class="rp2-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                    <input type="text" id="rp2Search" class="rp2-search" placeholder="Search reports..." autocomplete="off">
+                </div>
+                <div class="rp2-filters" role="tablist">
+                    <button class="rp2-filter active" data-type="" type="button">All</button>
+                    <button class="rp2-filter" data-type="recording" type="button">Audio</button>
+                    <button class="rp2-filter" data-type="meeting" type="button">Meeting</button>
+                    <button class="rp2-filter" data-type="learning" type="button">Learning</button>
+                </div>
+            </div>
+
+            <!-- Results table (reuses .history-table-wrap / .history-table styles) -->
+            <div class="history-table-wrap glass" style="margin-top:18px;">
+                <table class="history-table" id="rp2Table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Words</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rp2TableBody">
+                        <tr><td colspan="5" class="text-center t-muted py-8">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="history-pagination" id="rp2Pagination"></div>
+        </section>
+
+        <!-- ==================== FOOTER ==================== -->
     <footer class="footer">
         <p id="appFooterText">Transcription &amp; Learning Tool. Developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:2px">Jason Hogan</a></p>
     </footer>
@@ -2618,5 +2668,217 @@
     setTimeout(step, 220);
 })();
 </script>
+
+
+<style>
+/* ---- Report Pages: gradient toolbar (mirrors All Reports sidebar header) ---- */
+.rp2-toolbar {
+    background: linear-gradient(to bottom, var(--brand-grad-light) 0%, var(--brand-grad-mid) 50%, var(--brand-grad-dark) 100%);
+    border: 1px solid rgba(var(--brand-300-rgb), 0.18);
+    border-radius: 14px;
+    padding: 18px 20px 16px;
+    box-shadow: 0 6px 20px rgba(var(--brand-500-rgb), 0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.rp2-title {
+    display: flex; align-items: center; gap: 8px;
+    color: #ffffff;
+    font-size: 13px; font-weight: 800; letter-spacing: 1.2px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    margin-bottom: 12px;
+}
+.rp2-title svg { stroke: #ffffff; opacity: 0.95; flex-shrink: 0; }
+.rp2-search-wrap { position: relative; margin-bottom: 12px; }
+.rp2-search-icon {
+    position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    stroke: rgba(255,255,255,0.62);
+    pointer-events: none;
+}
+.rp2-search {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.10);
+    color: #ffffff;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+.rp2-search::placeholder { color: rgba(255,255,255,0.55); }
+.rp2-search:focus {
+    border-color: rgba(255,255,255,0.45);
+    background: rgba(255,255,255,0.16);
+}
+.rp2-filters {
+    display: flex; gap: 6px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 10px;
+    padding: 4px;
+}
+.rp2-filter {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255,255,255,0.72);
+    cursor: pointer;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.4px;
+    font-family: inherit;
+    transition: all 0.18s ease;
+}
+.rp2-filter:hover { color: #fff; background: rgba(255,255,255,0.10); }
+.rp2-filter.active {
+    background: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.35);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+</style>
+
+
+
+<script>
+/* ---- Report Pages section wiring ---- */
+(function () {
+    const state = { page: 1, perPage: 20, search: '', type: '', total: 0 };
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function fmtDate(iso) {
+        if (!iso) return '';
+        const d = new Date(iso);
+        if (isNaN(d)) return iso;
+        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    async function fetchReports() {
+        const tbody = document.getElementById('rp2TableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center t-muted py-8">Loading...</td></tr>';
+        const params = new URLSearchParams({
+            page: String(state.page),
+            per_page: String(state.perPage),
+            _t: Date.now()
+        });
+        if (state.search) params.set('search', state.search);
+        if (state.type)   params.set('mode', state.type);
+        try {
+            const r = await fetch('/api/list.php?' + params.toString(), { credentials: 'same-origin', cache: 'no-store' });
+            const data = await r.json();
+            const items = Array.isArray(data.data) ? data.data : (Array.isArray(data.items) ? data.items : (data.transcriptions || []));
+            state.total = data.total || items.length;
+            renderRows(items);
+            renderPagination();
+        } catch (e) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center t-muted py-8">Could not load reports.</td></tr>';
+        }
+    }
+
+    function renderRows(items) {
+        const tbody = document.getElementById('rp2TableBody');
+        if (!items.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center t-muted py-8">No reports match your filters.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = items.map(it => {
+            const mode  = (it.mode || 'recording').toLowerCase();
+            const label = mode === 'learning' ? 'Learning' : mode === 'meeting' ? 'Meeting' : 'Audio';
+            const title = esc(it.title || 'Untitled');
+            const words = (it.word_count != null) ? Number(it.word_count).toLocaleString() : '—';
+            return `<tr>
+                <td>${esc(fmtDate(it.created_at))}</td>
+                <td style="font-weight:600">${title}</td>
+                <td><span class="type-badge type-${mode}">${label}</span></td>
+                <td>${words}</td>
+                <td>
+                    <a href="/api/report.php?id=${encodeURIComponent(it.id)}" class="btn-primary btn-sm" style="display:inline-flex;align-items:center;gap:6px;">
+                        Open Report
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </a>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function renderPagination() {
+        const el = document.getElementById('rp2Pagination');
+        if (!el) return;
+        const pages = Math.max(1, Math.ceil(state.total / state.perPage));
+        if (pages <= 1) { el.innerHTML = ''; return; }
+        const buttons = [];
+        buttons.push(`<button class="btn-secondary btn-sm" ${state.page === 1 ? 'disabled' : ''} data-page="${state.page - 1}">Prev</button>`);
+        for (let i = 1; i <= pages; i++) {
+            if (i === 1 || i === pages || Math.abs(i - state.page) <= 2) {
+                buttons.push(`<button class="btn-secondary btn-sm ${i === state.page ? 'is-current' : ''}" data-page="${i}">${i}</button>`);
+            } else if (Math.abs(i - state.page) === 3) {
+                buttons.push('<span style="padding:6px 4px;color:var(--fg-muted)">…</span>');
+            }
+        }
+        buttons.push(`<button class="btn-secondary btn-sm" ${state.page === pages ? 'disabled' : ''} data-page="${state.page + 1}">Next</button>`);
+        el.innerHTML = buttons.join('');
+    }
+
+    // Lazy-bind after section is in the DOM
+    function bindOnce() {
+        const sect = document.getElementById('reportPagesSection');
+        if (!sect || sect._rp2Bound) return;
+        sect._rp2Bound = true;
+
+        const searchInput = document.getElementById('rp2Search');
+        let tmr;
+        searchInput?.addEventListener('input', () => {
+            clearTimeout(tmr);
+            tmr = setTimeout(() => {
+                state.search = searchInput.value.trim();
+                state.page = 1;
+                fetchReports();
+            }, 250);
+        });
+
+        document.querySelectorAll('#reportPagesSection .rp2-filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#reportPagesSection .rp2-filter').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.type = btn.dataset.type || '';
+                state.page = 1;
+                fetchReports();
+            });
+        });
+
+        document.getElementById('rp2Pagination')?.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-page]');
+            if (!btn || btn.disabled) return;
+            const p = parseInt(btn.dataset.page, 10);
+            if (!isNaN(p) && p !== state.page) {
+                state.page = p;
+                fetchReports();
+                sect.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        document.getElementById('reportPagesBackBtn')?.addEventListener('click', () => {
+            if (window.App && typeof window.App.showSection === 'function') window.App.showSection('upload');
+        });
+    }
+
+    window.ReportPages = {
+        load() {
+            bindOnce();
+            // Reset page to 1 on open so the user always sees the most recent first
+            state.page = 1;
+            fetchReports();
+        }
+    };
+})();
+</script>
+
 </body>
 </html>
