@@ -148,9 +148,10 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
     transform-origin: left center;
     animation: loginInputGrow 0.45s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
 }
-/* 8. Eyeball toggle pops in with bounce */
+/* 8. Eyeball toggle pops in with bounce — keep translateY(-50%) from the
+   base CSS so it stays vertically centered in the password input. */
 .login-form .login-field:nth-of-type(2) .login-password-toggle {
-    transform: scale(0.1) rotate(-90deg);
+    transform: translateY(-50%) scale(0.1) rotate(-90deg);
     animation: loginEyePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 3.1s forwards;
 }
 
@@ -163,9 +164,9 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
     100% { opacity: 1; transform: scaleX(1); }
 }
 @keyframes loginEyePop {
-    0%   { opacity: 0; transform: scale(0.1) rotate(-90deg); }
-    70%  { opacity: 1; transform: scale(1.15) rotate(8deg); }
-    100% { opacity: 1; transform: scale(1) rotate(0); }
+    0%   { opacity: 0; transform: translateY(-50%) scale(0.1) rotate(-90deg); }
+    70%  { opacity: 1; transform: translateY(-50%) scale(1.15) rotate(8deg); }
+    100% { opacity: 1; transform: translateY(-50%) scale(1) rotate(0); }
 }
 
 /* 9. Sign In button — scales in + brand shine sweep */
