@@ -2534,6 +2534,30 @@ async function tbSignOut() {
             z-index: 1;
             pointer-events: none;
         }
+        /* Dark mode: thicker brand overlay so the hero doesn't read
+           'too blue' — user wanted ~75% tint rather than the default
+           45-55% that let too much of the hero image + sparks through.
+           Light-mode rule at the top of this file is unchanged. */
+        @media screen {
+        [data-theme="dark"] #jaiHeroSection::before {
+            background:
+                radial-gradient(ellipse 70% 55% at 50% 22%,
+                    rgba(var(--brand-400-rgb), 0.68) 0%,
+                    rgba(var(--brand-500-rgb), 0.42) 45%,
+                    rgba(var(--brand-500-rgb), 0) 75%),
+                linear-gradient(180deg,
+                    rgba(var(--brand-500-rgb), 0.70) 0%,
+                    rgba(var(--brand-grad-mid-rgb), 0.85) 30%,
+                    rgba(var(--brand-grad-dark-rgb), 0.95) 70%,
+                    rgba(5, 8, 22, 0.98) 100%) !important;
+        }
+        /* Also tighten the hero image desaturation in dark mode so the
+           undertones go near-black rather than muted blue. */
+        [data-theme="dark"] #jaiHeroSection::after {
+            filter: grayscale(1) contrast(1.15) brightness(0.55) !important;
+        }
+        }
+
         /* Meeting mode: darker cover overlay so the boardroom image doesn't overwhelm the title */
         #jaiHeroSection[data-mode="meeting"]::before {
             background:
@@ -2564,6 +2588,7 @@ async function tbSignOut() {
             height: 65px;
             width: auto;
             max-width: 350px;
+            object-fit: contain;
             margin: 0 auto 32px auto;
             filter: brightness(0) invert(1);
             opacity: 0.95;
