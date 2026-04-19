@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260419v">
-    <link rel="stylesheet" href="css/ai-loading.css?v=20260419v">
+    <link rel="stylesheet" href="css/style.css?v=20260419y">
+    <link rel="stylesheet" href="css/ai-loading.css?v=20260419y">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1147,7 +1147,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                     Branding
                 </button>
-                <button class="settings-tab" data-stab="covers">
+                <button class="settings-tab" data-stab="covers" style="display:none !important;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                     Covers
                 </button>
@@ -1348,7 +1348,7 @@
             </div>
 
             <!-- Cover Pages Panel -->
-            <div class="settings-panel" id="settingsPanelCovers" data-stab-panel="covers">
+            <div class="settings-panel" id="settingsPanelCovers" data-stab-panel="covers" style="display:none !important;">
                 <p class="form-hint" style="margin-bottom:16px;color:rgba(255,255,255,0.55) !important">Manage cover page images for PDF reports. The default cover is used unless you select another when exporting.</p>
                 <div id="coverPageGrid" class="cover-page-grid"></div>
                 <div style="margin-top:16px;display:flex;gap:8px">
@@ -1938,18 +1938,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=20260419v"></script>
-    <script src="js/api.js?v=20260419v"></script>
-    <script src="js/pdf.js?v=20260419v"></script>
-    <script src="js/email-template.js?v=20260419v"></script>
-    <script src="js/autocomplete.js?v=20260419v"></script>
-    <script src="js/history.js?v=20260419v"></script>
-    <script src="js/assembler.js?v=20260419v"></script>
-    <script src="js/analytics.js?v=20260419v"></script>
-    <script src="js/contacts.js?v=20260419v"></script>
-    <script src="js/users.js?v=20260419v"></script>
-    <script src="js/app.js?v=20260419v"></script>
-    <script src="js/upload-particles.js?v=20260419v"></script>
+    <script src="js/ai-loading.js?v=20260419y"></script>
+    <script src="js/api.js?v=20260419y"></script>
+    <script src="js/pdf.js?v=20260419y"></script>
+    <script src="js/email-template.js?v=20260419y"></script>
+    <script src="js/autocomplete.js?v=20260419y"></script>
+    <script src="js/history.js?v=20260419y"></script>
+    <script src="js/assembler.js?v=20260419y"></script>
+    <script src="js/analytics.js?v=20260419y"></script>
+    <script src="js/contacts.js?v=20260419y"></script>
+    <script src="js/users.js?v=20260419y"></script>
+    <script src="js/app.js?v=20260419y"></script>
+    <script src="js/upload-particles.js?v=20260419y"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -3533,5 +3533,57 @@
     });
 })();
 </script>
+
+<script id="v349DropTouch">
+/* v3.49 — reliable touch feedback on #dropZone for mobile */
+(function () {
+    function attach() {
+        const dz = document.getElementById('dropZone');
+        if (!dz) return;
+        const on = () => dz.classList.add('is-touching');
+        const off = () => dz.classList.remove('is-touching');
+        dz.addEventListener('touchstart', on, { passive: true });
+        dz.addEventListener('touchend', off, { passive: true });
+        dz.addEventListener('touchcancel', off, { passive: true });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attach);
+    } else attach();
+})();
+</script>
+
+<style id="v350RowWipeFix">
+@media screen {
+/* ── v3.50 — override v3.45 row-wipe ──
+   Remove the stuck gradient overlay entirely, and speed up the
+   clip-path reveal so each row wipes in fast. Stagger stays. */
+.v345-row {
+    clip-path: inset(0 100% 0 0) !important;
+    opacity: 0 !important;
+    transition:
+        clip-path 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.2s ease !important;
+    transition-delay: var(--v345-delay, 0ms) !important;
+}
+.v345-row.v345-assembled {
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+}
+/* Nuke the stuck gradient overlay from v3.45 */
+.v345-row > td:first-child::before,
+.v345-row.v345-assembled > td:first-child::before {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+    transform: none !important;
+    opacity: 0 !important;
+    transition: none !important;
+    animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    .v345-row { clip-path: none !important; opacity: 1 !important; }
+}
+}
+</style>
 </body>
 </html>

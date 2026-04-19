@@ -5423,7 +5423,7 @@ audio::-webkit-media-controls-panel {
     background: linear-gradient(90deg, transparent, rgba(var(--brand-300-rgb), 0.55), transparent);
 }
 .offcanvas-logo {
-    height: 56px;
+    height: 39px;
     width: auto;
     object-fit: contain;
     filter: brightness(0) invert(1) drop-shadow(0 0 14px rgba(var(--brand-300-rgb), 0.45));
@@ -5588,14 +5588,8 @@ audio::-webkit-media-controls-panel {
     transition: opacity 0.5s ease 1.3s;
 }
 .offcanvas-foot::before {
-    content: '';
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 10px #10b981;
-    margin-right: auto;
-    margin-left: 0;
-    animation: jai-pulse-dot 2s ease-in-out infinite;
+    /* v3.49 — pulsating green dot was overlapping Sign Out; hidden. */
+    display: none !important;
 }
 .offcanvas-foot-version { color: rgba(255, 255, 255, 0.55); }
 .offcanvas.open .offcanvas-foot { opacity: 1; }
@@ -5967,4 +5961,41 @@ audio::-webkit-media-controls-panel {
 [data-theme="dark"] .rs-type-chip.type-recording {
     background: rgba(52, 211, 153, 0.26) !important;
     color: #a7f3d0 !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   v3.49 — Mobile-only drop-tile touch/hover glow
+   3px brand border + pulsating outer glow while pressed/hovered
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    #dropZone {
+        position: relative;
+        transition: border-color 0.25s ease, box-shadow 0.3s ease;
+    }
+    /* Hover / press state */
+    #dropZone:hover,
+    #dropZone:active,
+    #dropZone.is-touching {
+        border: 3px solid var(--brand-500, #2557b3) !important;
+        box-shadow:
+            0 0 0 3px rgba(var(--brand-500-rgb), 0.18),
+            0 0 24px 6px rgba(var(--brand-500-rgb), 0.42),
+            0 0 48px 12px rgba(var(--brand-400-rgb), 0.28) !important;
+        animation: v349DropPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes v349DropPulse {
+        0%, 100% {
+            box-shadow:
+                0 0 0 3px rgba(var(--brand-500-rgb), 0.18),
+                0 0 20px 4px rgba(var(--brand-500-rgb), 0.35),
+                0 0 40px 10px rgba(var(--brand-400-rgb), 0.22);
+        }
+        50% {
+            box-shadow:
+                0 0 0 3px rgba(var(--brand-500-rgb), 0.28),
+                0 0 32px 10px rgba(var(--brand-500-rgb), 0.55),
+                0 0 64px 18px rgba(var(--brand-400-rgb), 0.38);
+        }
+    }
 }

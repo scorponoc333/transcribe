@@ -1053,5 +1053,50 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     else init();
 })();
 </script>
+
+<style id="printAlwaysLightReset">
+@media print {
+    html, body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+    }
+    /* Nullify every dark-mode variable so no cascade leak. */
+    [data-theme="dark"] {
+        --card: #ffffff !important;
+        --ink: #0f172a !important;
+        --ink-soft: #334155 !important;
+        --ink-muted: #64748b !important;
+        --bg: #ffffff !important;
+        --bg-surface: #ffffff !important;
+        --fg: #0f172a !important;
+        --fg-heading: #0f172a !important;
+    }
+    [data-theme="dark"] body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+    }
+    /* Force any report/quiz content card back to light */
+    [data-theme="dark"] .report-section,
+    [data-theme="dark"] .report-card,
+    [data-theme="dark"] .transcript-box,
+    [data-theme="dark"] .qr-summary-card,
+    [data-theme="dark"] .qr-question,
+    [data-theme="dark"] .qr-answer,
+    [data-theme="dark"] .qr-explanation,
+    [data-theme="dark"] .learning-concept-card,
+    [data-theme="dark"] .concept-card,
+    [data-theme="dark"] .callout {
+        background: #ffffff !important;
+        border-color: rgba(0,0,0,0.10) !important;
+        color: #0f172a !important;
+    }
+    [data-theme="dark"] .report-section p,
+    [data-theme="dark"] .report-section li,
+    [data-theme="dark"] .report-card p,
+    [data-theme="dark"] .report-card li {
+        color: #334155 !important;
+    }
+}
+</style>
 </body>
 </html>

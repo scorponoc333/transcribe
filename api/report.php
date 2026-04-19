@@ -670,9 +670,10 @@ body {
     transform: scale(1.08);
 }
 .title-edit-input {
-    width: 90vw;
-    max-width: 1100px;
-    min-width: 360px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     padding: 16px 22px;
     background: rgba(255,255,255,0.12);
     border: 2px solid rgba(255,255,255,0.4);
@@ -686,6 +687,10 @@ body {
     line-height: 1.3;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
+}
+#jaiHeroSection .jaihero-title[data-editing="true"] {
+    max-width: 720px;
+    width: 100%;
 }
 .title-edit-input:focus {
     border-color: rgba(var(--brand-300-rgb), 0.7);
@@ -2865,7 +2870,7 @@ async function tbSignOut() {
     <div class="toc-section <?= $tocFontClass ?>">
         <img src="<?= e($logoPath) ?>" alt="Logo" class="toc-logo">
         <h2 class="toc-title">Table of Contents</h2>
-        <p class="toc-subtitle"><?= e($title) ?></p>
+        <p class="toc-subtitle" id="tocReportTitle"><?= e($title) ?></p>
         <ul class="toc-list">
             <?php foreach ($tocItems as $idx => $item):
                 $num = str_pad((string)($idx + 1), 2, '0', STR_PAD_LEFT);
@@ -4017,6 +4022,9 @@ function startEditTitle() {
             const d = await r.json();
             if (!r.ok) throw new Error(d.error || 'Failed');
             h1.textContent = newTitle;
+            const tocSub = document.getElementById('tocReportTitle');
+            if (tocSub) tocSub.textContent = newTitle;
+            document.title = newTitle;
         } catch (err) {
             jaiToast(err.message || 'Could not save the title. Please try again.', { kind: 'error', title: 'Could not save title' });
             h1.textContent = currentTitle;
@@ -4283,11 +4291,14 @@ function selectQuizAnswer(qi, oi, correct) {
     }
 
     if (window._quizAnswered >= window._quizTotal) {
-        // Save to database
+        // Save to database + capture attempt id for the View Report button
         fetch('/api/quiz.php', {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin',
             body: JSON.stringify({ action: 'save', transcription_id: TRANSCRIPTION_ID, score: window._quizScore, total_questions: window._quizTotal, questions_json: JSON.stringify(window._quizQuestions), answers_json: JSON.stringify(window._quizAnswers) })
-        }).catch(() => {});
+        })
+            .then(r => r.ok ? r.json() : null)
+            .then(d => { if (d && d.id) window._lastQuizAttemptId = d.id; })
+            .catch(() => {});
 
         // Start AI summary generation during celebration
         window._quizAISummaryPromise = generateQuizAISummary();
@@ -4499,7 +4510,7 @@ function showQuizCelebration(score, total) {
         excellent:{ icon: 'medal',    title: 'Excellent Work!',  subtitle: 'Top-tier knowledge - you clearly know this material.',      tierClass: 'tier-excellent',medal: '\ud83e\udd47' },
         good:     { icon: 'star',     title: 'Well Done!',       subtitle: 'Solid understanding - keep building on what you know.',     tierClass: 'tier-good',     medal: '\ud83e\udd48' },
         okay:     { icon: 'target',   title: 'Nice Try!',        subtitle: 'You got the basics - another pass will lock it in.',        tierClass: 'tier-okay',     medal: '\ud83e\udd49' },
-        tryagain: { icon: 'sprout',   title: 'Keep Going!',      subtitle: 'Every attempt builds mastery - give it another shot.',      tierClass: 'tier-tryagain', medal: '\ud83c\udf31' }
+        tryagain: { icon: 'trophy',   title: 'Keep Going!',      subtitle: 'Every attempt builds mastery - give it another shot.',      tierClass: 'tier-tryagain', medal: '\ud83c\udfc6' }
     };
     let tier;
     if (isPerfect)           tier = tiers.perfect;
@@ -4537,12 +4548,12 @@ function showQuizCelebration(score, total) {
                     <div class="celebration-score-pct">${pct}%</div>
                 </div>
                 <div id="celebrationAISummary" class="celebration-ai-summary"></div>
-                <div class="celebration-actions">
-                    <button class="quiz-btn-retake" onclick="closeCelebration(); setTimeout(() => startPopQuiz(), 600);">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                        Try Again
+                <div class="celebration-actions" style="flex-direction:column;gap:12px;align-items:stretch;">
+                    <button class="quiz-btn-retake quiz-btn-view-report" onclick="viewQuizReportSlideUp()" style="width:100%;justify-content:center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        View Report
                     </button>
-                    <button class="quiz-btn-close" onclick="closeCelebration()">Close</button>
+                    <button class="quiz-btn-close" onclick="closeCelebration(); setTimeout(() => startPopQuiz(), 600);" style="width:100%;">Try Again</button>
                 </div>
             </div>
         </div>
@@ -5843,6 +5854,85 @@ function copyTranscript() {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
+    }
+})();
+</script>
+
+<style id="printAlwaysLightReset">
+@media print {
+    html, body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+    }
+    /* Nullify every dark-mode variable so no cascade leak. */
+    [data-theme="dark"] {
+        --card: #ffffff !important;
+        --ink: #0f172a !important;
+        --ink-soft: #334155 !important;
+        --ink-muted: #64748b !important;
+        --bg: #ffffff !important;
+        --bg-surface: #ffffff !important;
+        --fg: #0f172a !important;
+        --fg-heading: #0f172a !important;
+    }
+    [data-theme="dark"] body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+    }
+    /* Force any report/quiz content card back to light */
+    [data-theme="dark"] .report-section,
+    [data-theme="dark"] .report-card,
+    [data-theme="dark"] .transcript-box,
+    [data-theme="dark"] .qr-summary-card,
+    [data-theme="dark"] .qr-question,
+    [data-theme="dark"] .qr-answer,
+    [data-theme="dark"] .qr-explanation,
+    [data-theme="dark"] .learning-concept-card,
+    [data-theme="dark"] .concept-card,
+    [data-theme="dark"] .callout {
+        background: #ffffff !important;
+        border-color: rgba(0,0,0,0.10) !important;
+        color: #0f172a !important;
+    }
+    [data-theme="dark"] .report-section p,
+    [data-theme="dark"] .report-section li,
+    [data-theme="dark"] .report-card p,
+    [data-theme="dark"] .report-card li {
+        color: #334155 !important;
+    }
+}
+</style>
+
+<script>
+/* v3.48 — PDF print reorder: move Visual Insights to sit just above
+   Full Transcript at print time, restore after print. Screen order
+   unchanged. */
+(function () {
+    let _chartsParent = null, _chartsNext = null;
+    function relocate() {
+        const charts = document.getElementById('chartsSection');
+        const transcriptBox = document.getElementById('transcriptBox');
+        if (!charts || !transcriptBox) return;
+        const transcriptSection = transcriptBox.closest('.report-section');
+        if (!transcriptSection) return;
+        _chartsParent = charts.parentNode;
+        _chartsNext = charts.nextSibling;
+        transcriptSection.parentNode.insertBefore(charts, transcriptSection);
+    }
+    function restore() {
+        const charts = document.getElementById('chartsSection');
+        if (!charts || !_chartsParent) return;
+        _chartsParent.insertBefore(charts, _chartsNext);
+        _chartsParent = null; _chartsNext = null;
+    }
+    window.addEventListener('beforeprint', relocate);
+    window.addEventListener('afterprint', restore);
+    // Edge/Chrome print-preview reliability: also listen via matchMedia
+    if (window.matchMedia) {
+        const mq = window.matchMedia('print');
+        const handler = (e) => { if (e.matches) relocate(); else restore(); };
+        if (mq.addEventListener) mq.addEventListener('change', handler);
+        else if (mq.addListener) mq.addListener(handler);
     }
 })();
 </script>
