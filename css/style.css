@@ -5999,3 +5999,13 @@ audio::-webkit-media-controls-panel {
         }
     }
 }
+
+
+/* v3.63 — mobile only: remove Tailwind pt-8 on the upload hero so
+   "Transcribe Your Audio" sits right under the header. */
+@media (max-width: 768px) {
+    #uploadSection .typewriter-hero {
+        padding-top: 0 !important;
+        margin-top: -6px !important;
+    }
+}
