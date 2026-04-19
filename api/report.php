@@ -2598,7 +2598,7 @@ async function tbSignOut() {
             max-width: 1015px;
             aspect-ratio: 2.5 / 1;
             object-fit: contain;
-            margin: 0 auto 14px auto;
+            margin: 0 auto 15px auto;
             filter: brightness(0) invert(1);
             opacity: 0.95;
         }
@@ -5275,13 +5275,12 @@ function copyTranscript() {
 
 .jaihero-logo {
     opacity: 0;
-    transform: translateY(-216px) scale(0.85);
+    transform: translateY(-20px) scale(0.92);
     animation: jaiLogoDrop 1s cubic-bezier(0.22, 1, 0.36, 1) 0.25s forwards;
 }
 @keyframes jaiLogoDrop {
-    0%   { opacity: 0; transform: translateY(-216px) scale(0.85); }
-    70%  { opacity: 0.95; transform: translateY(-185px) scale(1.03); }
-    100% { opacity: 0.95; transform: translateY(-190px) scale(1); }
+    0%   { opacity: 0; transform: translateY(-20px) scale(0.92); }
+    100% { opacity: 0.95; transform: translateY(0) scale(1); }
 }
 /* Shockwave ring from logo impact */
 .jaihero-logo::after {
@@ -7110,10 +7109,10 @@ function viewQuizReportSlideUp() {
 <style id="v388BadgeLift">
 @media (min-width: 769px) {
     #jaiHeroSection .jaihero-logo {
-        transform: translateY(-190px);
+        /* translate lift removed */
     }
     #jaiHeroSection .jaihero-badge {
-        margin-top: -80px !important;
+        margin-top: 0 !important;
         position: relative;
         z-index: 5;
     }
@@ -7123,10 +7122,10 @@ function viewQuizReportSlideUp() {
 <style id="v390MobileBadge">
 @media (max-width: 768px) {
     #jaiHeroSection .jaihero-logo {
-        transform: translateY(-190px);
+        /* translate lift removed */
     }
     #jaiHeroSection .jaihero-badge {
-        margin-top: -34px !important;
+        margin-top: 0 !important;
         position: relative;
         z-index: 5;
     }
