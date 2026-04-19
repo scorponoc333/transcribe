@@ -164,13 +164,9 @@ ${this._heroHeader(mode, title, `${modeLabel} Transcription`)}
 
 </td></tr>
 
-${this._contactSection()}
-
-${this._consultationBanner()}
-
 <!-- FOOTER -->
 <tr><td style="background:#0f172a;border-radius:0 0 16px 16px;padding:28px 40px;text-align:center;">
-    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;">Transcription &amp; Learning Tool developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:underline;">Jason Hogan</a></p>
+    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;"><a href="https://jasonai.ca" target="_blank" style="color:rgba(255,255,255,0.8);text-decoration:underline;font-weight:600;">Jason AI</a></p>
 </td></tr>
 
 </table>
@@ -223,13 +219,9 @@ ${this._heroHeader('recording', title, 'Audio Transcription')}
 
 </td></tr>
 
-${this._contactSection()}
-
-${this._consultationBanner()}
-
 <!-- FOOTER -->
 <tr><td style="background:#0f172a;border-radius:0 0 16px 16px;padding:28px 40px;text-align:center;">
-    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;">Transcription &amp; Learning Tool developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:underline;">Jason Hogan</a></p>
+    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;"><a href="https://jasonai.ca" target="_blank" style="color:rgba(255,255,255,0.8);text-decoration:underline;font-weight:600;">Jason AI</a></p>
 </td></tr>
 
 </table>
@@ -613,13 +605,9 @@ ${this._heroHeader('learning', title, 'Learning Analysis')}
 
 </td></tr>
 
-${this._contactSection()}
-
-${this._consultationBanner()}
-
 <!-- FOOTER -->
 <tr><td style="background:#0f172a;border-radius:0 0 16px 16px;padding:28px 40px;text-align:center;">
-    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;">Transcription &amp; Learning Tool developed by <a href="https://www.linkedin.com/in/jasonhogan333/" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:underline;">Jason Hogan</a></p>
+    <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);line-height:20px;"><a href="https://jasonai.ca" target="_blank" style="color:rgba(255,255,255,0.8);text-decoration:underline;font-weight:600;">Jason AI</a></p>
 </td></tr>
 
 </table>
