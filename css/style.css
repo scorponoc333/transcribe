@@ -5723,3 +5723,142 @@ audio::-webkit-media-controls-panel {
 .settings-modal.size-animating {
     transition: height 1.2s cubic-bezier(0.22, 1, 0.36, 1), width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+
+/* ════════════════════════════════════════════════════════════════════
+   DARK-MODE OVERRIDES — History / Contacts / Users / Report Pages
+   The LIGHT CARD DESIGN block above hard-codes white cards + gray inputs.
+   These rules convert those to the dark-mode equivalents without
+   touching the light mode at all.
+   ════════════════════════════════════════════════════════════════════ */
+[data-theme="dark"] .history-filters.glass,
+[data-theme="dark"] .history-table-wrap.glass,
+[data-theme="dark"] .contacts-toolbar.glass,
+[data-theme="dark"] .contacts-table-wrap.glass,
+[data-theme="dark"] .table-container.glass,
+[data-theme="dark"] .users-toolbar,
+[data-theme="dark"] .users-table-wrap,
+[data-theme="dark"] .users-table-wrap.glass {
+    background: rgba(15, 23, 42, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35) !important;
+    color: var(--fg, #e2e8f0) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* Labels above inputs */
+[data-theme="dark"] .history-filters label,
+[data-theme="dark"] .contacts-toolbar label,
+[data-theme="dark"] .users-toolbar label {
+    color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Inputs inside these filter cards */
+[data-theme="dark"] .history-filters .form-input,
+[data-theme="dark"] .history-filters select,
+[data-theme="dark"] .history-filters input,
+[data-theme="dark"] .contacts-toolbar .form-input,
+[data-theme="dark"] .contacts-toolbar input,
+[data-theme="dark"] .users-toolbar .form-input,
+[data-theme="dark"] .users-search-wrap input {
+    background: rgba(15, 23, 42, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: var(--fg, #e2e8f0) !important;
+}
+[data-theme="dark"] .history-filters .form-input:focus,
+[data-theme="dark"] .history-filters select:focus,
+[data-theme="dark"] .history-filters input:focus,
+[data-theme="dark"] .contacts-toolbar .form-input:focus,
+[data-theme="dark"] .contacts-toolbar input:focus,
+[data-theme="dark"] .users-toolbar .form-input:focus,
+[data-theme="dark"] .users-search-wrap input:focus {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border-color: var(--brand-400) !important;
+    box-shadow: 0 0 0 3px rgba(var(--brand-500-rgb), 0.22) !important;
+}
+[data-theme="dark"] .history-filters ::placeholder,
+[data-theme="dark"] .contacts-toolbar ::placeholder,
+[data-theme="dark"] .users-toolbar ::placeholder,
+[data-theme="dark"] .users-search-wrap ::placeholder {
+    color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Search-icon SVG in users-search-wrap */
+[data-theme="dark"] .users-search-wrap svg {
+    color: rgba(255, 255, 255, 0.45) !important;
+    stroke: rgba(255, 255, 255, 0.45) !important;
+}
+
+/* Table head / body */
+[data-theme="dark"] .history-table th,
+[data-theme="dark"] .contacts-table th,
+[data-theme="dark"] .data-table th,
+[data-theme="dark"] .users-table th {
+    color: rgba(255, 255, 255, 0.5) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: transparent !important;
+}
+[data-theme="dark"] .history-table td,
+[data-theme="dark"] .contacts-table td,
+[data-theme="dark"] .data-table td,
+[data-theme="dark"] .users-table td {
+    color: var(--fg, #e2e8f0) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+[data-theme="dark"] .history-table tr:hover td,
+[data-theme="dark"] .contacts-table tr:hover td,
+[data-theme="dark"] .data-table tr:hover td,
+[data-theme="dark"] .users-table tr:hover td {
+    background: rgba(var(--brand-500-rgb), 0.10) !important;
+}
+
+/* Overwrite the `.history-table td * { color: dark !important }` catch-all
+   (defined earlier in the LIGHT CARD block) so cell content is readable. */
+[data-theme="dark"] .history-table td *,
+[data-theme="dark"] .history-table td span,
+[data-theme="dark"] .history-table td small,
+[data-theme="dark"] .history-table td time,
+[data-theme="dark"] .history-table td div,
+[data-theme="dark"] .history-table td a {
+    color: var(--fg, #e2e8f0) !important;
+}
+[data-theme="dark"] .history-table td small,
+[data-theme="dark"] .history-table td .text-xs,
+[data-theme="dark"] .cell-time,
+[data-theme="dark"] .cell-date + * {
+    color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Action icon buttons in table rows */
+[data-theme="dark"] .history-table .btn-icon,
+[data-theme="dark"] .contacts-table .btn-icon,
+[data-theme="dark"] .data-table .btn-icon,
+[data-theme="dark"] .history-table td button,
+[data-theme="dark"] .history-table td a.btn-icon {
+    color: rgba(255, 255, 255, 0.65) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+[data-theme="dark"] .history-table svg,
+[data-theme="dark"] .contacts-table svg,
+[data-theme="dark"] .data-table svg,
+[data-theme="dark"] .history-table td button svg,
+[data-theme="dark"] .history-table td a svg {
+    stroke: rgba(255, 255, 255, 0.65) !important;
+}
+[data-theme="dark"] .history-table .btn-icon:hover,
+[data-theme="dark"] .contacts-table .btn-icon:hover,
+[data-theme="dark"] .data-table .btn-icon:hover,
+[data-theme="dark"] .history-table td button:hover,
+[data-theme="dark"] .history-table td a.btn-icon:hover {
+    background: rgba(var(--brand-500-rgb), 0.18) !important;
+    border-color: rgba(var(--brand-400-rgb), 0.45) !important;
+}
+[data-theme="dark"] .history-table .btn-icon:hover svg,
+[data-theme="dark"] .contacts-table .btn-icon:hover svg,
+[data-theme="dark"] .data-table .btn-icon:hover svg,
+[data-theme="dark"] .history-table td button:hover svg,
+[data-theme="dark"] .history-table td a:hover svg {
+    stroke: var(--brand-200, #bfdbfe) !important;
+}
