@@ -1650,7 +1650,7 @@ body {
     margin: 0;
 }
 .study-time-badge {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
