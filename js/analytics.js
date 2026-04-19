@@ -11,6 +11,24 @@ const Analytics = {
             this.renderSummaryCards(data.totals);
             this.renderCostCards(data.cost_totals, data.daily_costs);
             this.renderCostBreakdown(data.cost_by_operation);
+
+        // Entrance animation: fade + slide + shine sweep for each card as it
+        // scrolls into view. Safe to call multiple times — Assembler dedupes.
+        setTimeout(() => {
+            if (!window.Assembler) return;
+            document.querySelectorAll('#analyticsSection .analytics-card').forEach((el, i) => {
+                Assembler.observe(el, { kind: 'card', delay: (i % 4) * 120 });
+            });
+            document.querySelectorAll('#analyticsSection .analytics-chart-card').forEach((el, i) => {
+                Assembler.observe(el, { kind: 'chart', delay: (i % 2) * 180 });
+            });
+            const cb = document.getElementById('costBreakdownCard');
+            if (cb) Assembler.observe(cb, { kind: 'card' });
+            document.querySelectorAll('#analyticsSection .analytics-section-title').forEach(el => {
+                Assembler.observe(el, { kind: 'text' });
+            });
+        }, 40);
+
             this.renderMonthlyTranscriptions(data.monthly_transcriptions);
             this.renderMonthlyEmails(data.monthly_emails);
             this.renderAvgTime(data.avg_time_monthly);
@@ -27,8 +45,8 @@ const Analytics = {
     },
 
     renderSummaryCards(totals) {
-        document.getElementById('statTotalTranscriptions').textContent = (totals.total_transcriptions || 0).toLocaleString();
-        document.getElementById('statTotalEmails').textContent = (totals.total_emails || 0).toLocaleString();
+        Assembler.countUpText(document.getElementById('statTotalTranscriptions'), (totals.total_transcriptions || 0).toLocaleString());
+        Assembler.countUpText(document.getElementById('statTotalEmails'), (totals.total_emails || 0).toLocaleString());
 
         const avgSec = totals.avg_timer_seconds || 0;
         if (avgSec > 0) {
@@ -39,7 +57,7 @@ const Analytics = {
             document.getElementById('statAvgTime').textContent = '\u2014';
         }
 
-        document.getElementById('statTotalWords').textContent = (totals.total_words || 0).toLocaleString();
+        Assembler.countUpText(document.getElementById('statTotalWords'), (totals.total_words || 0).toLocaleString());
     },
 
     renderMonthlyTranscriptions(data) {
@@ -60,24 +78,24 @@ const Analytics = {
                     {
                         label: 'Recordings',
                         data: recordings,
-                        backgroundColor: this._color('#2563eb', 0.7),
-                        borderColor: '#2563eb',
+                        backgroundColor: this._color(this._brand('600', '#2563eb'), 0.7),
+                        borderColor: this._brand('600', '#2563eb'),
                         borderWidth: 1,
                         borderRadius: 4,
                     },
                     {
                         label: 'Meetings',
                         data: meetings,
-                        backgroundColor: this._color('#7c3aed', 0.7),
-                        borderColor: '#7c3aed',
+                        backgroundColor: this._color(this._brand('500', '#3b82f6'), 0.7),
+                        borderColor: this._brand('500', '#3b82f6'),
                         borderWidth: 1,
                         borderRadius: 4,
                     },
                     {
                         label: 'Learning',
                         data: learning,
-                        backgroundColor: this._color('#10b981', 0.7),
-                        borderColor: '#10b981',
+                        backgroundColor: this._color(this._brand('400', '#3b82f6'), 0.7),
+                        borderColor: this._brand('400', '#3b82f6'),
                         borderWidth: 1,
                         borderRadius: 4,
                     }
@@ -108,8 +126,8 @@ const Analytics = {
                 datasets: [{
                     label: 'Emails Sent',
                     data: counts,
-                    backgroundColor: this._color('#10b981', 0.7),
-                    borderColor: '#10b981',
+                    backgroundColor: this._color(this._brand('400', '#3b82f6'), 0.7),
+                    borderColor: this._brand('400', '#3b82f6'),
                     borderWidth: 1,
                     borderRadius: 4,
                 }]
@@ -132,17 +150,24 @@ const Analytics = {
             return;
         }
 
-        // For a single data point, show a big stat card instead of a broken line chart
+        // For a single data point, show an enriched stat card
         if (data.length === 1) {
             this._destroyChart('chartAvgTime');
-            const mins = Math.round((data[0].avg_seconds || 0) / 60 * 10) / 10;
+            const secs = data[0].avg_seconds || 0;
+            const mins = Math.round(secs / 60 * 10) / 10;
+            const formattedTime = secs >= 60
+                ? `${Math.floor(secs / 60)}m ${Math.round(secs % 60)}s`
+                : `${Math.round(secs)}s`;
             if (wrap) {
                 wrap.className = 'chart-container';
                 wrap.innerHTML = `
                     <div class="analytics-single-value">
+                        <div style="width:56px;height:56px;border-radius:16px;background:rgba(var(--brand-300-rgb),0.14);border:1px solid rgba(var(--brand-300-rgb),0.25);display:grid;place-items:center;margin-bottom:12px;color:var(--brand-400)">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
                         <span class="single-value-number">${mins}</span>
-                        <span class="single-value-label">minutes (avg)</span>
-                        <span class="single-value-sub">${data[0].month}</span>
+                        <span class="single-value-label">minutes average</span>
+                        <span class="single-value-sub" style="margin-top:6px;font-size:13px">${formattedTime} per transcription &middot; ${data[0].month}</span>
                     </div>`;
             }
             return;
@@ -163,11 +188,11 @@ const Analytics = {
                 datasets: [{
                     label: 'Avg Time (minutes)',
                     data: times,
-                    borderColor: '#d97706',
-                    backgroundColor: this._color('#d97706', 0.15),
+                    borderColor: this._brand('300', '#93c5fd'),
+                    backgroundColor: this._color(this._brand('300', '#93c5fd'), 0.15),
                     fill: true,
                     tension: 0.4,
-                    pointBackgroundColor: '#d97706',
+                    pointBackgroundColor: this._brand('300', '#93c5fd'),
                     pointRadius: 5,
                     pointHoverRadius: 7,
                 }]
@@ -223,7 +248,7 @@ const Analytics = {
             return friendlyNames[raw] || d.model || 'Unknown';
         });
         const counts = data.map(d => d.count || 0);
-        const colors = ['#2563eb', '#a855f7', '#10b981', '#d97706', '#ef4444', '#06b6d4'];
+        const colors = this._brandPalette(6);
         const total = counts.reduce((a, b) => a + b, 0);
 
         this._createChart('chartModelUsage', 'doughnut', {
@@ -231,9 +256,9 @@ const Analytics = {
                 labels,
                 datasets: [{
                     data: counts,
-                    backgroundColor: labels.map((_, i) => this._color(colors[i % colors.length], 0.8)),
-                    borderColor: labels.map((_, i) => colors[i % colors.length]),
-                    borderWidth: 2,
+                    backgroundColor: labels.map((_, i) => colors[i % colors.length]),
+                    borderColor: 'rgba(255,255,255,0.15)',
+                    borderWidth: 3,
                 }]
             },
             options: {
@@ -279,10 +304,10 @@ const Analytics = {
         const avgCost = costTotals.avg_cost_per_op || 0;
         const totalTokens = costTotals.total_tokens || 0;
 
-        document.getElementById('statTotalCost').textContent = totalCost > 0 ? `$${totalCost.toFixed(4)}` : '$0.00';
-        document.getElementById('statTotalOps').textContent = totalOps.toLocaleString();
-        document.getElementById('statAvgCostOp').textContent = avgCost > 0 ? `$${avgCost.toFixed(5)}` : '$0.00';
-        document.getElementById('statTotalTokens').textContent = totalTokens.toLocaleString();
+        Assembler.countUpText(document.getElementById('statTotalCost'), totalCost > 0 ? `$${totalCost.toFixed(4)}` : '$0.00');
+        Assembler.countUpText(document.getElementById('statTotalOps'), totalOps.toLocaleString());
+        Assembler.countUpText(document.getElementById('statAvgCostOp'), avgCost > 0 ? `$${avgCost.toFixed(5)}` : '$0.00');
+        Assembler.countUpText(document.getElementById('statTotalTokens'), totalTokens.toLocaleString());
 
         // New cards
         const avgCost1kEl = document.getElementById('statAvgCost1k');
@@ -290,11 +315,11 @@ const Analytics = {
 
         if (avgCost1kEl) {
             const avg1k = totalTokens > 0 ? (totalCost / (totalTokens / 1000)) : 0;
-            avgCost1kEl.textContent = '$' + avg1k.toFixed(4);
+            Assembler.countUpText(avgCost1kEl, '$' + avg1k.toFixed(4));
         }
         if (estMonthlyEl) {
             const monthCost = (dailyCosts || []).reduce((sum, d) => sum + (d.total_cost || 0), 0);
-            estMonthlyEl.textContent = '$' + monthCost.toFixed(4);
+            Assembler.countUpText(estMonthlyEl, '$' + monthCost.toFixed(4));
         }
     },
 
@@ -307,8 +332,19 @@ const Analytics = {
             return;
         }
 
-        const opLabels = { analyze: 'AI Analysis', translate: 'Translation' };
-        const opColors = { analyze: '#2563eb', translate: '#7c3aed' };
+        const opLabels = {
+            analyze: 'AI Analysis',
+            translate: 'Translation',
+            learning_analysis: 'Learning Analysis',
+            pop_quiz: 'Pop Quiz',
+            title_gen: 'Title Generation',
+            summarize: 'Summary',
+        };
+        // Fallback: prettify any unknown snake_case operation into Title Case
+        const prettify = (s) => String(s || '')
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, c => c.toUpperCase());
+        const opColors = { analyze: this._brand('600', '#2563eb'), translate: this._brand('500', '#3b82f6') };
 
         let html = `<table style="width:100%;border-collapse:collapse;font-size:14px;">
             <thead>
@@ -323,7 +359,7 @@ const Analytics = {
             <tbody>`;
 
         for (const row of costByOp) {
-            const label = opLabels[row.operation] || row.operation;
+            const label = opLabels[row.operation] || prettify(row.operation);
             const color = opColors[row.operation] || '#64748b';
             html += `<tr style="border-bottom:1px solid var(--border-light);">
                 <td style="padding:10px 12px;">
@@ -356,10 +392,10 @@ const Analytics = {
                 datasets: [{
                     label: 'Cost (USD)',
                     data: costs,
-                    backgroundColor: this._color('#ef4444', 0.7),
-                    borderColor: '#ef4444',
+                    backgroundColor: this._color(this._brand('400', '#60a5fa'), 0.7),
+                    borderColor: this._brand('400', '#60a5fa'),
                     borderWidth: 1,
-                    borderRadius: 4,
+                    borderRadius: 6,
                     barPercentage: 0.6,
                 }]
             },
@@ -402,7 +438,7 @@ const Analytics = {
             return parts[parts.length - 1];
         });
         const costs = data.map(d => d.total_cost || 0);
-        const colors = ['#ef4444', '#f59e0b', '#06b6d4', '#8b5cf6', '#10b981', '#2563eb'];
+        const colors = ['#f87171', '#fbbf24', '#22d3ee', '#60a5fa', '#34d399', '#a78bfa'];
         const totalCost = costs.reduce((a, b) => a + b, 0);
 
         this._createChart('chartCostByModel', 'doughnut', {
@@ -410,9 +446,9 @@ const Analytics = {
                 labels,
                 datasets: [{
                     data: costs,
-                    backgroundColor: labels.map((_, i) => this._color(colors[i % colors.length], 0.8)),
-                    borderColor: labels.map((_, i) => colors[i % colors.length]),
-                    borderWidth: 2,
+                    backgroundColor: labels.map((_, i) => colors[i % colors.length]),
+                    borderColor: 'rgba(255,255,255,0.15)',
+                    borderWidth: 3,
                 }]
             },
             options: {
@@ -468,8 +504,8 @@ const Analytics = {
                 datasets: [{
                     label: 'Daily Cost (USD)',
                     data: costs,
-                    backgroundColor: this._color('#f59e0b', 0.7),
-                    borderColor: '#f59e0b',
+                    backgroundColor: this._color(this._brand('300', '#93c5fd'), 0.7),
+                    borderColor: this._brand('300', '#93c5fd'),
                     borderWidth: 1,
                     borderRadius: 4,
                 }]
@@ -510,10 +546,10 @@ const Analytics = {
         const activeUsersEl = document.getElementById('statActiveUsers');
         const tooltipEl = document.getElementById('roiTooltipTrigger');
 
-        if (timeSavedEl) timeSavedEl.textContent = `${roi.total_time_saved_hours || 0}h`;
-        if (avgSavedEl) avgSavedEl.textContent = `${roi.avg_saved_per_transcription || 0}m`;
-        if (estimatedValueEl) estimatedValueEl.textContent = `$${(roi.estimated_value || 0).toLocaleString()}`;
-        if (activeUsersEl) activeUsersEl.textContent = roi.active_users || 0;
+        if (timeSavedEl) Assembler.countUpText(timeSavedEl, `${roi.total_time_saved_hours || 0}h`);
+        if (avgSavedEl) Assembler.countUpText(avgSavedEl, `${roi.avg_saved_per_transcription || 0}m`);
+        if (estimatedValueEl) Assembler.countUpText(estimatedValueEl, `$${(roi.estimated_value || 0).toLocaleString()}`);
+        if (activeUsersEl) Assembler.countUpText(activeUsersEl, String(roi.active_users || 0));
         if (tooltipEl) tooltipEl.title = roi.methodology || '';
     },
 
@@ -530,7 +566,7 @@ const Analytics = {
         // Horizontal bar chart
         const labels = data.map(d => d.user_name || 'Unknown');
         const counts = data.map(d => d.transcription_count || 0);
-        const colors = ['#2563eb', '#7c3aed', '#10b981', '#d97706', '#ef4444', '#06b6d4', '#8b5cf6', '#f43f5e'];
+        const colors = this._brandPalette(8);
 
         this._createChart('chartUserUsage', 'bar', {
             data: {
@@ -591,11 +627,12 @@ const Analytics = {
     },
 
     _textColor() {
-        return this._isDark() ? 'rgba(255,255,255,0.7)' : 'rgba(51,65,85,0.9)';
+        // Cards always have dark gradient backgrounds now
+        return 'rgba(255,255,255,0.75)';
     },
 
     _gridColor() {
-        return this._isDark() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+        return 'rgba(255,255,255,0.10)';
     },
 
     _color(hex, alpha) {
@@ -605,10 +642,24 @@ const Analytics = {
         return `rgba(${r},${g},${b},${alpha})`;
     },
 
+    /** Get computed brand color from CSS variable, with hex fallback */
+    _brand(level, fallback) {
+        const val = getComputedStyle(document.documentElement).getPropertyValue(`--brand-${level}`).trim();
+        return val || fallback;
+    },
+
     /**
      * Default options for bar/line charts — uses maintainAspectRatio: false
      * so charts respect their container's fixed height instead of bloating.
      */
+    /** Palette of brand shades (light -> dark) for multi-series charts */
+    _brandPalette(n) {
+        const levels = ['200', '300', '400', '500', '600', '700', '800'];
+        const out = [];
+        for (let i = 0; i < n; i++) out.push(this._brand(levels[i % levels.length], '#3b82f6'));
+        return out;
+    },
+
     _barDefaults() {
         return {
             responsive: true,

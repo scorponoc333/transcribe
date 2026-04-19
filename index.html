@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260419e">
-    <link rel="stylesheet" href="css/ai-loading.css?v=20260419e">
+    <link rel="stylesheet" href="css/style.css?v=20260419f">
+    <link rel="stylesheet" href="css/ai-loading.css?v=20260419f">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1936,17 +1936,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=20260419e"></script>
-    <script src="js/api.js?v=20260419e"></script>
-    <script src="js/pdf.js?v=20260419e"></script>
-    <script src="js/email-template.js?v=20260419e"></script>
-    <script src="js/autocomplete.js?v=20260419e"></script>
-    <script src="js/history.js?v=20260419e"></script>
-    <script src="js/analytics.js?v=20260419e"></script>
-    <script src="js/contacts.js?v=20260419e"></script>
-    <script src="js/users.js?v=20260419e"></script>
-    <script src="js/app.js?v=20260419e"></script>
-    <script src="js/upload-particles.js?v=20260419e"></script>
+    <script src="js/ai-loading.js?v=20260419f"></script>
+    <script src="js/api.js?v=20260419f"></script>
+    <script src="js/pdf.js?v=20260419f"></script>
+    <script src="js/email-template.js?v=20260419f"></script>
+    <script src="js/autocomplete.js?v=20260419f"></script>
+    <script src="js/history.js?v=20260419f"></script>
+    <script src="js/assembler.js?v=20260419f"></script>
+    <script src="js/analytics.js?v=20260419f"></script>
+    <script src="js/contacts.js?v=20260419f"></script>
+    <script src="js/users.js?v=20260419f"></script>
+    <script src="js/app.js?v=20260419f"></script>
+    <script src="js/upload-particles.js?v=20260419f"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -3123,6 +3124,79 @@
     });
 })();
 </script>
+
+
+<style id="assembleFx">
+/* ===== Assembler entrance animations ===== */
+.asm {
+    opacity: 0;
+    will-change: opacity, transform, clip-path;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.asm.asm-kind-card {
+    transform: translateY(24px) scale(0.98);
+    filter: blur(6px);
+    transition: opacity 0.9s, transform 0.9s, filter 0.9s;
+    transition-delay: var(--asm-delay, 0ms);
+}
+.asm.asm-kind-chart {
+    transform: translateY(18px) scale(0.985);
+    transition: opacity 1.1s, transform 1.1s;
+    transition-delay: var(--asm-delay, 0ms);
+}
+.asm.asm-kind-text {
+    transform: translateX(-10px);
+    transition: opacity 0.7s, transform 0.7s;
+    transition-delay: var(--asm-delay, 0ms);
+}
+.asm.is-assembled {
+    opacity: 1;
+    transform: none;
+    filter: none;
+}
+/* Gradient shine sweep on cards when they first assemble */
+.asm.asm-kind-card,
+.asm.asm-kind-chart { position: relative; overflow: hidden; }
+.asm.asm-kind-card::after,
+.asm.asm-kind-chart::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -140%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(100deg,
+        transparent 0%,
+        rgba(var(--brand-300-rgb, 147, 197, 253), 0.0) 25%,
+        rgba(var(--brand-300-rgb, 147, 197, 253), 0.22) 50%,
+        rgba(var(--brand-300-rgb, 147, 197, 253), 0.0) 75%,
+        transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    transition: left 1.05s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+}
+.asm.is-assembled.asm-kind-card::after,
+.asm.is-assembled.asm-kind-chart::after {
+    opacity: 1;
+    left: 140%;
+    transition-delay: calc(var(--asm-delay, 0ms) + 280ms);
+}
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .asm { opacity: 1 !important; transform: none !important; filter: none !important; }
+    .asm::after { display: none !important; }
+}
+
+/* ===== Dark-mode pill readability in All Reports sidebar ===== */
+[data-theme="dark"] .rs-type-chip.type-learning,
+[data-theme="dark"] .rs-type-chip.type-meeting,
+[data-theme="dark"] .rs-type-chip.type-recording {
+    background: rgba(var(--brand-300-rgb), 0.22);
+    color: var(--brand-200, #bfdbfe);
+}
+</style>
 
 </body>
 </html>
