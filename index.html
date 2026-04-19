@@ -2567,11 +2567,26 @@
         if (!sb) return;
         if (onTranscribe) {
             // Re-show every time the user lands on the Transcribe flow
+            clearTimeout(sb._fadeTimer);
+            sb.classList.remove('rs-closing');
             sb.style.display = '';
             document.body.classList.add('has-reports-sidebar');
         } else {
-            sb.style.display = 'none';
+            // Fade out (1s) when navigating away — same animation as the X close button
+            const wasVisible = sb.style.display !== 'none';
             document.body.classList.remove('has-reports-sidebar');
+            if (wasVisible) {
+                sb.classList.add('rs-closing');
+                clearTimeout(sb._fadeTimer);
+                sb._fadeTimer = setTimeout(() => {
+                    sb.style.display = 'none';
+                    sb.classList.remove('rs-closing');
+                }, 1000);
+            } else {
+                // Already hidden — just make sure any residual class is gone
+                sb.classList.remove('rs-closing');
+                sb.style.display = 'none';
+            }
         }
     }
     // Wait for App to be defined, then wrap showSection
@@ -2796,7 +2811,7 @@
                 <td><span class="type-badge type-${mode}">${label}</span></td>
                 <td>${words}</td>
                 <td>
-                    <a href="/api/report.php?id=${encodeURIComponent(it.id)}" class="btn-primary btn-sm" style="display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;">
+                    <a href="/api/report.php?id=${encodeURIComponent(it.id)}" class="btn-primary btn-sm rp2-open-btn" data-id="${it.id}" data-title="${title}" style="display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;">
                         Open Report
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                     </a>
@@ -2864,6 +2879,21 @@
         document.getElementById('reportPagesBackBtn')?.addEventListener('click', () => {
             if (window.App && typeof window.App.showSection === 'function') window.App.showSection('upload');
         });
+
+        // Intercept Open Report clicks and replay the sidebar openReport animation
+        document.getElementById('rp2TableBody')?.addEventListener('click', (e) => {
+            const a = e.target.closest('a.rp2-open-btn');
+            if (!a) return;
+            const id = a.dataset.id;
+            const title = a.dataset.title || '';
+            if (!id) return;
+            if (window.__rsApi && typeof window.__rsApi.openReport === 'function') {
+                e.preventDefault();
+                try { window.__rsApi.openReport(id, title); return; }
+                catch (err) { console.warn('openReport animation failed, falling back to nav', err); }
+            }
+            // If animation API is unavailable, let the default href navigation happen.
+        });
     }
 
     window.ReportPages = {
@@ -2876,6 +2906,22 @@
     };
 })();
 </script>
+
+
+<style>
+/* Force the Report Pages "Open Report" button text/icon to white — beats
+   the .history-table td a { color: dark !important } rule. */
+#rp2Table td a.btn-primary,
+#rp2Table td a.btn-primary *,
+#rp2Table td a.btn-primary:hover,
+#rp2Table td a.btn-primary:hover * {
+    color: #ffffff !important;
+}
+#rp2Table td a.btn-primary svg,
+#rp2Table td a.btn-primary:hover svg {
+    stroke: #ffffff !important;
+}
+</style>
 
 </body>
 </html>

@@ -2523,6 +2523,20 @@ async function tbSignOut() {
             z-index: 1;
             pointer-events: none;
         }
+        /* Meeting mode: darker cover overlay so the boardroom image doesn't overwhelm the title */
+        #jaiHeroSection[data-mode="meeting"]::before {
+            background:
+                radial-gradient(ellipse 70% 55% at 50% 22%,
+                    rgba(var(--brand-400-rgb), 0.68) 0%,
+                    rgba(var(--brand-500-rgb), 0.35) 45%,
+                    rgba(var(--brand-500-rgb), 0) 75%),
+                linear-gradient(180deg,
+                    rgba(var(--brand-400-rgb), 0.62) 0%,
+                    rgba(var(--brand-500-rgb), 0.80) 30%,
+                    rgba(var(--brand-grad-mid-rgb), 0.95) 70%,
+                    rgba(var(--brand-grad-dark-rgb), 1.0) 100%);
+        }
+
         #jaiHeroSection .jaihero-inner {
             position: relative;
             z-index: 2;
@@ -2715,7 +2729,7 @@ async function tbSignOut() {
             opacity: 0.7;
         }
     </style>
-    <section id="jaiHeroSection">
+    <section id="jaiHeroSection" data-mode="<?= e($mode) ?>">
         <canvas id="jaiHeroConstellation" class="no-print" aria-hidden="true"
                 style="position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;opacity:0.41;"></canvas>
         <div class="jaihero-inner" style="z-index:3;position:relative;">
