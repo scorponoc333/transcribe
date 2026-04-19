@@ -2292,6 +2292,15 @@ body {
     .btn { padding: 9px 14px; font-size: 12px; }
 }
 </style>
+<script>
+(function () {
+    try {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    } catch (e) {}
+})();
+</script>
 </head>
 <body>
 
@@ -5041,6 +5050,103 @@ function copyTranscript() {
 })();
 
 </script>
+
+
+<style id="reportDarkFx">
+/* ═══════════════════════════════════════════════════════════════════
+   DARK-MODE OVERRIDES for the branded report pages.
+   Activated whenever the user set theme=dark in the main app. The
+   covers themselves already use a dark brand gradient in both modes —
+   we just need to retint the white content cards below.
+   ═══════════════════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+    --card: rgba(15, 23, 42, 0.72) !important;
+    --ink: #f1f5f9 !important;
+    --ink-soft: #cbd5e1 !important;
+    --ink-muted: #94a3b8 !important;
+}
+[data-theme="dark"] body {
+    background: linear-gradient(165deg, #050816 0%, #0a1128 45%, #0f1f40 100%) !important;
+    color: var(--ink) !important;
+}
+[data-theme="dark"] .report-wrapper,
+[data-theme="dark"] .quiz-report-wrapper { color: var(--ink) !important; }
+
+[data-theme="dark"] .report-section {
+    background: rgba(15, 23, 42, 0.72) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 28px rgba(0, 0, 0, 0.35) !important;
+    color: var(--ink) !important;
+}
+[data-theme="dark"] .report-section h1,
+[data-theme="dark"] .report-section h2,
+[data-theme="dark"] .report-section h3,
+[data-theme="dark"] .report-section h4 {
+    color: var(--ink) !important;
+}
+[data-theme="dark"] .report-section p,
+[data-theme="dark"] .report-section li,
+[data-theme="dark"] .report-section span,
+[data-theme="dark"] .report-section td,
+[data-theme="dark"] .report-section div {
+    color: var(--ink-soft) !important;
+}
+
+/* Transcript / code-style blocks */
+[data-theme="dark"] .transcript-box,
+[data-theme="dark"] .callout,
+[data-theme="dark"] .concept-card,
+[data-theme="dark"] .learning-concept-card,
+[data-theme="dark"] .exercise-header,
+[data-theme="dark"] .quiz-header,
+[data-theme="dark"] .insight-list,
+[data-theme="dark"] .chart-card,
+[data-theme="dark"] .metric-card,
+[data-theme="dark"] .stat-card {
+    background: rgba(15, 23, 42, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: var(--ink-soft) !important;
+}
+[data-theme="dark"] .transcript-formatted p,
+[data-theme="dark"] .transcript-formatted .ts-block,
+[data-theme="dark"] .transcript-formatted .sp-block { color: var(--ink-soft) !important; }
+[data-theme="dark"] .transcript-formatted p:first-child strong.ts-title { color: var(--ink) !important; }
+
+/* Pop quiz report specifics */
+[data-theme="dark"] .quiz-report-wrapper .performance-summary,
+[data-theme="dark"] .quiz-report-wrapper .strengths-card,
+[data-theme="dark"] .quiz-report-wrapper .review-card,
+[data-theme="dark"] .quiz-report-wrapper .question-card,
+[data-theme="dark"] .strengths-card,
+[data-theme="dark"] .review-card,
+[data-theme="dark"] .question-card {
+    background: rgba(15, 23, 42, 0.60) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    color: var(--ink) !important;
+}
+[data-theme="dark"] .strengths-card h3,
+[data-theme="dark"] .review-card h3,
+[data-theme="dark"] .question-card h3 { color: var(--ink) !important; }
+[data-theme="dark"] .strengths-card li,
+[data-theme="dark"] .review-card li,
+[data-theme="dark"] .question-card p,
+[data-theme="dark"] .question-card li { color: var(--ink-soft) !important; }
+
+/* Floating buttons (download pdf, pop quiz) — already brand-gradient so
+   they work, but ensure text stays white on hover in dark */
+[data-theme="dark"] .floating-pdf-btn,
+[data-theme="dark"] .pop-quiz-btn { color: #fff !important; }
+
+/* Footer / report-footer */
+[data-theme="dark"] .report-footer {
+    background: linear-gradient(to bottom, var(--brand-grad-dark), #050816) !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Any <a> inside report content should stay readable */
+[data-theme="dark"] .report-section a { color: var(--brand-300, #93c5fd) !important; }
+</style>
 
 </body>
 </html>
