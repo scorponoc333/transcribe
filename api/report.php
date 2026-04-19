@@ -6636,12 +6636,8 @@ function copyTranscript() {
     /* Kill the floating hamburger — inline version takes over */
     .rp-mobile-menu-btn { display: none !important; }
 
-    /* 3) Double the topbar brand logo: 26 -> 52 */
-    .topbar-brand-logo {
-        height: 52px !important;
-        max-width: 240px !important;
-    }
-    .topbar { padding: 6px 14px !important; }
+    /* Topbar brand logo stays default size */
+    /* Hero logo doubled on mobile (see jaihero-logo rule below) */
 
     /* 4) Black brand gradient for Public/Private + Quiz History */
     .mpa-btn {
@@ -6671,6 +6667,15 @@ function copyTranscript() {
     /* Keep the inline Public label concise ("Public" / "Private") */
 }
 [data-theme="dark"] .rp-inline-menu svg { stroke: #ffffff; }
+</style>
+
+<style id="v381HeroLogoMobile">
+@media (max-width: 768px) {
+    #jaiHeroSection .jaihero-logo {
+        height: 96px !important;
+        max-width: 320px !important;
+    }
+}
 </style>
 </body>
 </html>
