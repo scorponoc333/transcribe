@@ -951,5 +951,107 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     else run();
 })();
 </script>
+
+<style id="v344QuizAnimations">
+@media screen {
+.qr-section-title.v344-typewriting::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 0.9em;
+    margin-left: 3px;
+    background: currentColor;
+    vertical-align: text-bottom;
+    animation: v344QuizCaret 0.85s steps(1) infinite;
+}
+.qr-section-title.v344-typewriting.v344-done::after { animation: none; opacity: 0; }
+@keyframes v344QuizCaret { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+.qr-answer.v344-item {
+    opacity: 0;
+    transform: translateX(-14px);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--v344-delay, 0ms);
+}
+.qr-answer.v344-item.v344-assembled { opacity: 1; transform: none; }
+
+.qr-summary-card li.v344-item,
+.qr-summary-card p.v344-item {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--v344-delay, 0ms);
+}
+.qr-summary-card li.v344-item.v344-assembled,
+.qr-summary-card p.v344-item.v344-assembled { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .qr-section-title.v344-typewriting::after,
+    .qr-answer.v344-item,
+    .qr-summary-card li.v344-item,
+    .qr-summary-card p.v344-item {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+}
+</style>
+<script>
+(function () {
+    if (!window.IntersectionObserver) return;
+    const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+            if (e.isIntersecting && !e.target._v344Done) {
+                e.target._v344Done = true;
+                if (e.target._v344Fn) { try { e.target._v344Fn(e.target); } catch (x) {} }
+                io.unobserve(e.target);
+            }
+        }
+    }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+    const observe = (el, fn) => { if (!el || el._v344Obs) return; el._v344Obs = true; el._v344Fn = fn; io.observe(el); };
+
+    function typeInto(el, full, speed) {
+        speed = speed || 28;
+        el.textContent = '';
+        el.classList.add('v344-typewriting');
+        let i = 0;
+        (function step() {
+            if (i >= full.length) { el.classList.add('v344-done'); return; }
+            el.textContent += full[i];
+            i++;
+            const ch = full[i - 1];
+            setTimeout(step, speed + (ch === ',' || ch === '.' ? 180 : 0));
+        })();
+    }
+
+    function init() {
+        // Section title typewriter
+        document.querySelectorAll('.qr-section-title').forEach((el) => {
+            const full = el.textContent.trim();
+            if (!full) return;
+            el.style.minHeight = el.offsetHeight + 'px';
+            el.textContent = '';
+            observe(el, () => typeInto(el, full, 25));
+        });
+        // Answer option items stagger
+        document.querySelectorAll('.qr-question').forEach((q, qi) => {
+            q.querySelectorAll('.qr-answer').forEach((a, ai) => {
+                a.classList.add('v344-item');
+                a.style.setProperty('--v344-delay', (ai * 120) + 'ms');
+                observe(a, () => a.classList.add('v344-assembled'));
+            });
+        });
+        // Summary lists stagger
+        document.querySelectorAll('.qr-summary-card li, .qr-summary-card p').forEach((el, i) => {
+            el.classList.add('v344-item');
+            el.style.setProperty('--v344-delay', (i * 90) + 'ms');
+            observe(el, () => el.classList.add('v344-assembled'));
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+})();
+</script>
 </body>
 </html>

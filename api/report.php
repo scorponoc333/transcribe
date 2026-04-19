@@ -3654,6 +3654,13 @@ const REPORT = {
     Chart.defaults.color = '#475569';
     Chart.defaults.plugins.legend.labels.boxWidth = 12;
     Chart.defaults.plugins.legend.labels.padding = 12;
+    // v3.44 — global chart entrance animation
+    Chart.defaults.animation = {
+        duration: 2400,
+        easing: 'easeOutCubic',
+        animateRotate: true,   // doughnut/pie: spin in
+        animateScale:  true,   // pie pieces "spring" from center
+    };
 
     /** Resolve --brand-XXX CSS var to an actual hex color for Chart.js */
     function brandColor(level, fallback) {
@@ -5617,6 +5624,226 @@ function copyTranscript() {
         const el = document.getElementById('jaiToast');
         if (el) el.classList.remove('show');
     };
+})();
+</script>
+
+<style id="v344ReportAnimations">
+@media screen {
+/* ── Typewriter caret for section titles + TL;DR ── */
+.section-title.v344-typewriting::after,
+.tldr-text.v344-typewriting::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 0.9em;
+    margin-left: 3px;
+    background: currentColor;
+    vertical-align: text-bottom;
+    animation: v344Caret 0.85s steps(1) infinite;
+}
+.section-title.v344-typewriting.v344-done::after,
+.tldr-text.v344-typewriting.v344-done::after {
+    animation: none;
+    opacity: 0;
+}
+@keyframes v344Caret {
+    0%, 50%   { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* ── Table rows: hidden until scrolled in, then stagger + gradient wipe ── */
+.learning-report-table tbody tr.v344-row {
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--v344-delay, 0ms);
+    position: relative;
+    overflow: hidden;
+}
+.learning-report-table tbody tr.v344-row.v344-assembled {
+    opacity: 1;
+    transform: translateX(0);
+}
+.learning-report-table tbody tr.v344-row::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -120%;
+    width: 55%; height: 100%;
+    background: linear-gradient(100deg,
+        transparent 0%,
+        rgba(var(--brand-300-rgb, 147, 197, 253), 0.18) 50%,
+        transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    opacity: 0;
+    transition: left 0.9s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+}
+.learning-report-table tbody tr.v344-row.v344-assembled::after {
+    opacity: 1;
+    left: 120%;
+    transition-delay: calc(var(--v344-delay, 0ms) + 200ms);
+}
+
+/* ── Tile cards (concepts, exercises, celebration items) ── */
+.learning-concept-card.v344-tile,
+.concept-card.v344-tile,
+.exercise-header.v344-tile,
+.celebration-card .celebration-item.v344-tile {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--v344-delay, 0ms);
+    position: relative;
+    overflow: hidden;
+}
+.learning-concept-card.v344-tile.v344-assembled,
+.concept-card.v344-tile.v344-assembled,
+.exercise-header.v344-tile.v344-assembled,
+.celebration-card .celebration-item.v344-tile.v344-assembled {
+    opacity: 1;
+    transform: none;
+}
+.learning-concept-card.v344-tile::after,
+.concept-card.v344-tile::after,
+.exercise-header.v344-tile::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -140%;
+    width: 55%; height: 100%;
+    background: linear-gradient(100deg,
+        transparent 0%,
+        rgba(var(--brand-300-rgb, 147, 197, 253), 0.22) 50%,
+        transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    opacity: 0;
+    transition: left 1.0s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+}
+.learning-concept-card.v344-tile.v344-assembled::after,
+.concept-card.v344-tile.v344-assembled::after,
+.exercise-header.v344-tile.v344-assembled::after {
+    opacity: 1;
+    left: 140%;
+    transition-delay: calc(var(--v344-delay, 0ms) + 260ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-title.v344-typewriting::after,
+    .tldr-text.v344-typewriting::after,
+    .learning-report-table tbody tr.v344-row,
+    .learning-concept-card.v344-tile,
+    .concept-card.v344-tile,
+    .exercise-header.v344-tile {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+}
+</style>
+<script>
+/* v3.44 report animation orchestra */
+(function () {
+    if (!window.IntersectionObserver) return;
+
+    const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            if (entry.isIntersecting && !entry.target._v344Done) {
+                entry.target._v344Done = true;
+                if (entry.target._v344Fn) {
+                    try { entry.target._v344Fn(entry.target); } catch (e) {}
+                }
+                io.unobserve(entry.target);
+            }
+        }
+    }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+
+    function observe(el, fn) {
+        if (!el || el._v344Obs) return;
+        el._v344Obs = true;
+        el._v344Fn = fn;
+        io.observe(el);
+    }
+
+    function typeInto(el, fullText, opts) {
+        opts = opts || {};
+        const speed = opts.speed || 30;
+        const commaPause = opts.commaPause || 180;
+        el.textContent = '';
+        el.classList.add('v344-typewriting');
+        let i = 0;
+        function step() {
+            if (i >= fullText.length) {
+                el.classList.add('v344-done');
+                if (opts.done) opts.done();
+                return;
+            }
+            el.textContent += fullText[i];
+            i++;
+            const ch = fullText[i - 1];
+            const pause = (ch === ',' || ch === '.') ? commaPause : 0;
+            setTimeout(step, speed + pause);
+        }
+        step();
+    }
+
+    function init() {
+        // Section title typewriter
+        document.querySelectorAll('.section-title').forEach((el) => {
+            // Skip if already animated by an earlier pass (hero title etc)
+            if (el.id === 'reportTitle') return;
+            const full = el.textContent.replace(/^\s+|\s+$/g, '');
+            if (!full) return;
+            // Reserve original so reflow doesn't shrink the element
+            el.style.minHeight = el.offsetHeight + 'px';
+            el.textContent = '';
+            observe(el, () => typeInto(el, full, { speed: 25 }));
+        });
+
+        // TL;DR typewriter — long text, fast speed
+        document.querySelectorAll('.tldr-text').forEach((el) => {
+            const full = el.textContent.replace(/^\s+|\s+$/g, '');
+            if (!full) return;
+            el.style.minHeight = el.offsetHeight + 'px';
+            el.textContent = '';
+            observe(el, () => typeInto(el, full, { speed: 8, commaPause: 60 }));
+        });
+
+        // Table rows: stagger wipe
+        document.querySelectorAll('.learning-report-table tbody tr').forEach((tr, idx) => {
+            tr.classList.add('v344-row');
+            tr.style.setProperty('--v344-delay', (idx * 120) + 'ms');
+            observe(tr, () => tr.classList.add('v344-assembled'));
+        });
+
+        // Tiles
+        document.querySelectorAll('.learning-concept-card, .concept-card, .exercise-header').forEach((el, idx) => {
+            el.classList.add('v344-tile');
+            el.style.setProperty('--v344-delay', ((idx % 6) * 110) + 'ms');
+            observe(el, () => el.classList.add('v344-assembled'));
+        });
+
+        // Chart re-animation on scroll-in
+        document.querySelectorAll('.chart-card canvas').forEach((canvas) => {
+            const card = canvas.closest('.chart-card');
+            if (!card) return;
+            observe(card, () => {
+                // Chart.js stores chart instance on the canvas via Chart.getChart
+                try {
+                    const ch = (typeof Chart !== 'undefined' && Chart.getChart) ? Chart.getChart(canvas) : null;
+                    if (!ch) return;
+                    if (typeof ch.reset === 'function') ch.reset();
+                    ch.update();
+                } catch (e) {}
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
 </script>
 </body>
