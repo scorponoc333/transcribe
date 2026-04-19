@@ -2736,8 +2736,9 @@ async function tbSignOut() {
                 position: relative;
             }
             #jaiHeroSection .jaihero-logo {
-                height: 583px !important;
-                max-width: 2538px !important;
+                height: 1457px !important;
+                max-width: 3800px !important;
+                margin-top: -30px !important;
             }
             /* v3.99 — Hide Public / Quiz History stacked buttons in PDF */
             .mob-page-actions,
@@ -5827,6 +5828,7 @@ function copyTranscript() {
             if (el.id === 'reportTitle') return;
             const full = el.textContent.replace(/^\s+|\s+$/g, '');
             if (!full) return;
+            el._v344Full = full;
             // Reserve original so reflow doesn't shrink the element
             el.style.minHeight = el.offsetHeight + 'px';
             el.textContent = '';
@@ -5837,9 +5839,21 @@ function copyTranscript() {
         document.querySelectorAll('.tldr-text').forEach((el) => {
             const full = el.textContent.replace(/^\s+|\s+$/g, '');
             if (!full) return;
+            el._v344Full = full;
             el.style.minHeight = el.offsetHeight + 'px';
             el.textContent = '';
             observe(el, () => typeInto(el, full, { speed: 8, commaPause: 60 }));
+        });
+        // v3.103 — restore full text before printing (IntersectionObserver
+        // doesn't reliably fire during paged-media layout, which left the
+        // TL;DR box blank in PDFs).
+        window.addEventListener('beforeprint', () => {
+            document.querySelectorAll('.section-title, .tldr-text').forEach(el => {
+                if (el._v344Full && (!el.textContent || !el.textContent.trim())) {
+                    el.textContent = el._v344Full;
+                    el.classList.remove('v344-typewriting');
+                }
+            });
         });
 
         // Table rows: stagger wipe
