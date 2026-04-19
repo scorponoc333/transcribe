@@ -2593,9 +2593,9 @@ async function tbSignOut() {
         }
         #jaiHeroSection .jaihero-logo {
             display: block;
-            height: 249px;
+            height: 233px;
             width: auto;
-            max-width: 1084px;
+            max-width: 1015px;
             aspect-ratio: 2.5 / 1;
             object-fit: contain;
             margin: 0 auto 14px auto;
@@ -2736,8 +2736,8 @@ async function tbSignOut() {
                 position: relative;
             }
             #jaiHeroSection .jaihero-logo {
-                height: 98px !important;
-                max-width: 520px !important;
+                height: 233px !important;
+                max-width: 1015px !important;
             }
             #jaiHeroSection .jaihero-edit-wrap { display: none !important; }
             #jaiHeroConstellation { display: none !important; }
