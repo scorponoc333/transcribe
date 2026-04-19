@@ -2731,7 +2731,7 @@ async function tbSignOut() {
     </style>
     <section id="jaiHeroSection" data-mode="<?= e($mode) ?>">
         <canvas id="jaiHeroConstellation" class="no-print" aria-hidden="true"
-                style="position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;opacity:0.41;"></canvas>
+                style="position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;opacity:0.29;"></canvas>
         <div class="jaihero-inner" style="z-index:3;position:relative;">
             <img class="jaihero-logo" src="<?= e($logoPath) ?>" alt="Logo">
             <div class="jaihero-badge"><?= $modeInfo['label'] ?></div>
