@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=2026041b6">
-    <link rel="stylesheet" href="css/ai-loading.css?v=2026041b6">
+    <link rel="stylesheet" href="css/style.css?v=2026041b7">
+    <link rel="stylesheet" href="css/ai-loading.css?v=2026041b7">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1948,18 +1948,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=2026041b6"></script>
-    <script src="js/api.js?v=2026041b6"></script>
-    <script src="js/pdf.js?v=2026041b6"></script>
-    <script src="js/email-template.js?v=2026041b6"></script>
-    <script src="js/autocomplete.js?v=2026041b6"></script>
-    <script src="js/history.js?v=2026041b6"></script>
-    <script src="js/assembler.js?v=2026041b6"></script>
-    <script src="js/analytics.js?v=2026041b6"></script>
-    <script src="js/contacts.js?v=2026041b6"></script>
-    <script src="js/users.js?v=2026041b6"></script>
-    <script src="js/app.js?v=2026041b6"></script>
-    <script src="js/upload-particles.js?v=2026041b6"></script>
+    <script src="js/ai-loading.js?v=2026041b7"></script>
+    <script src="js/api.js?v=2026041b7"></script>
+    <script src="js/pdf.js?v=2026041b7"></script>
+    <script src="js/email-template.js?v=2026041b7"></script>
+    <script src="js/autocomplete.js?v=2026041b7"></script>
+    <script src="js/history.js?v=2026041b7"></script>
+    <script src="js/assembler.js?v=2026041b7"></script>
+    <script src="js/analytics.js?v=2026041b7"></script>
+    <script src="js/contacts.js?v=2026041b7"></script>
+    <script src="js/users.js?v=2026041b7"></script>
+    <script src="js/app.js?v=2026041b7"></script>
+    <script src="js/upload-particles.js?v=2026041b7"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -4207,6 +4207,60 @@
         display: inline !important;
         white-space: normal !important;
     }
+}
+</style>
+
+<style id="v376Rp2EyeDate">
+@media (max-width: 768px) {
+    /* Eye button: fully restyle to mirror the envelope btn look.
+       (The anchor uses .btn-primary on desktop — we kill that on mobile.) */
+    #rp2Table .rp2-open-btn {
+        background: var(--btn-icon-bg, rgba(var(--brand-500-rgb), 0.06)) !important;
+        border: 1px solid var(--btn-icon-border, rgba(var(--brand-500-rgb), 0.28)) !important;
+        color: var(--brand-500, #2557b3) !important;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232557b3' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>") !important;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: 18px 18px !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        border-radius: 10px !important;
+        padding: 0 !important;
+        font-size: 0 !important;
+        box-shadow: none !important;
+    }
+    #rp2Table .rp2-open-btn::before { content: none !important; }
+    #rp2Table .rp2-open-btn > svg { display: none !important; }
+    #rp2Table .rp2-open-btn:hover {
+        background-color: var(--btn-icon-hover, rgba(var(--brand-500-rgb), 0.12)) !important;
+        border-color: var(--brand-500, #2557b3) !important;
+        transform: translateY(-1px);
+    }
+
+    /* Dark-mode variants — tint the icon light */
+    [data-theme="dark"] #rp2Table .rp2-open-btn {
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2393c5fd' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>") !important;
+        border-color: rgba(var(--brand-300-rgb, 147,197,253), 0.35) !important;
+    }
+
+    /* Show the date cell (first td) below title */
+    #rp2Table tbody tr > td:nth-child(1) {
+        display: block !important;
+        order: 3 !important;
+        flex: 1 1 100% !important;
+        padding: 0 !important;
+        font-size: 11px !important;
+        color: var(--ink-muted, #8a94a7) !important;
+        letter-spacing: 0.3px;
+    }
+    /* Put the actions on row 1 right-side of the title; date below as its own row */
+    #rp2Table tbody tr {
+        flex-wrap: wrap !important;
+        row-gap: 2px !important;
+    }
+    #rp2Table tbody tr > td:nth-child(2) { flex: 1 1 auto !important; order: 1 !important; }
+    #rp2Table tbody tr > td:nth-child(5) { order: 2 !important; }
 }
 </style>
 </body>
