@@ -1692,6 +1692,13 @@ const App = {
 
     closeSettings() {
         this._bounceCloseModal(this.dom.settingsModal);
+        // If we're embedded inside a parent page's lightbox (e.g. report.php
+        // opens us in an iframe), ask the parent to close the lightbox too.
+        try {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage('close-settings-lightbox', '*');
+            }
+        } catch (e) { /* cross-origin — ignore */ }
     },
 
     async saveSettings() {

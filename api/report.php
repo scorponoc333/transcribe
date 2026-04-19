@@ -4907,5 +4907,127 @@ function copyTranscript() {
     }
 })();
 </script>
+
+<!-- ====== Settings lightbox (shared across report pages) ====== -->
+<style>
+#settingsLightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(6, 13, 32, 0.78);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+#settingsLightbox.is-open {
+    display: flex;
+    opacity: 1;
+}
+#settingsLightbox .sl-frame-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#settingsLightbox iframe {
+    width: 100vw;
+    height: 100vh;
+    border: 0;
+    background: transparent;
+}
+#settingsLightbox .sl-close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    z-index: 2;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.28);
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+#settingsLightbox .sl-close:hover {
+    background: rgba(255,255,255,0.24);
+    border-color: rgba(255,255,255,0.5);
+    transform: scale(1.06);
+}
+</style>
+<div id="settingsLightbox" aria-hidden="true">
+    <div class="sl-frame-wrap">
+        <button type="button" class="sl-close" id="settingsLightboxClose" title="Close settings" aria-label="Close settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <iframe id="settingsLightboxFrame" title="Settings" src="about:blank" loading="lazy"></iframe>
+    </div>
+</div>
+<script>
+(function () {
+    const box = document.getElementById('settingsLightbox');
+    const closeBtn = document.getElementById('settingsLightboxClose');
+    const frame = document.getElementById('settingsLightboxFrame');
+
+    function open() {
+        // Load on open so the iframe doesn't fetch until needed
+        if (!frame.dataset.loaded) {
+            frame.src = '/index.html#settings';
+            frame.dataset.loaded = '1';
+        }
+        box.classList.add('is-open');
+        box.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+    function close() {
+        box.classList.remove('is-open');
+        box.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        // Reset iframe to stop music/anim and free memory
+        setTimeout(() => {
+            if (!box.classList.contains('is-open')) {
+                frame.src = 'about:blank';
+                delete frame.dataset.loaded;
+            }
+        }, 350);
+    }
+
+    // Intercept every anchor whose href points at /index.html#settings and the
+    // dedicated #settings-lightbox-btn id (if added) — open the lightbox instead.
+    document.addEventListener('click', function (e) {
+        const a = e.target.closest('a[href$="#settings"], a[href*="/index.html#settings"], [data-settings-lightbox]');
+        if (!a) return;
+        e.preventDefault();
+        open();
+    }, true);
+
+    closeBtn.addEventListener('click', close);
+
+    // Esc to close
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && box.classList.contains('is-open')) close();
+    });
+
+    // If the iframe (same-origin index.html) posts a close request, honour it
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data === 'close-settings-lightbox') close();
+    });
+
+    // Expose for external triggers
+    window.openSettingsLightbox = open;
+    window.closeSettingsLightbox = close;
+})();
+</script>
+
 </body>
 </html>
