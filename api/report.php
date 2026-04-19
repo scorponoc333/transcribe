@@ -2736,9 +2736,17 @@ async function tbSignOut() {
                 position: relative;
             }
             #jaiHeroSection .jaihero-logo {
-                height: 1457px !important;
-                max-width: 3800px !important;
-                margin-top: -30px !important;
+                width: 90% !important;
+                max-width: 900px !important;
+                height: auto !important;
+                aspect-ratio: auto !important;
+                transform: none !important;
+                margin: 0 auto 40px auto !important;
+            }
+            /* Force badge back into flow under the logo — overrides the
+               screen rule that pulls it up 75/70px. */
+            #jaiHeroSection .jaihero-badge {
+                margin-top: 0 !important;
             }
             /* v3.99 — Hide Public / Quiz History stacked buttons in PDF */
             .mob-page-actions,
