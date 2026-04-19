@@ -2542,19 +2542,19 @@ async function tbSignOut() {
         [data-theme="dark"] #jaiHeroSection::before {
             background:
                 radial-gradient(ellipse 70% 55% at 50% 22%,
-                    rgba(var(--brand-400-rgb), 0.68) 0%,
-                    rgba(var(--brand-500-rgb), 0.42) 45%,
+                    rgba(var(--brand-400-rgb), 0.50) 0%,
+                    rgba(var(--brand-500-rgb), 0.28) 45%,
                     rgba(var(--brand-500-rgb), 0) 75%),
                 linear-gradient(180deg,
-                    rgba(var(--brand-500-rgb), 0.70) 0%,
-                    rgba(var(--brand-grad-mid-rgb), 0.85) 30%,
-                    rgba(var(--brand-grad-dark-rgb), 0.95) 70%,
-                    rgba(5, 8, 22, 0.98) 100%) !important;
+                    rgba(var(--brand-500-rgb), 0.50) 0%,
+                    rgba(var(--brand-grad-mid-rgb), 0.68) 30%,
+                    rgba(var(--brand-grad-dark-rgb), 0.80) 70%,
+                    rgba(5, 8, 22, 0.86) 100%) !important;
         }
-        /* Also tighten the hero image desaturation in dark mode so the
-           undertones go near-black rather than muted blue. */
+        /* Keep the hero image visible in dark mode — just darker and
+           desaturated, not nearly-invisible. */
         [data-theme="dark"] #jaiHeroSection::after {
-            filter: grayscale(1) contrast(1.15) brightness(0.55) !important;
+            filter: grayscale(1) contrast(1.10) brightness(0.75) !important;
         }
         }
 

@@ -1727,7 +1727,7 @@ const App = window.App = {
 
     async saveSettings() {
         const modelSelect = document.getElementById('openRouterModel');
-        const fields = {
+        const raw = {
             openRouterApiKey: this.dom.apiKeyInput.value.trim(),
             openRouterModel: modelSelect ? modelSelect.value : 'google/gemini-2.5-pro',
             whisperModel: this.dom.whisperModel.value,
@@ -1745,6 +1745,22 @@ const App = window.App = {
             loginAnimationOpacity: document.getElementById('loginAnimationOpacity')?.value || '50',
             loginAnimationSpeed: document.getElementById('loginAnimationSpeed')?.value || '50',
         };
+        // Safeguard: if a field came through empty but our cache has a
+        // non-empty value, the form almost certainly wasn't populated
+        // (e.g. the modal opened before loadSettings resolved). In that
+        // case we DO NOT send that field — so a stray Save click can't
+        // wipe the DB. Applies only to the sensitive/user-editable
+        // text fields; toggles / selects / sliders always send.
+        const cache = this._settingsCache || {};
+        const protectIfBlank = ['openRouterApiKey', 'smtpHost', 'smtpUser', 'smtpPass', 'senderEmail', 'senderName', 'footerText'];
+        const fields = {};
+        for (const k in raw) {
+            if (protectIfBlank.includes(k) && raw[k] === '' && cache[k] && String(cache[k]).length > 0) {
+                // skip — DB keeps existing value
+                continue;
+            }
+            fields[k] = raw[k];
+        }
 
         try {
             await API.saveSettings(fields);
