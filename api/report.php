@@ -5027,6 +5027,19 @@ function copyTranscript() {
     window.openSettingsLightbox = open;
     window.closeSettingsLightbox = close;
 })();
+
+/* Auto-print when the page was opened with ?print=1 (history "Download PDF"). */
+(function () {
+    try {
+        const p = new URLSearchParams(window.location.search);
+        if (p.get('print') === '1') {
+            // Give the browser a beat to render fonts, charts, and the hero
+            // sparks canvas before the print dialog snapshots the page.
+            window.addEventListener('load', () => setTimeout(() => window.print(), 750));
+        }
+    } catch (e) {}
+})();
+
 </script>
 
 </body>

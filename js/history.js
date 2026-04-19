@@ -123,7 +123,7 @@ const History = {
                     <a href="${reportUrl}" target="_blank" rel="noopener" class="btn-icon btn-xs" title="Open Full Report" data-open-report="1" data-id="${row.id}" data-title="${title.replace(/"/g,'&quot;')}">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
-                    ${row.has_pdf ? `<button class="btn-icon btn-xs" onclick="History.downloadPdf(${row.id})" title="Download Legacy PDF">
+                    ${row.has_pdf ? `<button class="btn-icon btn-xs" onclick="History.downloadPdf(${row.id})" title="Download PDF">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </button>` : ''}
                     <button class="btn-icon btn-xs" onclick="History.emailTranscript(${row.id})" title="Send Email">
@@ -304,7 +304,10 @@ const History = {
     },
 
     downloadPdf(id) {
-        window.open(`api/pdf.php?id=${id}`, '_blank');
+        // Open the real branded report page with ?print=1 — it auto-fires
+        // window.print() on load so the user gets the same Save-as-PDF
+        // experience as clicking Download PDF on the report itself.
+        window.open(`api/report.php?id=${id}&print=1`, '_blank');
     },
 
     async viewEmailLog(id) {
