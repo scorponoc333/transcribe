@@ -223,7 +223,7 @@ const API = {
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
                 'HTTP-Referer': window.location.origin || 'http://localhost',
-                'X-Title': 'Transcribe AI'
+                'X-Title': 'JAI Transcribe'
             },
             body: JSON.stringify({
                 model: this.getModel(),
@@ -345,7 +345,7 @@ ${transcript}
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
                 'HTTP-Referer': window.location.origin || 'http://localhost',
-                'X-Title': 'Transcribe AI'
+                'X-Title': 'JAI Transcribe'
             },
             body: JSON.stringify({
                 model: this.getModel(),
@@ -456,6 +456,11 @@ ${transcript}
         if (options.cc) body.cc = options.cc;
         if (options.bcc) body.bcc = options.bcc;
         if (options.attachments?.length) body.attachments = options.attachments;
+        // Critical: forward transcription_id so send-smtp.php can build the
+        // report URL. Without this the URL falls back to '#' and the email
+        // button does nothing when clicked.
+        if (options.transcription_id) body.transcription_id = options.transcription_id;
+        if (options.reply_to) body.reply_to = options.reply_to;
 
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
@@ -663,14 +668,130 @@ ${transcript}
     // ---- Learning Mode API ----
 
     async getYouTubeTranscript(url) {
-        const response = await fetch('api/youtube-transcript.php', {
+        const idMatch = url.match(/(?:youtube\.com\/watch\?.*v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+        if (!idMatch) throw new Error('Invalid YouTube URL');
+        const videoId = idMatch[1];
+
+        // Method 1: Server-side (may fail due to YouTube IP blocking)
+        try {
+            const r = await fetch('api/youtube-transcript.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            });
+            const d = await r.json();
+            if (r.ok && d.success) return d;
+        } catch (e) { console.warn('Server YT fetch failed:', e); }
+
+        // Method 2: Use our server proxy to get caption tracks, then fetch captions
+        try {
+            const t = await this._ytViaProxy(videoId);
+            if (t) return t;
+        } catch (e) { console.warn('Proxy method failed:', e); }
+
+        // Method 3: Client-side innertube API (user's browser IP)
+        try {
+            const t = await this._ytInnertubeClient(videoId);
+            if (t) return { success: true, transcript: t, title: 'YouTube Video', video_id: videoId };
+        } catch (e) { console.warn('Innertube failed:', e); }
+
+        // Method 4: Client-side page scrape
+        try {
+            const t = await this._ytCaptionsClient(videoId);
+            if (t) return { success: true, transcript: t, title: 'YouTube Video', video_id: videoId };
+        } catch (e) { console.warn('Captions scrape failed:', e); }
+
+        throw new Error('Could not fetch transcript. The video may not have captions, or it might be private.');
+    },
+
+    async _ytViaProxy(videoId) {
+        // Use our proxy which tries innertube player API with different clients
+        const resp = await fetch(`api/yt-proxy.php?video_id=${videoId}&action=player`);
+        const data = await resp.json();
+        if (data?.success && data?.transcript) return data;
+
+        // Fallback: try tracks endpoint
+        const trackResp = await fetch(`api/yt-proxy.php?video_id=${videoId}&action=tracks`);
+        const trackData = await trackResp.json();
+        if (!trackData?.tracks?.length) return null;
+
+        let trackUrl = null;
+        for (const t of trackData.tracks) {
+            if (t.languageCode === 'en') { trackUrl = t.baseUrl; break; }
+        }
+        if (!trackUrl) trackUrl = trackData.tracks[0]?.baseUrl;
+        if (!trackUrl) return null;
+
+        const capResp = await fetch(`api/yt-proxy.php?action=caption&caption_url=${encodeURIComponent(trackUrl)}`);
+        const capData = await capResp.json();
+        if (!capData?.success || !capData?.transcript) return null;
+
+        return {
+            success: true,
+            transcript: capData.transcript,
+            title: trackData.title || `YouTube Video (${videoId})`,
+            video_id: videoId,
+        };
+    },
+
+    async _ytInnertubeClient(videoId) {
+        // Use no-cors mode won't work for reading response. Instead, try with credentials
+        // which sends YouTube cookies if user is logged in — bypasses bot detection
+        const r = await fetch('https://www.youtube.com/youtubei/v1/get_transcript?prettyPrint=false', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url })
+            credentials: 'include',
+            body: JSON.stringify({
+                context: { client: { clientName: 'WEB', clientVersion: '2.20241031.00.00' } },
+                params: btoa('\n\x0b' + videoId)
+            })
         });
-        const result = await response.json();
-        if (!response.ok || !result.success) throw new Error(result.error || 'Failed to fetch YouTube transcript');
-        return result;
+        if (!r.ok) return null;
+        const data = await r.json();
+        for (const action of (data?.actions || [])) {
+            const panel = action?.updateEngagementPanelAction?.content?.transcriptRenderer?.content?.transcriptSearchPanelRenderer;
+            if (!panel) continue;
+            const segs = panel?.body?.transcriptSegmentListRenderer?.initialSegments || [];
+            const lines = [];
+            for (const s of segs) {
+                const text = (s?.transcriptSegmentRenderer?.snippet?.runs || []).map(r => r.text || '').join('').trim();
+                if (text && !/^\[.*\]$/.test(text)) lines.push(text);
+            }
+            if (lines.length) {
+                const paras = [];
+                for (let i = 0; i < lines.length; i += 5) paras.push(lines.slice(i, i + 5).join(' '));
+                return paras.join('\n\n');
+            }
+        }
+        return null;
+    },
+
+    async _ytCaptionsClient(videoId) {
+        const r = await fetch(`https://www.youtube.com/watch?v=${videoId}`, { credentials: 'omit' });
+        if (!r.ok) return null;
+        const html = await r.text();
+        const m = html.match(/"captionTracks":\s*(\[.*?\])/);
+        if (!m) return null;
+        let tracks; try { tracks = JSON.parse(m[1]); } catch { return null; }
+        if (!tracks?.length) return null;
+        let trackUrl = null;
+        for (const t of tracks) { if (t.languageCode === 'en') { trackUrl = t.baseUrl; break; } }
+        if (!trackUrl) trackUrl = tracks[0]?.baseUrl;
+        if (!trackUrl) return null;
+        const xr = await fetch(trackUrl);
+        if (!xr.ok) return null;
+        const xml = await xr.text();
+        const doc = new DOMParser().parseFromString(xml, 'text/xml');
+        const lines = [];
+        for (const n of doc.querySelectorAll('text')) {
+            let t = n.textContent.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();
+            t = t.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+            if (t && !/^\[.*\]$/.test(t)) lines.push(t);
+        }
+        if (!lines.length) return null;
+        const paras = [];
+        for (let i = 0; i < lines.length; i += 5) paras.push(lines.slice(i, i + 5).join(' '));
+        return paras.join('\n\n');
     },
 
     async analyzeLearning(transcript, objective, apiKey) {
@@ -682,7 +803,7 @@ ${transcript}
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey}`,
                 'HTTP-Referer': window.location.origin,
-                'X-Title': 'Transcribe AI - Learning Analysis'
+                'X-Title': 'JAI Transcribe - Learning Analysis'
             },
             body: JSON.stringify({
                 model: this.getModel(),
@@ -751,13 +872,16 @@ CRITICAL INSTRUCTIONS:
 6. When statistics are found, present them prominently with context
 7. For technical content, explain terms in plain language
 8. Identify relationships between concepts to help build understanding
+9. NEVER use markdown formatting (no ** or ## or * etc) — write plain text only
+10. For the learning_objectives_addressed field, write flowing prose paragraphs. Do NOT use numbered lists or bullet points — write it as natural paragraphs explaining what the learner will gain
+11. URLS ARE CRITICAL — READ THIS CAREFULLY: NEVER generate or guess URLs. The ONLY URLs you may include are ones that were EXPLICITLY mentioned in the transcript text (e.g., "visit openai.com" or "check out github.com/user/repo"). If a URL was not literally spoken or written in the source content, DO NOT include any URL at all. Do not try to find URLs for products mentioned — just describe the product without a URL. NEVER fabricate YouTube links, article links, or any other URLs. Omit the "url" field entirely unless the exact URL appeared in the transcript. A resource with no URL is correct; a resource with a fake URL is a critical error.
 
 Return JSON with these OPTIONAL keys (include only what's relevant):
 {
   "title": "A descriptive, engaging title for this learning report (8-15 words)",
   "difficulty_level": "beginner OR intermediate OR advanced — based on the content complexity",
-  "executive_summary": "A comprehensive overview of the content (3-4 paragraphs). Cover the main themes, why this content matters, and what the reader will gain from it.",
-  "learning_objectives_addressed": "How this content addresses the user's stated learning objective. Be specific about what they will learn.",
+  "executive_summary": "A comprehensive overview of the content (3-4 paragraphs). Cover the main themes, why this content matters, and what the reader will gain from it. Plain text only, no markdown.",
+  "learning_objectives_addressed": "How this content addresses the user's stated learning objective. Write 2-3 flowing paragraphs in plain prose. No numbered lists, no bullets, no markdown. Explain naturally what the learner will understand after studying this content.",
   "key_concepts": [{"term": "concept name", "explanation": "detailed explanation in plain language", "importance": "high/medium/low"}],
   "glossary": [{"term": "technical term", "definition": "clear definition in simple language"}],
   "core_insights": ["Key insight or takeaway — each should be a complete, actionable thought"],
@@ -765,15 +889,28 @@ Return JSON with these OPTIONAL keys (include only what's relevant):
   "statistics": [{"stat": "the statistic (e.g., 85%)", "context": "what this statistic means and why it matters", "source": "where it came from if mentioned"}],
   "dates_timeline": [{"date": "date or time period", "event": "what happened", "significance": "why this matters"}],
   "locations": [{"name": "location name", "context": "relevance to the content"}],
-  "products_tools": [{"name": "product or tool name", "description": "what it does", "url": "URL if mentioned"}],
-  "resources_urls": [{"name": "resource name", "url": "URL if available", "description": "what this resource offers"}],
+  "products_tools": [{"name": "product or tool name", "description": "what it does", "search_query": "a specific Google search query to find this product"}],
+  "resources_urls": [{"name": "resource name", "description": "what this resource offers", "search_query": "a specific Google search query to find this resource"}],
   "contact_info": [{"name": "person or organization", "detail": "contact details mentioned"}],
   "roadmap": [{"phase": "phase name or step", "description": "what happens in this phase", "timeline": "when, if mentioned"}],
   "action_items": [{"task": "specific action to take", "priority": "high/medium/low"}],
   "concept_relationships": [{"from": "concept A", "to": "concept B", "relationship": "how A relates to B"}],
-  "prerequisites": ["Knowledge or skills needed to fully understand this content"],
-  "further_learning": [{"topic": "suggested topic to explore next", "why": "why this would help deepen understanding", "resource": "suggested resource if applicable"}]
+  "prerequisites": ["Knowledge or skills needed to fully understand this content — ONLY include if the content genuinely requires prior knowledge. Omit entirely for beginner-friendly content."],
+  "further_learning": [{"topic": "suggested topic to explore next", "why": "why this would help deepen understanding", "resource": "suggested resource name if applicable"}],
+  "tldr": "A punchy 2-3 sentence summary of the ENTIRE content. Write it like you're explaining to a friend in 30 seconds. Plain text, no markdown.",
+  "estimated_study_time_minutes": 15,
+  "key_quotes": [{"quote": "exact memorable quote from the transcript", "speaker": "who said it if known", "context": "why this quote matters"}],
+  "practical_exercises": [{"title": "exercise name", "description": "what to do — be specific and actionable", "difficulty": "beginner/intermediate/advanced", "time_estimate": "how long it takes"}]
 }
+
+SECTION INCLUSION RULES — READ CAREFULLY:
+- ONLY include a section if there is genuinely meaningful content for it
+- If the transcript has no memorable quotes, OMIT key_quotes entirely
+- If no prior knowledge is needed, OMIT prerequisites entirely
+- If practical exercises don't make sense for this content, OMIT practical_exercises entirely
+- If the content is too short for a roadmap, OMIT roadmap entirely
+- estimated_study_time_minutes should be a realistic number (integer) based on content length and complexity
+- The AI should be honest — empty sections make the report look bad, so only include what adds real value
 
 CONTENT TO ANALYZE:
 ---
