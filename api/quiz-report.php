@@ -1881,5 +1881,52 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     tick();
 })();
 </script>
+
+<style id="v3110UnifiedMenu">
+.unified-menu-btn {
+    display: none;
+    background: transparent;
+    border: 0;
+    color: #ffffff;
+    width: 60px; height: 60px;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    padding: 14px;
+    border-radius: 12px;
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    z-index: 3;
+}
+.unified-menu-btn:hover { opacity: 0.85; }
+.unified-menu-btn svg { stroke: #ffffff; }
+@media (max-width: 768px) {
+    .unified-menu-btn { display: inline-flex !important; }
+    .topbar .topbar-actions > * { display: none !important; }
+    .topbar {
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+        padding-left: 18px !important;
+        min-height: 84px;
+    }
+}
+</style>
+<button type="button" id="unifiedMenuBtn" class="unified-menu-btn no-print" aria-label="Menu">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+<script id="v3110MountMenu">
+(function () {
+    function mount() {
+        const btn = document.getElementById('unifiedMenuBtn');
+        const tb  = document.querySelector('.topbar');
+        if (btn && tb && btn.parentNode !== tb) tb.appendChild(btn);
+        btn?.addEventListener('click', () => { if (typeof openMobileMenu === 'function') openMobileMenu(); });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', mount);
+    } else { mount(); }
+})();
+</script>
 </body>
 </html>

@@ -6251,11 +6251,16 @@ function copyTranscript() {
     background: transparent;
     border: 0;
     color: #ffffff;
-    width: 44px; height: 44px;
+    width: 60px; height: 60px;
     align-items: center; justify-content: center;
     cursor: pointer;
-    padding: 0;
-    margin-left: auto;
+    padding: 14px;
+    border-radius: 12px;
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    z-index: 3;
 }
 .unified-menu-btn:hover { opacity: 0.85; }
 .unified-menu-btn svg { stroke: #ffffff; }
@@ -7239,5 +7244,29 @@ function viewQuizReportSlideUp() {
     tick();
 })();
 </script>
+
+<script id="v3110MountMenu">
+(function () {
+    function mount() {
+        const btn = document.getElementById('unifiedMenuBtn');
+        const tb  = document.querySelector('.topbar');
+        if (btn && tb && btn.parentNode !== tb) tb.appendChild(btn);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', mount);
+    } else { mount(); }
+})();
+</script>
+
+<style id="v3110HeaderHeight">
+@media (max-width: 768px) {
+    .topbar {
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+        padding-left: 18px !important;
+        min-height: 84px;
+    }
+}
+</style>
 </body>
 </html>
