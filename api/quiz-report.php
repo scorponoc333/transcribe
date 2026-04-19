@@ -1772,5 +1772,21 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     }
 }
 </style>
+
+<style id="v391QrLogosMobile">
+@media (max-width: 768px) {
+    /* Header brand logo -50% */
+    .topbar-logo {
+        height: 13px !important;
+        max-width: 70px !important;
+    }
+    /* Cover tile logo -50% so it fits inside the card */
+    .qr-cover-logo {
+        height: 22px !important;
+        max-width: 120px !important;
+        margin-bottom: 14px !important;
+    }
+}
+</style>
 </body>
 </html>
