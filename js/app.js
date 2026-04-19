@@ -3,7 +3,7 @@
  * Manages UI state, event handlers, and user interactions
  */
 
-const App = {
+const App = window.App = {
     // State
     state: 'idle',
     currentFile: null,
