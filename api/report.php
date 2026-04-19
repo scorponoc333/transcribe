@@ -5274,13 +5274,14 @@ function copyTranscript() {
 }
 
 .jaihero-logo {
-    transform: translateY(-26px) scale(0.85);
-    animation: jaiLogoDrop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.95s forwards;
+    opacity: 0;
+    transform: translateY(-216px) scale(0.85);
+    animation: jaiLogoDrop 1s cubic-bezier(0.22, 1, 0.36, 1) 0.25s forwards;
 }
 @keyframes jaiLogoDrop {
-    0%   { opacity: 0; transform: translateY(-26px) scale(0.85); }
-    70%  { opacity: 1; transform: translateY(5px) scale(1.04); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+    0%   { opacity: 0; transform: translateY(-216px) scale(0.85); }
+    70%  { opacity: 0.95; transform: translateY(-185px) scale(1.03); }
+    100% { opacity: 0.95; transform: translateY(-190px) scale(1); }
 }
 /* Shockwave ring from logo impact */
 .jaihero-logo::after {
@@ -7112,7 +7113,7 @@ function viewQuizReportSlideUp() {
         transform: translateY(-190px);
     }
     #jaiHeroSection .jaihero-badge {
-        margin-top: -95px !important;
+        margin-top: -80px !important;
         position: relative;
         z-index: 5;
     }
@@ -7125,7 +7126,7 @@ function viewQuizReportSlideUp() {
         transform: translateY(-190px);
     }
     #jaiHeroSection .jaihero-badge {
-        margin-top: -49px !important;
+        margin-top: -34px !important;
         position: relative;
         z-index: 5;
     }
