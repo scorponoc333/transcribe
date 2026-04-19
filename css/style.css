@@ -6009,3 +6009,19 @@ audio::-webkit-media-controls-panel {
         margin-top: -6px !important;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   v3.114 — role-based menu gating.
+   <body> carries data-role="admin|manager|editor" and
+   data-is-master="0|1" from the server. Items tagged with the
+   classes below are hidden when the body state doesn't qualify.
+   ═══════════════════════════════════════════════════════════════ */
+body:not([data-is-master="1"]) .requires-master {
+    display: none !important;
+}
+body:not([data-role="admin"]):not([data-is-master="1"]) .requires-admin {
+    display: none !important;
+}
+body[data-role="editor"]:not([data-is-master="1"]) .requires-manager-plus {
+    display: none !important;
+}

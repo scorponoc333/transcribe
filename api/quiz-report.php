@@ -23,12 +23,19 @@ if ($attemptId <= 0) {
 
 try {
     $db = getDB();
-    $stmt = $db->prepare("SELECT qa.*, t.title as transcription_title, t.mode
-                          FROM quiz_attempts qa
-                          JOIN transcriptions t ON t.id = qa.transcription_id
-                          WHERE qa.id = :id AND qa.user_id = :uid AND qa.organization_id = :oid
-                          LIMIT 1");
-    $stmt->execute([':id' => $attemptId, ':uid' => $userId, ':oid' => $orgId]);
+    // v3.114 — editors scoped to own attempts; admin/manager see tenant-wide
+    $orgRole = getCurrentOrgRole();
+    $requireOwner = ($orgRole === 'editor') && !isMasterAdmin();
+    $sql = "SELECT qa.*, t.title as transcription_title, t.mode
+            FROM quiz_attempts qa
+            JOIN transcriptions t ON t.id = qa.transcription_id
+            WHERE qa.id = :id AND qa.organization_id = :oid" .
+            ($requireOwner ? " AND qa.user_id = :uid" : "") .
+           " LIMIT 1";
+    $stmt = $db->prepare($sql);
+    $bind = [':id' => $attemptId, ':oid' => $orgId];
+    if ($requireOwner) $bind[':uid'] = $userId;
+    $stmt->execute($bind);
     $attempt = $stmt->fetch(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     http_response_code(500);
@@ -333,7 +340,7 @@ body {
 })();
 </script>
 </head>
-<body>
+<body data-role="<?= e(getCurrentOrgRole() ?: 'guest') ?>" data-is-master="<?= isMasterAdmin() ? '1' : '0' ?>">
 
 <div class="topbar no-print">
     <div class="topbar-inner">
@@ -358,13 +365,13 @@ body {
                 <div class="tb-more-menu">
                     <a href="/index.html#history" class="tb-more-item">History</a>
                     <a href="/index.html#reports" class="tb-more-item">Reports</a>
-                    <a href="/index.html#analytics" class="tb-more-item">Analytics</a>
+                    <a href="/index.html#analytics" class="tb-more-item requires-manager-plus">Analytics</a>
                     <a href="/index.html#contacts" class="tb-more-item">Contacts</a>
                     <div class="tb-more-divider"></div>
                     <a href="/index.html#feedback" class="tb-more-item">Feedback</a>
                 </div>
             </div>
-            <a href="/index.html#settings" class="btn app-nav-btn btn-icon-only" title="Settings">
+            <a href="/index.html#settings" class="btn app-nav-btn btn-icon-only requires-manager-plus" title="Settings">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </a>
             <button type="button" class="btn app-nav-btn" onclick="tbSignOut()" title="Sign Out">
@@ -1415,7 +1422,7 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
             <span>History</span>
             <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
-        <a class="offcanvas-item" href="/index.html#analytics">
+        <a class="offcanvas-item requires-manager-plus" href="/index.html#analytics">
             <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             <span>Analytics</span>
             <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
@@ -1425,9 +1432,14 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
             <span>Contacts</span>
             <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
-        <a class="offcanvas-item offcanvas-item-admin" href="/index.html#users">
+        <a class="offcanvas-item offcanvas-item-admin requires-admin" href="/index.html#users">
             <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span>Users</span>
+            <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a class="offcanvas-item requires-master" href="/admin/">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>Super Admin</span>
             <svg class="offcanvas-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
         <a class="offcanvas-item" href="/index.html#feedback">
@@ -1441,7 +1453,7 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             <span>Sign Out</span>
         </button>
-        <button id="offcanvasSettings" class="offcanvas-gear-btn" type="button" aria-label="Settings" title="Settings">
+        <button id="offcanvasSettings" class="offcanvas-gear-btn requires-manager-plus" type="button" aria-label="Settings" title="Settings">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
     </div>
