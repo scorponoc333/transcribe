@@ -2736,9 +2736,12 @@ async function tbSignOut() {
                 position: relative;
             }
             #jaiHeroSection .jaihero-logo {
-                height: 233px !important;
-                max-width: 1015px !important;
+                height: 583px !important;
+                max-width: 2538px !important;
             }
+            /* v3.99 — Hide Public / Quiz History stacked buttons in PDF */
+            .mob-page-actions,
+            .mob-page-actions * { display: none !important; }
             #jaiHeroSection .jaihero-edit-wrap { display: none !important; }
             #jaiHeroConstellation { display: none !important; }
             #jaiHeroSection .jaihero-url {

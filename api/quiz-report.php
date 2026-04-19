@@ -1788,5 +1788,12 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     }
 }
 </style>
+
+<style id="v399QrPrintHide">
+@media print {
+    .qr-mob-actions,
+    .qr-mob-actions * { display: none !important; }
+}
+</style>
 </body>
 </html>
