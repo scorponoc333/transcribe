@@ -1311,6 +1311,20 @@ const App = {
     },
 
     resetToUpload() {
+        // Always re-show the All Reports sidebar on a Transcribe click,
+        // even if we short-circuit below because we're already on upload.
+        (function () {
+            const sb = document.getElementById('reportsSidebar');
+            if (sb) {
+                sb.style.display = '';
+                sb.classList.remove('rs-closing');
+                document.body.classList.add('has-reports-sidebar');
+                // Replay the assembly animation so it feels alive
+                if (window.__rsApi && typeof window.__rsApi.playAssembly === 'function') {
+                    try { window.__rsApi.playAssembly(); } catch (e) {}
+                }
+            }
+        })();
         // If a transcription is running, go to upload but keep the pill visible
         if (this._bgTranscribing) {
             this.showSection('upload');
