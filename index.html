@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=2026041b4">
-    <link rel="stylesheet" href="css/ai-loading.css?v=2026041b4">
+    <link rel="stylesheet" href="css/style.css?v=2026041b5">
+    <link rel="stylesheet" href="css/ai-loading.css?v=2026041b5">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1948,18 +1948,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=2026041b4"></script>
-    <script src="js/api.js?v=2026041b4"></script>
-    <script src="js/pdf.js?v=2026041b4"></script>
-    <script src="js/email-template.js?v=2026041b4"></script>
-    <script src="js/autocomplete.js?v=2026041b4"></script>
-    <script src="js/history.js?v=2026041b4"></script>
-    <script src="js/assembler.js?v=2026041b4"></script>
-    <script src="js/analytics.js?v=2026041b4"></script>
-    <script src="js/contacts.js?v=2026041b4"></script>
-    <script src="js/users.js?v=2026041b4"></script>
-    <script src="js/app.js?v=2026041b4"></script>
-    <script src="js/upload-particles.js?v=2026041b4"></script>
+    <script src="js/ai-loading.js?v=2026041b5"></script>
+    <script src="js/api.js?v=2026041b5"></script>
+    <script src="js/pdf.js?v=2026041b5"></script>
+    <script src="js/email-template.js?v=2026041b5"></script>
+    <script src="js/autocomplete.js?v=2026041b5"></script>
+    <script src="js/history.js?v=2026041b5"></script>
+    <script src="js/assembler.js?v=2026041b5"></script>
+    <script src="js/analytics.js?v=2026041b5"></script>
+    <script src="js/contacts.js?v=2026041b5"></script>
+    <script src="js/users.js?v=2026041b5"></script>
+    <script src="js/app.js?v=2026041b5"></script>
+    <script src="js/upload-particles.js?v=2026041b5"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -4146,6 +4146,47 @@
     }
     #historyTable tbody tr {
         gap: 4px !important;
+    }
+}
+</style>
+
+<style id="v374CostOpMobile">
+@media (max-width: 768px) {
+    /* Cost breakdown table — mobile only */
+    #costBreakdownTable { overflow-x: visible !important; }
+    #costBreakdownTable table { font-size: 12px !important; }
+
+    /* Shrink column headers so the Operation column keeps some width */
+    #costBreakdownTable thead th {
+        padding: 6px 4px !important;
+        font-size: 9px !important;
+        letter-spacing: 0.3px !important;
+    }
+    #costBreakdownTable tbody td {
+        padding: 8px 4px !important;
+        font-size: 12px !important;
+    }
+
+    /* The Operation cell is the first td — flex with dot on the left,
+       label flex:1 so it wraps cleanly below the dot column. */
+    #costBreakdownTable tbody td:first-child {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+        min-width: 0 !important;
+    }
+    #costBreakdownTable tbody td:first-child > span:first-child {
+        /* The dot */
+        flex: 0 0 8px !important;
+        margin: 6px 0 0 0 !important;
+        vertical-align: unset !important;
+    }
+    #costBreakdownTable tbody td:first-child > span:last-child {
+        /* The label */
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        word-break: break-word !important;
+        line-height: 1.25 !important;
     }
 }
 </style>
