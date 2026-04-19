@@ -670,9 +670,9 @@ body {
     transform: scale(1.08);
 }
 .title-edit-input {
-    width: 70%;
-    max-width: 720px;
-    min-width: 320px;
+    width: 90%;
+    max-width: 900px;
+    min-width: 360px;
     padding: 16px 22px;
     background: rgba(255,255,255,0.12);
     border: 2px solid rgba(255,255,255,0.4);
@@ -4796,125 +4796,101 @@ function copyTranscript() {
     });
 }
 
-/* ── Hero floating sparks (fireflies) ─────────────────── */
-(function initHeroFloatingSparks() {
-    const canvas = document.getElementById('jaiHeroConstellation');
-    if (!canvas) { console.log('[hero-sparks] canvas not found'); return; }
-    console.log('[hero-sparks] init');
-    const section = document.getElementById('jaiHeroSection');
-    const ctx = canvas.getContext('2d');
-    let sparks = [];
-    let w = 0, h = 0, dpr = Math.max(1, window.devicePixelRatio || 1);
+/* ── Hero floating sparks (fireflies) ───────────────────────────── */
+(function initHeroSparks() {
+    const run = () => {
+        const canvas = document.getElementById('jaiHeroConstellation');
+        const section = document.getElementById('jaiHeroSection');
+        if (!canvas || !section) return;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            console.log('[hero-sparks] reduced motion — skipping');
+            return;
+        }
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { console.warn('[hero-sparks] no 2d context'); return; }
 
-    function sparkCount() {
-        // ~1 spark per 7000 px² for a lively feel
-        return Math.max(120, Math.min(260, Math.round((w * h) / 4500)));
-    }
+        let w = 0, h = 0;
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
-    function resize() {
-        const rect = section.getBoundingClientRect();
-        w = rect.width; h = rect.height;
-        canvas.width = Math.floor(w * dpr);
-        canvas.height = Math.floor(h * dpr);
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    function makeSpark(randomLife) {
-        const speed = 0.06 + Math.random() * 0.28;
-        const angle = Math.random() * Math.PI * 2;
-        return {
-            x: Math.random() * w,
-            y: Math.random() * h,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            r: 0.6 + Math.random() * 1.8,
-            // each spark has its own flicker rhythm
-            flickerPhase: Math.random() * Math.PI * 2,
-            flickerSpeed: 0.03 + Math.random() * 0.07,
-            // wander adds small random acceleration each frame
-            wanderPhase: Math.random() * Math.PI * 2,
-            wanderSpeed: 0.012 + Math.random() * 0.025,
-            life: randomLife ? Math.random() * 600 : 0,
-            maxLife: 400 + Math.random() * 500
-        };
-    }
-
-    function seed() {
-        const n = sparkCount();
-        sparks = [];
-        for (let i = 0; i < n; i++) sparks.push(makeSpark(true));
-    }
-
-    function draw() {
-        ctx.clearRect(0, 0, w, h);
-
-        for (let i = 0; i < sparks.length; i++) {
-            const s = sparks[i];
-
-            // Wander — gently curve the direction over time
-            s.wanderPhase += s.wanderSpeed;
-            const wander = Math.sin(s.wanderPhase) * 0.02;
-            // rotate velocity by a tiny angle
-            const cosW = Math.cos(wander), sinW = Math.sin(wander);
-            const nvx = s.vx * cosW - s.vy * sinW;
-            const nvy = s.vx * sinW + s.vy * cosW;
-            s.vx = nvx; s.vy = nvy;
-
-            s.x += s.vx;
-            s.y += s.vy;
-            s.life++;
-            s.flickerPhase += s.flickerSpeed;
-
-            // Wrap around edges so sparks appear to drift off and come back from other side
-            if (s.x < -10) s.x = w + 10;
-            else if (s.x > w + 10) s.x = -10;
-            if (s.y < -10) s.y = h + 10;
-            else if (s.y > h + 10) s.y = -10;
-
-            // Respawn when life expires
-            if (s.life > s.maxLife) {
-                sparks[i] = makeSpark(false);
-                continue;
-            }
-
-            // Life fade: ease in, hold, ease out
-            const lifeRatio = s.life / s.maxLife;
-            let lifeFade;
-            if (lifeRatio < 0.15) lifeFade = lifeRatio / 0.15;
-            else if (lifeRatio > 0.85) lifeFade = (1 - lifeRatio) / 0.15;
-            else lifeFade = 1;
-
-            // Flicker — fast shimmer
-            const flicker = 0.55 + 0.45 * Math.sin(s.flickerPhase);
-            const alpha = lifeFade * flicker;
-
-            // Outer glow — warm white-blue
-            const glowR = s.r * 5;
-            const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR);
-            grad.addColorStop(0, 'rgba(220, 235, 255, ' + (alpha * 0.95) + ')');
-            grad.addColorStop(0.5, 'rgba(180, 210, 255, ' + (alpha * 0.35) + ')');
-            grad.addColorStop(1, brandRgba('300', 0));
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Bright white core
-            ctx.fillStyle = 'rgba(255, 255, 255, ' + Math.min(1, alpha * 1.6) + ')';
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-            ctx.fill();
+        function sizeCanvas() {
+            w = section.clientWidth || section.offsetWidth || 800;
+            h = section.clientHeight || section.offsetHeight || 400;
+            canvas.width = Math.round(w * dpr);
+            canvas.height = Math.round(h * dpr);
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
 
-        requestAnimationFrame(draw);
-    }
+        function makeSpark(randomLife) {
+            const speed = 0.08 + Math.random() * 0.35;
+            const ang = Math.random() * Math.PI * 2;
+            return {
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: Math.cos(ang) * speed,
+                vy: Math.sin(ang) * speed,
+                r: 0.7 + Math.random() * 2.0,
+                ph: Math.random() * Math.PI * 2,
+                phs: 0.04 + Math.random() * 0.08,
+                life: randomLife ? Math.random() * 300 : 0,
+                maxLife: 260 + Math.random() * 420
+            };
+        }
 
-    resize();
-    seed();
-    draw();
-    window.addEventListener('resize', () => { resize(); seed(); });
+        let sparks = [];
+        function seed() {
+            const n = Math.max(100, Math.min(220, Math.round((w * h) / 4800)));
+            sparks = [];
+            for (let i = 0; i < n; i++) sparks.push(makeSpark(true));
+        }
+
+        let stopped = false;
+        function frame() {
+            if (stopped || !document.body.contains(canvas)) return;
+            ctx.clearRect(0, 0, w, h);
+            for (let i = 0; i < sparks.length; i++) {
+                const s = sparks[i];
+                s.x += s.vx; s.y += s.vy; s.ph += s.phs; s.life++;
+                if (s.x < -10) s.x = w + 10; else if (s.x > w + 10) s.x = -10;
+                if (s.y < -10) s.y = h + 10; else if (s.y > h + 10) s.y = -10;
+                if (s.life > s.maxLife) { sparks[i] = makeSpark(false); continue; }
+                const r = s.life / s.maxLife;
+                const fade = r < 0.15 ? r / 0.15 : r > 0.85 ? (1 - r) / 0.15 : 1;
+                const flick = 0.55 + 0.45 * Math.sin(s.ph);
+                const a = fade * flick;
+                // glow
+                const glowR = s.r * 5;
+                const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR);
+                grad.addColorStop(0, 'rgba(220,235,255,' + (a * 0.9) + ')');
+                grad.addColorStop(0.6, 'rgba(180,210,255,' + (a * 0.3) + ')');
+                grad.addColorStop(1, 'rgba(180,210,255,0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath(); ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2); ctx.fill();
+                // core
+                ctx.fillStyle = 'rgba(255,255,255,' + Math.min(1, a * 1.5 + 0.1) + ')';
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+            }
+            requestAnimationFrame(frame);
+        }
+
+        sizeCanvas();
+        seed();
+        console.log('[hero-sparks] init', { w, h, dpr, sparks: sparks.length });
+        frame();
+
+        // Respond to resize / section growth
+        const onResize = () => { sizeCanvas(); seed(); };
+        window.addEventListener('resize', onResize);
+        if (window.ResizeObserver) {
+            try { new ResizeObserver(onResize).observe(section); } catch (e) {}
+        }
+    };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(run));
+    } else {
+        requestAnimationFrame(run);
+    }
 })();
 </script>
 </body>
