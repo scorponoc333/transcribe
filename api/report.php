@@ -2847,6 +2847,7 @@ async function tbSignOut() {
         if (!empty($analysis['learning_objectives_addressed'])) $tocItems[] = ['Learning Objectives', 'sec-learning-objectives-addressed'];
         if (!empty($analysis['key_concepts'])) $tocItems[] = ['Key Concepts', 'sec-key-concepts'];
         if (!empty($analysis['glossary'])) $tocItems[] = ['Glossary', 'sec-glossary'];
+        $tocItems[] = ['Visual Insights', 'sec-visual-insights'];
         if (!empty($analysis['core_insights'])) $tocItems[] = ['Core Insights', 'sec-core-insights'];
         if (!empty($analysis['statistics'])) $tocItems[] = ['Key Statistics', 'sec-key-statistics'];
         if (!empty($analysis['products_tools'])) $tocItems[] = ['Products & Tools', 'sec-products-tools'];
@@ -2856,7 +2857,6 @@ async function tbSignOut() {
         if (!empty($analysis['practical_exercises'])) $tocItems[] = ['Practical Exercises', 'sec-practical-exercises'];
         if (!empty($analysis['further_learning'])) $tocItems[] = ['Further Learning', 'sec-further-learning'];
     }
-    $tocItems[] = ['Visual Insights', 'sec-visual-insights'];
     if ($transcript) $tocItems[] = ['Full Transcript', 'sec-full-transcript'];
     $tocItemCount = count($tocItems);
     // Auto-scale font size so it fits on one page (tighter for more items)
@@ -3139,7 +3139,41 @@ async function tbSignOut() {
     </div>
     <?php endif; ?>
 
-    <?php // Core Insights ?>
+    <!-- Visual Insights — mode-specific charts (before transcript) -->
+    <div class="report-section" id="chartsSection">
+        <div class="section-pad">
+            <h2 class="section-title" id="sec-visual-insights"><span class="section-title-bar"></span>Visual Insights</h2>
+            <div class="charts-grid">
+                <?php if ($mode === 'meeting'): ?>
+                    <div class="chart-card"><h3>Speaker Talk Time</h3><canvas id="chart_speakers"></canvas></div>
+                    <div class="chart-card"><h3>Sentiment Distribution</h3><canvas id="chart_sentiment"></canvas></div>
+                    <div class="chart-card chart-wide"><h3>Action Items by Owner</h3><canvas id="chart_actions"></canvas></div>
+                <?php elseif ($mode === 'learning'): ?>
+                    <div class="chart-card chart-wide">
+                        <h3>Concept Coverage</h3>
+                        <p class="chart-subtitle">How thoroughly each key concept is explored in the material. Higher score = more depth and detail on that topic.</p>
+                        <canvas id="chart_concepts"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Learning Domain Mix</h3>
+                        <p class="chart-subtitle">The type of thinking this material trains: <strong>Conceptual</strong> (what), <strong>Procedural</strong> (how), <strong>Strategic</strong> (when / why), <strong>Reflective</strong> (evaluate).</p>
+                        <canvas id="chart_domain"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Difficulty Spread</h3>
+                        <p class="chart-subtitle">How many concepts sit at each difficulty tier. Tells you at a glance whether this is foundational, intermediate, or advanced material.</p>
+                        <canvas id="chart_difficulty"></canvas>
+                    </div>
+                <?php else: ?>
+                    <div class="chart-card"><h3>Words per Minute</h3><canvas id="chart_wpm"></canvas></div>
+                    <div class="chart-card"><h3>Speech Pace Profile</h3><canvas id="chart_pace"></canvas></div>
+                    <div class="chart-card chart-wide"><h3>Top Words</h3><canvas id="chart_topwords"></canvas></div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+        <?php // Core Insights ?>
     <?php if (!empty($analysis['core_insights']) && is_array($analysis['core_insights'])): ?>
     <div class="report-section">
         <div class="section-pad">
@@ -3383,41 +3417,7 @@ async function tbSignOut() {
 
     <?php endif; /* end learning */ ?>
 
-    <!-- Visual Insights — mode-specific charts (before transcript) -->
-    <div class="report-section" id="chartsSection">
-        <div class="section-pad">
-            <h2 class="section-title" id="sec-visual-insights"><span class="section-title-bar"></span>Visual Insights</h2>
-            <div class="charts-grid">
-                <?php if ($mode === 'meeting'): ?>
-                    <div class="chart-card"><h3>Speaker Talk Time</h3><canvas id="chart_speakers"></canvas></div>
-                    <div class="chart-card"><h3>Sentiment Distribution</h3><canvas id="chart_sentiment"></canvas></div>
-                    <div class="chart-card chart-wide"><h3>Action Items by Owner</h3><canvas id="chart_actions"></canvas></div>
-                <?php elseif ($mode === 'learning'): ?>
-                    <div class="chart-card chart-wide">
-                        <h3>Concept Coverage</h3>
-                        <p class="chart-subtitle">How thoroughly each key concept is explored in the material. Higher score = more depth and detail on that topic.</p>
-                        <canvas id="chart_concepts"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Learning Domain Mix</h3>
-                        <p class="chart-subtitle">The type of thinking this material trains: <strong>Conceptual</strong> (what), <strong>Procedural</strong> (how), <strong>Strategic</strong> (when / why), <strong>Reflective</strong> (evaluate).</p>
-                        <canvas id="chart_domain"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Difficulty Spread</h3>
-                        <p class="chart-subtitle">How many concepts sit at each difficulty tier. Tells you at a glance whether this is foundational, intermediate, or advanced material.</p>
-                        <canvas id="chart_difficulty"></canvas>
-                    </div>
-                <?php else: ?>
-                    <div class="chart-card"><h3>Words per Minute</h3><canvas id="chart_wpm"></canvas></div>
-                    <div class="chart-card"><h3>Speech Pace Profile</h3><canvas id="chart_pace"></canvas></div>
-                    <div class="chart-card chart-wide"><h3>Top Words</h3><canvas id="chart_topwords"></canvas></div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- Full Transcript — after visual insights, last content section -->
+<!-- Full Transcript — after visual insights, last content section -->
     <?php if ($transcript): ?>
     <?php
     // ── Smart transcript formatter ───────────────────────────────
@@ -5097,6 +5097,11 @@ function copyTranscript() {
     background: linear-gradient(165deg, #050816 0%, #0a1128 45%, #0f1f40 100%) !important;
     color: var(--ink) !important;
 }
+
+@media screen {
+    html, body { overflow-x: hidden; }
+}
+
 [data-theme="dark"] .report-wrapper,
 [data-theme="dark"] .quiz-report-wrapper { color: var(--ink) !important; }
 
