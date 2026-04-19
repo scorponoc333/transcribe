@@ -1550,7 +1550,7 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     gap: 8px;
     grid-template-columns: 1fr 1fr;
 }
-.rp-bottom-bar { display: grid; }
+@media (max-width: 768px) { .rp-bottom-bar { display: grid; } }
 .rp-bottom-bar.open {
     transform: translateY(0);
     opacity: 1;
@@ -1750,18 +1750,12 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
 })();
 </script>
 
-<style id="v388BarDesktop">
+<style id="v3107BarMobileOnly">
+/* v3.107 — quiz-report: hide bottom bar on desktop entirely.
+   Desktop users already have the floating Download PDF on the
+   right side; they don't need the centered share pill. */
 @media (min-width: 769px) {
-    .rp-bottom-bar {
-        left: 50%;
-        right: auto;
-        transform: translate(-50%, 120%);
-        width: min(520px, 92vw);
-        bottom: 18px;
-    }
-    .rp-bottom-bar.open {
-        transform: translate(-50%, 0);
-    }
+    .rp-bottom-bar { display: none !important; }
 }
 </style>
 
