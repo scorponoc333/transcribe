@@ -112,17 +112,18 @@ const History = {
             const title = App.escapeHtml(row.title || 'Untitled');
             const userName = showUserCol ? `<td class="t-muted text-sm">${App.escapeHtml(row.user_name || '—')}</td>` : '';
 
+            const reportUrl = `api/report.php?id=${row.id}`;
             return `<tr>
                 <td><div class="cell-date">${date}</div><div class="cell-time">${time}</div></td>
-                <td class="cell-title">${title}</td>
+                <td class="cell-title"><a href="${reportUrl}" target="_blank" rel="noopener" data-open-report="1" data-id="${row.id}" data-title="${title.replace(/"/g,'&quot;')}" style="color:inherit;text-decoration:none;border-bottom:1px dashed transparent;transition:border-color 0.2s" onmouseover="this.style.borderColor='currentColor'" onmouseout="this.style.borderColor='transparent'" title="Open full report">${title}</a></td>
                 <td>${modeLabel}</td>
                 ${userName}
                 <td>${row.word_count.toLocaleString()}</td>
                 <td class="cell-actions">
-                    <button class="btn-icon btn-xs" onclick="History.viewTranscript(${row.id})" title="View">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    </button>
-                    ${row.has_pdf ? `<button class="btn-icon btn-xs" onclick="History.downloadPdf(${row.id})" title="Download PDF">
+                    <a href="${reportUrl}" target="_blank" rel="noopener" class="btn-icon btn-xs" title="Open Full Report" data-open-report="1" data-id="${row.id}" data-title="${title.replace(/"/g,'&quot;')}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </a>
+                    ${row.has_pdf ? `<button class="btn-icon btn-xs" onclick="History.downloadPdf(${row.id})" title="Download Legacy PDF">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     </button>` : ''}
                     <button class="btn-icon btn-xs" onclick="History.emailTranscript(${row.id})" title="Send Email">
@@ -138,6 +139,37 @@ const History = {
                 </td>
             </tr>`;
         }).join('');
+
+        // Intercept left-clicks on Open Report links so they play the same
+        // gradient/logo/title animation used by the All Reports sidebar.
+        (function () {
+            if (History._openReportHooked) return;
+            History._openReportHooked = true;
+            const tbody = document.getElementById('historyTableBody');
+            if (!tbody) return;
+            tbody.addEventListener('click', function (e) {
+                // Allow modifier-click / middle-click to open in a new tab normally
+                if (e.defaultPrevented) return;
+                if (e.button && e.button !== 0) return;
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                const link = e.target.closest('a[data-open-report="1"]');
+                if (!link) return;
+                const id = link.dataset.id;
+                const rawTitle = link.dataset.title || '';
+                // data-title was HTML-escaped when rendered; decode for the overlay
+                const div = document.createElement('div');
+                div.innerHTML = rawTitle;
+                const title = div.textContent || div.innerText || '';
+                if (!id) return;
+                if (window.__rsApi && typeof window.__rsApi.openReport === 'function') {
+                    e.preventDefault();
+                    try { window.__rsApi.openReport(id, title); return; }
+                    catch (err) { console.warn('openReport animation failed, falling back to nav', err); }
+                }
+                // Fallback: let the default <a href> navigation happen.
+            });
+        })();
+
     },
 
     renderPagination(result) {
@@ -195,6 +227,15 @@ const History = {
     },
 
     async viewTranscript(id) {
+        // Always navigate to the full report page — no more quick preview modal
+        if (typeof App !== 'undefined' && App._showReportTransition) {
+            App._showReportTransition(id);
+        } else {
+            window.location.href = '/api/report.php?id=' + id;
+        }
+        return;
+
+        // Legacy modal code below (kept but unreachable)
         this._viewingId = id;
         const modal = document.getElementById('transcriptViewModal');
         const titleEl = document.getElementById('viewModalTitle');
