@@ -6,6 +6,48 @@
 > then read the memory files at `C:\Users\User\.claude\projects\C--xampp-htdocs-transcribe\memory\MEMORY.md`
 > for full context. This file tells you WHERE WE ARE. Memory tells you WHO Jason is and WHAT we're building.
 
+## Last updated: 2026-04-19 (post-SSO)
+
+## 2026-04-19 session snapshot #5 — SSO EXCHANGE WIRED — READ FIRST IF RESUMING
+
+### What shipped
+Cross-subdomain SSO is live. User logs in at `app.jasonai.ca`, clicks a tool tile, lands in the tool already authenticated. Demonstrated end-to-end between hub → transcribe.
+
+### Transcribe side (droplet /var/www/transcribe/)
+- `api/_jwt.php` (new) — HS256 verify with constant-time sig compare + exp enforcement
+- `api/sso-exchange.php` (new) — `?t=<jwt>[&r=<returnPath>]`. Verifies with shared secret from `/etc/jai-transcribe/secrets.env` key `JWT_SECRET`. Finds user by lowercased email OR auto-provisions (new org + admin user; hub tier→transcribe org plan mapping: personal→solo, professional→team, enterprise→enterprise, comp→enterprise, else→trial). Mints PHP session, redirects to `r` or `/`.
+- `/etc/jai-transcribe/secrets.env` — added `JWT_SECRET=` matching hub's `jwt_secret`.
+
+### Hub side (app.jasonai.ca)
+- `assets/hub.js` — new helpers `getCookie(name)` + `buildSsoUrl(toolUrl)`. Access button on the app detail page now wraps the tool URL as `{tool}/api/sso-exchange.php?t=<jasonai_jwt>`. Only applies when URL matches `*.jasonai.ca` (skips dev_url/localhost to avoid token leakage). Falls back to bare URL if JWT cookie absent.
+- Deployed via scp to `/home/customer/www/app.jasonai.ca/public_html/assets/hub.js`.
+
+### E2E verified
+- **Existing user path** (jasonhogan333@gmail.com): token issued → sso-exchange returned 302 → session.php showed `user_id:1, is_master_admin:true`. No duplicate row created. `last_login_at` bumped.
+- **Auto-provision path** (sso-test-<ts>@example.com): new org `SSO Test User's Team` plan=`team` + new admin user created. Test data cleaned up after.
+- Invalid/expired JWT → returns "Invalid or expired sign-in link" page (styled dark, matches tool aesthetic).
+- Returns `r` path is validated (only allows `/...` paths, not arbitrary redirects — prevents open-redirect).
+
+### How Jason tests manually
+1. Open `https://app.jasonai.ca/` — should redirect to auth.html (not logged in yet)
+2. Click "Forgot password", enter `jasonhogan333@gmail.com`, check email for reset link
+3. Set password, log in
+4. Click Transcribe tile → detail page → "Open Transcribe" button → should land inside transcribe WITHOUT a second login prompt
+
+### GitHub commits (this session)
+- scorponoc333/jasonai-hub@d189070 — hub.js SSO handoff
+- scorponoc333/jasonai-landing — initial commit (landing page)
+- scorponoc333/transcribe@d8dc3f8 — `research/api/_jwt.php` + `research/api/sso-exchange.php`
+
+### Outstanding next-sprint options
+1. **Seat-cap enforcement** on transcribe `api/users.php` — 402 + upsell modal. Upgrade URL now points at a live hub (can deep-link to `app.jasonai.ca/?upgrade=transcribe`).
+2. **First tool fork** via `/base-fork` skill — invoice.jasonai.ca. Second live tool alongside transcribe.
+3. **Stripe wiring** — replace hub's `sk_test_XXXX` stubs with real keys after creating products + prices in Stripe dashboard.
+4. **Silent SSO refresh** — today SSO only fires via explicit tile click. Could check cookie on tool's page load (`_bootstrap.php`) and trigger SSO exchange automatically if logged into hub but not tool. Polish.
+5. **Hub → tool logout propagation** — per seats_and_billing memory, mismatch nonce every 30s. Not wired.
+
+---
+
 ## Last updated: 2026-04-19 (late late night, post-hub-deploy)
 
 ## 2026-04-19 session snapshot #4 — HUB LIVE AT https://app.jasonai.ca/ — READ FIRST IF RESUMING
