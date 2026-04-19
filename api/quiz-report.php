@@ -1785,8 +1785,11 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
 <style id="v3104QrPrintLogo">
 @media print {
     .qr-cover-logo {
+        width: auto !important;
         height: 132px !important;
-        max-width: 360px !important;
+        max-width: none !important;
+        aspect-ratio: auto !important;
+        object-fit: contain !important;
         margin-top: -50px !important;
         margin-bottom: 18px !important;
     }
