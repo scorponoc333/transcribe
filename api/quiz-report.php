@@ -1335,9 +1335,7 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     gap: 8px;
     grid-template-columns: 1fr 1fr;
 }
-@media (max-width: 768px) {
-    .rp-bottom-bar { display: grid; }
-}
+.rp-bottom-bar { display: grid; }
 .rp-bottom-bar.open {
     transform: translateY(0);
     opacity: 1;
@@ -1430,7 +1428,7 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
         if (e.key === 'Escape' && modal && modal.classList.contains('open')) qrShareClose();
     });
 
-    if (bar && window.matchMedia('(max-width: 768px)').matches) {
+    if (bar) {
         let shown = false;
         const show = () => {
             if (shown) return;
@@ -1536,5 +1534,20 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     };
 })();
 </script>
+
+<style id="v388BarDesktop">
+@media (min-width: 769px) {
+    .rp-bottom-bar {
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, 120%);
+        width: min(520px, 92vw);
+        bottom: 18px;
+    }
+    .rp-bottom-bar.open {
+        transform: translate(-50%, 0);
+    }
+}
+</style>
 </body>
 </html>

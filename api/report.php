@@ -2593,9 +2593,9 @@ async function tbSignOut() {
         }
         #jaiHeroSection .jaihero-logo {
             display: block;
-            height: 156px;
+            height: 195px;
             width: auto;
-            max-width: 680px;
+            max-width: 850px;
             aspect-ratio: 2.5 / 1;
             object-fit: contain;
             margin: 0 auto 14px auto;
@@ -6191,9 +6191,7 @@ function copyTranscript() {
     gap: 8px;
     grid-template-columns: 1fr 1fr;
 }
-@media (max-width: 768px) {
-    .rp-bottom-bar { display: grid; }
-}
+.rp-bottom-bar { display: grid; }
 .rp-bottom-bar.open {
     transform: translateY(0);
     opacity: 1;
@@ -6387,8 +6385,8 @@ window.rpIsLogged = <?= $logged ? 'true' : 'false' ?>;
         }
     });
 
-    // Bottom bar scroll-trigger (mobile only) + hard fallback
-    if (bar && window.matchMedia('(max-width: 768px)').matches) {
+    // Bottom bar scroll-trigger (desktop + mobile) + hard fallback
+    if (bar) {
         let shown = false;
         const show = () => {
             if (shown) return;
@@ -6730,5 +6728,30 @@ function viewQuizReportSlideUp() {
     setTimeout(() => { window.location.href = url; }, 1400);
 }
 </script>
+
+<style id="v388BarDesktop">
+@media (min-width: 769px) {
+    .rp-bottom-bar {
+        left: 50%;
+        right: auto;
+        transform: translate(-50%, 120%);
+        width: min(520px, 92vw);
+        bottom: 18px;
+    }
+    .rp-bottom-bar.open {
+        transform: translate(-50%, 0);
+    }
+}
+</style>
+
+<style id="v388BadgeLift">
+@media (min-width: 769px) {
+    #jaiHeroSection .jaihero-badge {
+        margin-top: -35px !important;
+        position: relative;
+        z-index: 5;
+    }
+}
+</style>
 </body>
 </html>
