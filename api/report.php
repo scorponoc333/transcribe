@@ -5201,5 +5201,244 @@ function copyTranscript() {
 [data-theme="dark"] .study-time-badge strong { color: #ffffff; }
 </style>
 
+
+<style id="reportAssembleFx">
+@media screen {
+/* ───────────── Hero cover scripted entrance (≈ 2.8s total) ───────────── */
+#jaiHeroSection {
+    clip-path: inset(50% 8% 50% 8% round 20px);
+    filter: blur(10px);
+    transform: scale(0.95);
+    animation: jaiHeroCardIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+}
+#jaiHeroSection::after {
+    /* Scanner light streak during card materialization */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(140, 210, 255, 0) 30%,
+        rgba(180, 225, 255, 0.38) 50%,
+        rgba(140, 210, 255, 0) 70%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0;
+    animation: jaiHeroScan 0.9s ease 0.05s forwards;
+    transform: translateX(-40%);
+    mix-blend-mode: overlay;
+}
+@keyframes jaiHeroCardIn {
+    0%   { opacity: 0; clip-path: inset(50% 8% 50% 8% round 20px); filter: blur(10px); transform: scale(0.95); }
+    55%  { opacity: 1; clip-path: inset(0 0 0 0 round 20px); filter: blur(0); }
+    100% { opacity: 1; clip-path: inset(0 0 0 0 round 20px); filter: blur(0); transform: scale(1); }
+}
+@keyframes jaiHeroScan {
+    0%   { opacity: 0; transform: translateX(-40%); }
+    50%  { opacity: 1; }
+    100% { opacity: 0; transform: translateX(140%); }
+}
+
+/* Inner element staggered reveal — all start hidden, then animate in on a timeline. */
+.jaihero-logo,
+.jaihero-badge,
+.jaihero-divider,
+.jaihero-title,
+.jaihero-edit-wrap,
+.jaihero-meta-item,
+.jaihero-url {
+    opacity: 0;
+    will-change: opacity, transform;
+}
+
+.jaihero-logo {
+    transform: translateY(-26px) scale(0.85);
+    animation: jaiLogoDrop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.95s forwards;
+}
+@keyframes jaiLogoDrop {
+    0%   { opacity: 0; transform: translateY(-26px) scale(0.85); }
+    70%  { opacity: 1; transform: translateY(5px) scale(1.04); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+/* Shockwave ring from logo impact */
+.jaihero-logo::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 2px solid rgba(180, 220, 255, 0.75);
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 0;
+    pointer-events: none;
+    animation: jaiLogoRipple 1s cubic-bezier(0.16, 1, 0.3, 1) 1.45s forwards;
+}
+@keyframes jaiLogoRipple {
+    0%   { opacity: 0.85; transform: translate(-50%, -50%) scale(0.15); border-width: 3px; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(28); border-width: 0.5px; }
+}
+
+.jaihero-badge {
+    transform: scale(0.5);
+    animation: jaiBadgePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.4s forwards;
+}
+@keyframes jaiBadgePop {
+    0%   { opacity: 0; transform: scale(0.5); }
+    65%  { opacity: 1; transform: scale(1.08); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.jaihero-divider {
+    transform: scaleX(0);
+    transform-origin: center;
+    animation: jaiDividerDraw 0.55s cubic-bezier(0.22, 1, 0.36, 1) 1.7s forwards;
+}
+@keyframes jaiDividerDraw {
+    to { opacity: 1; transform: scaleX(1); }
+}
+
+.jaihero-title {
+    transform: translateY(16px);
+    clip-path: inset(0 100% 0 0);
+    animation: jaiTitleSweep 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.95s forwards;
+}
+@keyframes jaiTitleSweep {
+    0%   { opacity: 0; transform: translateY(16px); clip-path: inset(0 100% 0 0); }
+    30%  { opacity: 1; transform: translateY(0); }
+    100% { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0 0); }
+}
+
+.jaihero-edit-wrap {
+    transform: scale(0.1) rotate(-90deg);
+    animation: jaiEditPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 2.55s forwards;
+}
+@keyframes jaiEditPop {
+    0%   { opacity: 0; transform: scale(0.1) rotate(-90deg); }
+    70%  { opacity: 1; transform: scale(1.15) rotate(6deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+.jaihero-meta-item {
+    transform: translateY(12px);
+    animation: jaiMetaUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.jaihero-meta-item:nth-child(1) { animation-delay: 2.35s; }
+.jaihero-meta-item:nth-child(2) { animation-delay: 2.50s; }
+.jaihero-meta-item:nth-child(3) { animation-delay: 2.65s; }
+.jaihero-meta-item:nth-child(4) { animation-delay: 2.80s; }
+@keyframes jaiMetaUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.jaihero-url {
+    animation: jaiFadeIn 0.6s ease 2.95s forwards;
+}
+@keyframes jaiFadeIn {
+    to { opacity: 1; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    #jaiHeroSection,
+    #jaiHeroSection::after,
+    .jaihero-logo, .jaihero-logo::after,
+    .jaihero-badge, .jaihero-divider, .jaihero-title,
+    .jaihero-edit-wrap, .jaihero-meta-item, .jaihero-url {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        clip-path: none !important;
+        filter: none !important;
+    }
+}
+
+/* ───────────── Scroll-in assemble for content sections ───────────── */
+.report-section.asm {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+    filter: blur(4px);
+    transition: opacity 1.0s cubic-bezier(0.22, 1, 0.36, 1), transform 1.0s cubic-bezier(0.22, 1, 0.36, 1), filter 1.0s ease;
+    transition-delay: var(--asm-delay, 0ms);
+    position: relative;
+    overflow: hidden;
+}
+.report-section.asm.is-assembled {
+    opacity: 1;
+    transform: none;
+    filter: none;
+}
+/* Gradient shine sweep on section when it enters view */
+.report-section.asm::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -140%;
+    width: 60%; height: 100%;
+    background: linear-gradient(100deg,
+        transparent 0%,
+        rgba(var(--brand-300-rgb, 147, 197, 253), 0.0) 20%,
+        rgba(var(--brand-300-rgb, 147, 197, 253), 0.20) 50%,
+        rgba(var(--brand-300-rgb, 147, 197, 253), 0.0) 80%,
+        transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+}
+.report-section.asm.is-assembled::after {
+    opacity: 1;
+    left: 140%;
+    transition-delay: calc(var(--asm-delay, 0ms) + 320ms);
+}
+
+/* Metric cards (stat row) get their own inner stagger */
+.metric-card.asm {
+    opacity: 0;
+    transform: translateY(18px) scale(0.94);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--asm-delay, 0ms);
+}
+.metric-card.asm.is-assembled { opacity: 1; transform: none; }
+}  /* end @media screen */
+</style>
+<script src="/js/assembler.js?v=20260419n"></script>
+<script>
+(function () {
+    if (!window.Assembler) return;
+    function init() {
+        // Observe all .report-section blocks with a small stagger so when
+        // multiple sit in the initial viewport they cascade in rather than
+        // all fire together.
+        document.querySelectorAll('.report-section').forEach((el, i) => {
+            Assembler.observe(el, { kind: 'card', delay: Math.min(i * 80, 400) });
+        });
+
+        // Metric cards: observe each, stagger, and count up the number.
+        const metricCards = document.querySelectorAll('.metric-card');
+        metricCards.forEach((card, i) => {
+            card.style.setProperty('--asm-delay', (i * 140) + 'ms');
+            card.classList.add('asm');
+            Assembler.observe(card, {
+                kind: 'card',
+                delay: i * 140,
+                onEnter: () => {
+                    const val = card.querySelector('.metric-value');
+                    if (val && val.dataset.asmDone !== '1') {
+                        val.dataset.asmDone = '1';
+                        const txt = val.textContent.trim();
+                        Assembler.countUpText(val, txt, { duration: 2200 });
+                    }
+                }
+            });
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
 </body>
 </html>

@@ -773,5 +773,135 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
 }
 }  /* end @media screen — PDF stays light */
 </style>
+
+<style id="quizReportAssembleFx">
+@media screen {
+/* Cover card entrance */
+.report-card:first-of-type {
+    clip-path: inset(50% 8% 50% 8% round 20px);
+    filter: blur(10px);
+    transform: scale(0.95);
+    animation: qrCardIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+}
+@keyframes qrCardIn {
+    0%   { opacity: 0; clip-path: inset(50% 8% 50% 8% round 20px); filter: blur(10px); transform: scale(0.95); }
+    55%  { opacity: 1; clip-path: inset(0 0 0 0 round 20px); filter: blur(0); }
+    100% { opacity: 1; clip-path: inset(0 0 0 0 round 20px); filter: blur(0); transform: scale(1); }
+}
+
+.qr-cover-logo, .qr-cover-badge, .qr-cover-title, .qr-score-circle, .qr-cover-url {
+    opacity: 0;
+    will-change: opacity, transform;
+}
+.qr-cover-logo { transform: translateY(-22px) scale(0.85); animation: qrLogoDrop 0.55s cubic-bezier(0.34,1.56,0.64,1) 0.9s forwards; }
+.qr-cover-badge { transform: scale(0.5); animation: qrBadgePop 0.5s cubic-bezier(0.34,1.56,0.64,1) 1.3s forwards; }
+.qr-cover-title { transform: translateY(16px); clip-path: inset(0 100% 0 0); animation: qrTitleSweep 0.85s cubic-bezier(0.22,1,0.36,1) 1.65s forwards; }
+.qr-score-circle { transform: scale(0.3) rotate(-180deg); animation: qrScoreSpin 0.9s cubic-bezier(0.22,1,0.36,1) 2.1s forwards; }
+.qr-cover-url { animation: qrFadeIn 0.6s ease 2.9s forwards; }
+
+@keyframes qrLogoDrop { 0% { opacity:0; transform:translateY(-22px) scale(0.85); } 70% { opacity:1; transform:translateY(4px) scale(1.04); } 100% { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes qrBadgePop { 0% { opacity:0; transform:scale(0.5); } 65% { opacity:1; transform:scale(1.08); } 100% { opacity:1; transform:scale(1); } }
+@keyframes qrTitleSweep { 0% { opacity:0; transform:translateY(16px); clip-path:inset(0 100% 0 0); } 30% { opacity:1; transform:translateY(0); } 100% { opacity:1; clip-path:inset(0 0 0 0); } }
+@keyframes qrScoreSpin { 0% { opacity:0; transform:scale(0.3) rotate(-180deg); } 60% { opacity:1; transform:scale(1.06) rotate(10deg); } 100% { opacity:1; transform:scale(1) rotate(0); } }
+@keyframes qrFadeIn { to { opacity: 1; } }
+
+/* Scroll-in for the performance-summary + Q&A cards */
+.report-card.asm {
+    opacity: 0;
+    transform: translateY(26px) scale(0.985);
+    filter: blur(4px);
+    transition: opacity 1.0s cubic-bezier(0.22, 1, 0.36, 1), transform 1.0s cubic-bezier(0.22, 1, 0.36, 1), filter 1.0s ease;
+    transition-delay: var(--asm-delay, 0ms);
+    position: relative;
+    overflow: hidden;
+}
+.report-card.asm.is-assembled { opacity: 1; transform: none; filter: none; }
+.report-card.asm::after {
+    content: '';
+    position: absolute; top: 0; left: -140%;
+    width: 60%; height: 100%;
+    background: linear-gradient(100deg, transparent 0%, rgba(var(--brand-300-rgb, 147, 197, 253), 0.0) 20%, rgba(var(--brand-300-rgb, 147, 197, 253), 0.22) 50%, rgba(var(--brand-300-rgb, 147, 197, 253), 0.0) 80%, transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+}
+.report-card.asm.is-assembled::after { opacity: 1; left: 140%; transition-delay: calc(var(--asm-delay, 0ms) + 320ms); }
+
+.qr-summary-card.asm, .qr-question.asm {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--asm-delay, 0ms);
+}
+.qr-summary-card.asm.is-assembled, .qr-question.asm.is-assembled { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .report-card, .report-card::after,
+    .qr-cover-logo, .qr-cover-badge, .qr-cover-title, .qr-score-circle, .qr-cover-url,
+    .qr-summary-card.asm, .qr-question.asm {
+        animation: none !important; opacity: 1 !important; transform: none !important; clip-path: none !important; filter: none !important;
+    }
+}
+}  /* end @media screen */
+</style>
+<script src="/js/assembler.js?v=20260419n"></script>
+<script>
+(function () {
+    if (!window.Assembler) return;
+    function init() {
+        // Skip the very first .report-card (the cover) — it has its own
+        // scripted entrance. Observe the rest for scroll-in.
+        const cards = document.querySelectorAll('.report-card');
+        cards.forEach((el, i) => {
+            if (i === 0) return;
+            Assembler.observe(el, { kind: 'card', delay: Math.min((i - 1) * 120, 400) });
+        });
+
+        // Score circle number + percentage count-ups (fire when cover has finished)
+        setTimeout(() => {
+            const num = document.querySelector('.qr-score-num');
+            const pct = document.querySelector('.qr-score-pct');
+            if (num) {
+                const raw = num.cloneNode(true);
+                // Split out the big number vs the "/total" suffix
+                const firstTextNode = raw.firstChild;
+                if (firstTextNode && firstTextNode.nodeType === 3) {
+                    const target = parseInt(firstTextNode.textContent.trim(), 10);
+                    if (!isNaN(target)) {
+                        const suffixHtml = Array.from(raw.childNodes).slice(1).map(n => n.outerHTML || n.textContent).join('');
+                        const scoreSpan = document.createElement('span');
+                        scoreSpan.textContent = '0';
+                        num.innerHTML = '';
+                        num.appendChild(scoreSpan);
+                        num.insertAdjacentHTML('beforeend', suffixHtml);
+                        Assembler.countUp(scoreSpan, target, { duration: 2200 });
+                    }
+                }
+            }
+            if (pct) {
+                const targetPct = parseInt(pct.textContent.trim(), 10);
+                if (!isNaN(targetPct)) {
+                    Assembler.countUp(pct, targetPct, { duration: 2200, suffix: '%' });
+                }
+            }
+        }, 2150);
+
+        // Staggered inner-card reveals for summary + question lists
+        document.querySelectorAll('.qr-summary-card').forEach((el, i) => {
+            Assembler.observe(el, { kind: 'card', delay: i * 160 });
+        });
+        document.querySelectorAll('.qr-question').forEach((el, i) => {
+            Assembler.observe(el, { kind: 'card', delay: Math.min(i * 90, 400) });
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
 </body>
 </html>
