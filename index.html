@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=2026041ab">
-    <link rel="stylesheet" href="css/ai-loading.css?v=2026041ab">
+    <link rel="stylesheet" href="css/style.css?v=2026041ac">
+    <link rel="stylesheet" href="css/ai-loading.css?v=2026041ac">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1948,18 +1948,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=2026041ab"></script>
-    <script src="js/api.js?v=2026041ab"></script>
-    <script src="js/pdf.js?v=2026041ab"></script>
-    <script src="js/email-template.js?v=2026041ab"></script>
-    <script src="js/autocomplete.js?v=2026041ab"></script>
-    <script src="js/history.js?v=2026041ab"></script>
-    <script src="js/assembler.js?v=2026041ab"></script>
-    <script src="js/analytics.js?v=2026041ab"></script>
-    <script src="js/contacts.js?v=2026041ab"></script>
-    <script src="js/users.js?v=2026041ab"></script>
-    <script src="js/app.js?v=2026041ab"></script>
-    <script src="js/upload-particles.js?v=2026041ab"></script>
+    <script src="js/ai-loading.js?v=2026041ac"></script>
+    <script src="js/api.js?v=2026041ac"></script>
+    <script src="js/pdf.js?v=2026041ac"></script>
+    <script src="js/email-template.js?v=2026041ac"></script>
+    <script src="js/autocomplete.js?v=2026041ac"></script>
+    <script src="js/history.js?v=2026041ac"></script>
+    <script src="js/assembler.js?v=2026041ac"></script>
+    <script src="js/analytics.js?v=2026041ac"></script>
+    <script src="js/contacts.js?v=2026041ac"></script>
+    <script src="js/users.js?v=2026041ac"></script>
+    <script src="js/app.js?v=2026041ac"></script>
+    <script src="js/upload-particles.js?v=2026041ac"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -3852,6 +3852,128 @@
     background: rgba(255,255,255,0.14);
     transform: rotate(30deg);
     color: #fff;
+}
+</style>
+
+<style id="v365MobileTables">
+/* ═══════ v3.65 ═══════ */
+@media (max-width: 768px) {
+    /* A — Transcription History + Report Pages as stacked cards */
+    #historyTable,
+    #rp2Table {
+        display: block;
+        width: 100%;
+        border-collapse: collapse;
+    }
+    #historyTable thead,
+    #rp2Table thead { display: none; }
+    #historyTable tbody,
+    #rp2Table tbody { display: block; width: 100%; }
+
+    #historyTable tbody tr,
+    #rp2Table tbody tr {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 14px 12px;
+        border-bottom: 1px solid rgba(var(--primary-rgb), 0.08);
+    }
+    #historyTable tbody tr > td,
+    #rp2Table tbody tr > td { display: none; }
+
+    /* Show the Title cell (rp2: 2nd child, history: .cell-title) */
+    #rp2Table tbody tr > td:nth-child(2),
+    #historyTable tbody tr > td.cell-title {
+        display: block;
+        order: 2;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.35;
+        color: var(--fg-heading);
+        padding: 0;
+    }
+    #historyTable tbody tr > td.cell-title a { color: inherit; }
+
+    /* Show the Actions cell ABOVE the title */
+    #rp2Table tbody tr > td:nth-child(5),
+    #historyTable tbody tr > td.cell-actions {
+        display: flex;
+        order: 1;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 0;
+    }
+
+    /* Loading / empty placeholder rows span the full row */
+    #historyTable tbody tr > td[colspan],
+    #rp2Table tbody tr > td[colspan] { display: block; order: 0; text-align: center; }
+
+    /* B — Replace "Open Report" text+arrow with eye icon (gradient pill) */
+    #rp2Table .rp2-open-btn {
+        font-size: 0 !important;
+        padding: 0 !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        border-radius: 12px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    #rp2Table .rp2-open-btn > svg { display: none !important; }
+    #rp2Table .rp2-open-btn::before {
+        content: '';
+        display: block;
+        width: 22px; height: 22px;
+        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>") center/contain no-repeat;
+    }
+    /* Same eye treatment for history Open Full Report icon button */
+    #historyTable td.cell-actions a.btn-icon[data-open-report="1"] {
+        background: linear-gradient(135deg, var(--brand-500, #2557b3), var(--brand-700, #1a3a7a)) !important;
+        border-color: transparent !important;
+        width: 44px !important;
+        min-height: 44px !important;
+        border-radius: 12px !important;
+    }
+    #historyTable td.cell-actions a.btn-icon[data-open-report="1"] > svg { display: none !important; }
+    #historyTable td.cell-actions a.btn-icon[data-open-report="1"]::before {
+        content: '';
+        display: block;
+        width: 20px; height: 20px;
+        background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>") center/contain no-repeat;
+    }
+
+    /* Action buttons on history table: keep 44px tap targets */
+    #historyTable td.cell-actions .btn-icon {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* C — Center page-header-bar tiles + stack back button below */
+    .page-header-bar {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 10px !important;
+    }
+    .page-header-bar h1,
+    .page-header-bar h2 {
+        text-align: center !important;
+        width: 100% !important;
+    }
+    .page-header-bar .btn-secondary,
+    .page-header-bar .btn-icon {
+        margin: 0 auto !important;
+    }
+
+    /* Halve the gap above the first tile on every page */
+    main { padding-top: 30px !important; }
+    /* Keep the hero lift on uploadSection but adjust to the new padding */
+    #uploadSection .typewriter-hero {
+        padding-top: 4px !important;
+        margin-top: 0 !important;
+    }
 }
 </style>
 </body>
