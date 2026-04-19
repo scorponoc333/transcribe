@@ -5216,34 +5216,13 @@ function copyTranscript() {
     transform: scale(0.95);
     animation: jaiHeroCardIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
 }
-#jaiHeroSection::after {
-    /* Scanner light streak during card materialization */
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(140, 210, 255, 0) 30%,
-        rgba(180, 225, 255, 0.38) 50%,
-        rgba(140, 210, 255, 0) 70%,
-        transparent 100%);
-    pointer-events: none;
-    z-index: 3;
-    opacity: 0;
-    animation: jaiHeroScan 0.9s ease 0.05s forwards;
-    transform: translateX(-40%);
-    mix-blend-mode: overlay;
-}
+/* Scanner ::after removed — it was overriding the original hero image url. */
 @keyframes jaiHeroCardIn {
     0%   { opacity: 0; clip-path: inset(50% 8% 50% 8% round 20px); filter: blur(10px); transform: scale(0.95); }
     55%  { opacity: 1; clip-path: inset(0 0 0 0 round 20px); filter: blur(0); }
     100% { opacity: 1; clip-path: inset(0 0 0 0 round 20px); filter: blur(0); transform: scale(1); }
 }
-@keyframes jaiHeroScan {
-    0%   { opacity: 0; transform: translateX(-40%); }
-    50%  { opacity: 1; }
-    100% { opacity: 0; transform: translateX(140%); }
-}
+/* jaiHeroScan keyframes removed with the scanner ::after rule. */
 
 /* Inner element staggered reveal — all start hidden, then animate in on a timeline. */
 .jaihero-logo,
@@ -5392,8 +5371,9 @@ function copyTranscript() {
     transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
 }
 .report-section.asm.is-assembled::after {
-    opacity: 1;
+    opacity: 0;
     left: 140%;
+    transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease 0.9s;
     transition-delay: calc(var(--asm-delay, 0ms) + 320ms);
 }
 

@@ -827,7 +827,7 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     opacity: 0;
     transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
 }
-.report-card.asm.is-assembled::after { opacity: 1; left: 140%; transition-delay: calc(var(--asm-delay, 0ms) + 320ms); }
+.report-card.asm.is-assembled::after { opacity: 0; left: 140%; transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease 0.9s; transition-delay: calc(var(--asm-delay, 0ms) + 320ms); }
 
 .qr-summary-card.asm, .qr-question.asm {
     opacity: 0;
