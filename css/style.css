@@ -1724,7 +1724,7 @@ audio::-webkit-media-controls-panel {
     font-size: 12px;
     color: rgba(255,255,255,0.45);
     border-top: 1px solid rgba(255,255,255,0.08);
-    margin-top: auto;
+    margin-top: 60px;
     flex-shrink: 0;
 }
 
