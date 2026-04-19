@@ -3202,7 +3202,7 @@ audio::-webkit-media-controls-panel {
 }
 
 @media (max-width: 480px) {
-    .analytics-cards-grid { grid-template-columns: 1fr; }
+    .analytics-cards-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
 }
 
 .analytics-card {
