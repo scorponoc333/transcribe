@@ -503,3 +503,5 @@ const History = {
         }
     }
 };
+/* v3.82 — expose History on window so callers that use window.History can reach it (the native window.History object is the browser's history, which shadows any  namespace access). */
+try { window.__AppHistory = History; } catch (e) {}
