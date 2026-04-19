@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260419a">
-    <link rel="stylesheet" href="css/ai-loading.css?v=20260419a">
+    <link rel="stylesheet" href="css/style.css?v=20260419b">
+    <link rel="stylesheet" href="css/ai-loading.css?v=20260419b">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1930,17 +1930,17 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=20260419a"></script>
-    <script src="js/api.js?v=20260419a"></script>
-    <script src="js/pdf.js?v=20260419a"></script>
-    <script src="js/email-template.js?v=20260419a"></script>
-    <script src="js/autocomplete.js?v=20260419a"></script>
-    <script src="js/history.js?v=20260419a"></script>
-    <script src="js/analytics.js?v=20260419a"></script>
-    <script src="js/contacts.js?v=20260419a"></script>
-    <script src="js/users.js?v=20260419a"></script>
-    <script src="js/app.js?v=20260419a"></script>
-    <script src="js/upload-particles.js?v=20260419a"></script>
+    <script src="js/ai-loading.js?v=20260419b"></script>
+    <script src="js/api.js?v=20260419b"></script>
+    <script src="js/pdf.js?v=20260419b"></script>
+    <script src="js/email-template.js?v=20260419b"></script>
+    <script src="js/autocomplete.js?v=20260419b"></script>
+    <script src="js/history.js?v=20260419b"></script>
+    <script src="js/analytics.js?v=20260419b"></script>
+    <script src="js/contacts.js?v=20260419b"></script>
+    <script src="js/users.js?v=20260419b"></script>
+    <script src="js/app.js?v=20260419b"></script>
+    <script src="js/upload-particles.js?v=20260419b"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -3014,81 +3014,91 @@
 <script>
 /* ---- Hash router: landing on /index.html#<section> opens that section ---- */
 (function () {
+    const TAG = '[hashroute]';
+    const log = (...a) => { try { console.log(TAG, ...a); } catch (e) {} };
+
+    function sectionForHash(hash) {
+        switch (hash) {
+            case 'history':                              return { fn: 'showHistory',     section: 'history' };
+            case 'analytics':                            return { fn: 'showAnalytics',   section: 'analytics' };
+            case 'contacts':                             return { fn: 'showContacts',    section: 'contacts' };
+            case 'users':                                return { fn: 'showUsers',       section: 'users' };
+            case 'reports':
+            case 'reportpages':
+            case 'report-pages':                         return { fn: 'showReportPages', section: 'reportPages' };
+            case 'settings':                             return { modal: 'settingsModal' };
+            case 'feedback':                             return { fnGlobal: 'openFeedbackModal' };
+            case 'transcribe':
+            case 'upload':                               return { section: 'upload' };
+            default:                                     return null;
+        }
+    }
+
     function routeFromHash() {
         const hash = (window.location.hash || '').replace(/^#/, '').toLowerCase();
+        log('routeFromHash fired, hash =', JSON.stringify(hash), 'readyState =', document.readyState, 'App?', !!window.App, 'initDone?', !!(window.App && window.App._initDone));
         if (!hash) return;
-        // Small delay to make sure App + ReportPages are initialized
-        const tryRoute = (attemptsLeft) => {
-            const A = window.App;
-            if (!A) {
-                if (attemptsLeft > 0) return setTimeout(() => tryRoute(attemptsLeft - 1), 80);
-                return;
-            }
-            switch (hash) {
-                case 'history':
-                    if (typeof A.showHistory === 'function') A.showHistory();
-                    else if (typeof A.showSection === 'function') A.showSection('history');
-                    break;
-                case 'analytics':
-                    if (typeof A.showAnalytics === 'function') A.showAnalytics();
-                    else if (typeof A.showSection === 'function') A.showSection('analytics');
-                    break;
-                case 'contacts':
-                    if (typeof A.showContacts === 'function') A.showContacts();
-                    else if (typeof A.showSection === 'function') A.showSection('contacts');
-                    break;
-                case 'users':
-                    if (typeof A.showUsers === 'function') A.showUsers();
-                    else if (typeof A.showSection === 'function') A.showSection('users');
-                    break;
-                case 'reports':
-                case 'reportpages':
-                case 'report-pages':
-                    if (typeof A.showReportPages === 'function') A.showReportPages();
-                    else if (typeof A.showSection === 'function') A.showSection('reportPages');
-                    break;
-                case 'settings': {
-                    const m = document.getElementById('settingsModal');
-                    if (m) m.classList.add('active');
-                    break;
-                }
-                case 'feedback': {
-                    if (typeof window.openFeedbackModal === 'function') window.openFeedbackModal();
-                    break;
-                }
-                case 'transcribe':
-                case 'upload':
-                    if (typeof A.showSection === 'function') A.showSection('upload');
-                    break;
-                default:
-                    // Unknown hash — ignore
-                    break;
-            }
-        };
-        tryRoute(30);
+        const target = sectionForHash(hash);
+        if (!target) { log('unknown hash, ignoring'); return; }
+        const A = window.App;
+        if (!A) { log('App not defined yet — will retry via app:ready'); return; }
+        if (target.modal) {
+            const m = document.getElementById(target.modal);
+            if (m) { m.classList.add('active'); log('opened modal', target.modal); }
+            return;
+        }
+        if (target.fnGlobal && typeof window[target.fnGlobal] === 'function') {
+            try { window[target.fnGlobal](); log('called window.' + target.fnGlobal); } catch (e) { console.error(TAG, e); }
+            return;
+        }
+        if (target.fn && typeof A[target.fn] === 'function') {
+            try { A[target.fn](); log('called App.' + target.fn); return; } catch (e) { console.error(TAG, e); }
+        }
+        if (target.section && typeof A.showSection === 'function') {
+            try { A.showSection(target.section); log('called App.showSection', target.section); } catch (e) { console.error(TAG, e); }
+        }
     }
-    // On initial load: wait for App.init() to finish (it's async — awaits
-    // checkAuth + loadSettings, then calls showSection('upload') which would
-    // otherwise clobber our hash route). Use the app:ready event dispatched
-    // at the end of App.init(); fall back to a polling check if the event
-    // has already fired before we attached.
-    function routeOnceReady() {
-        if (window.App && window.App._initDone) { routeFromHash(); return; }
-        document.addEventListener('app:ready', routeFromHash, { once: true });
-        // Safety: if for any reason app:ready never fires within 4s, route anyway.
-        setTimeout(() => {
-            if (!window.App || !window.App._initDone) return;
-            // no-op: the once-listener above will catch it
-        }, 4000);
-        setTimeout(() => { routeFromHash(); }, 4500);
+
+    function initialRoute() {
+        // Always wait for full init before the FIRST route — showSection('upload')
+        // inside App.init() would clobber us if we routed earlier.
+        if (window.App && window.App._initDone) {
+            log('App already initialized, routing now');
+            routeFromHash();
+            return;
+        }
+        log('waiting for app:ready');
+        document.addEventListener('app:ready', function onReady() {
+            log('app:ready fired');
+            routeFromHash();
+        }, { once: true });
+        // Belt-and-suspenders: keep polling so if app:ready is missed we still route
+        let tries = 0;
+        const poll = setInterval(function () {
+            tries++;
+            if (window.App && window.App._initDone) {
+                log('poll caught initDone at try', tries);
+                clearInterval(poll);
+                routeFromHash();
+            } else if (tries > 60) { // 60 * 100ms = 6s
+                log('poll gave up after 6s, routing anyway');
+                clearInterval(poll);
+                routeFromHash();
+            }
+        }, 100);
     }
+
+    // Start when DOM is ready (or immediately if already parsed)
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', routeOnceReady);
+        document.addEventListener('DOMContentLoaded', initialRoute);
     } else {
-        routeOnceReady();
+        initialRoute();
     }
-    // Subsequent hash changes (already-initialized page) can route immediately.
-    window.addEventListener('hashchange', routeFromHash);
+    // In-page hash changes (no full navigation) route immediately
+    window.addEventListener('hashchange', function () {
+        log('hashchange event');
+        routeFromHash();
+    });
 })();
 </script>
 
