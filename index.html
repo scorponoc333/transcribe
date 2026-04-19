@@ -2473,32 +2473,74 @@
         },
 
         openReport(id, title) {
+            const reportUrl = '/api/report.php?id=' + encodeURIComponent(id);
             const overlay = document.getElementById('reportOpenOverlay');
             const titleEl = document.getElementById('reportOpenTitle');
-            titleEl.textContent = title || 'Opening Report';
+            if (titleEl) titleEl.textContent = title || 'Opening Report';
 
-            // Force brand gradient at runtime so it always resolves
+            // Sync overlay logo to whatever the header is currently showing
+            const hdrLogo = document.getElementById('headerLogo');
+            const overlayLogo = document.getElementById('reportOpenLogo');
+            if (overlayLogo) {
+                const stored = (function () { try { return localStorage.getItem('customLogoUrl'); } catch (e) { return null; } })();
+                const src = stored ? (stored + '?t=' + Date.now()) : (hdrLogo ? hdrLogo.src : '/img/logo.png');
+                if (src) overlayLogo.src = src;
+            }
+
+            // Brand gradient (blue fallbacks — NOT the old red ones)
             const root = document.documentElement;
             const get = (v, fb) => (getComputedStyle(root).getPropertyValue(v).trim() || fb);
-            const c1 = get('--brand-400', '#ec4444');
-            const c2 = get('--brand-600', '#a01616');
-            const c3 = get('--brand-grad-mid', '#4b0808');
-            const c4 = get('--brand-grad-dark', '#2a0404');
+            const c1 = get('--brand-400', '#4b8be8');
+            const c2 = get('--brand-600', '#2557b3');
+            const c3 = get('--brand-grad-mid', '#1a3a7a');
+            const c4 = get('--brand-grad-dark', '#0f1f40');
             overlay.style.background = 'linear-gradient(165deg, ' + c1 + ' 0%, ' + c2 + ' 35%, ' + c3 + ' 70%, ' + c4 + ' 100%)';
 
-            // Phase 1: zoom in (1s)
+            // Preload the target report in an iframe BEHIND the overlay
+            // so by the time the overlay zooms out, the page is fully rendered.
+            let frame = document.getElementById('reportOpenPreloadFrame');
+            if (frame) frame.remove();
+            frame = document.createElement('iframe');
+            frame.id = 'reportOpenPreloadFrame';
+            frame.src = reportUrl;
+            document.body.appendChild(frame);
+
+            let frameLoaded = false;
+            frame.addEventListener('load', () => { frameLoaded = true; }, { once: true });
+
+            // Phase 1: zoom in
             overlay.classList.remove('phase-out');
             overlay.classList.add('phase-in');
             this.startOverlayAnim();
 
-            // Navigate after 4.5s total (1s zoom + 3.5s hold), zoom out in parallel with load
+            // Loading bar — fill 0% -> 100% over 4.3s (matches the overall 4.5s arc)
+            const bar = document.getElementById('reportOpenBar');
+            if (bar) {
+                bar.style.transition = 'none';
+                bar.style.width = '0%';
+                // Force reflow, then animate
+                void bar.offsetWidth;
+                requestAnimationFrame(() => {
+                    bar.style.transition = 'width 4.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                    bar.style.width = '100%';
+                });
+            }
+
+            // Phase 3: zoom out at t=3.5s
             setTimeout(() => {
-                // Phase 3: zoom out
+                // Reveal the preloaded iframe underneath as the gradient starts receding
+                frame.classList.add('is-visible');
                 overlay.classList.remove('phase-in');
                 overlay.classList.add('phase-out');
+
+                // At t=~4.45s the overlay is mostly invisible + iframe is visible.
+                // Now navigate. Because the exact same pixels are on-screen from
+                // the iframe, browser paint-holding keeps them visible during the
+                // top-window swap → no white flash, no "loading" state.
+                const navAfter = frameLoaded ? 950 : 1400;
                 setTimeout(() => {
-                    window.location.href = '/api/report.php?id=' + encodeURIComponent(id);
-                }, 950); // let zoom-out mostly finish before navigate
+                    window.location.href = reportUrl;
+                }, navAfter);
             }, 3500);
         },
 
@@ -2920,6 +2962,48 @@
 #rp2Table td a.btn-primary svg,
 #rp2Table td a.btn-primary:hover svg {
     stroke: #ffffff !important;
+}
+</style>
+
+
+<style>
+/* Loading bar on the report-open overlay */
+.ro-progress-wrap {
+    width: 260px;
+    max-width: 70%;
+    margin: 20px auto 0;
+    height: 4px;
+    background: rgba(255,255,255,0.22);
+    border-radius: 999px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
+}
+.ro-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.65));
+    border-radius: 999px;
+    box-shadow: 0 0 12px rgba(255,255,255,0.6);
+}
+
+/* The preloaded report page sits behind the overlay during the transition */
+#reportOpenPreloadFrame {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+    /* overlay z-index is 99998; put this just under that */
+    z-index: 99997;
+}
+#reportOpenPreloadFrame.is-visible {
+    opacity: 1;
 }
 </style>
 
