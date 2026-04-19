@@ -2593,9 +2593,9 @@ async function tbSignOut() {
         }
         #jaiHeroSection .jaihero-logo {
             display: block;
-            height: 293px;
+            height: 249px;
             width: auto;
-            max-width: 1275px;
+            max-width: 1084px;
             aspect-ratio: 2.5 / 1;
             object-fit: contain;
             margin: 0 auto 14px auto;
@@ -2625,7 +2625,7 @@ async function tbSignOut() {
         #jaiHeroSection .jaihero-title {
             margin: 0 auto 16px auto;
             max-width: 720px;
-            font-size: 28px;
+            font-size: 35px;
             font-weight: 800;
             line-height: 1.25;
             letter-spacing: -0.4px;
@@ -2703,7 +2703,7 @@ async function tbSignOut() {
         }
         @media (max-width: 600px) {
             #jaiHeroSection .jaihero-inner { padding: 48px 24px 40px; }
-            #jaiHeroSection .jaihero-title { font-size: 26px; }
+            #jaiHeroSection .jaihero-title { font-size: 33px; }
             #jaiHeroSection .jaihero-meta { gap: 28px; }
         }
         @media print {
@@ -7108,8 +7108,11 @@ function viewQuizReportSlideUp() {
 
 <style id="v388BadgeLift">
 @media (min-width: 769px) {
+    #jaiHeroSection .jaihero-logo {
+        transform: translateY(-50px);
+    }
     #jaiHeroSection .jaihero-badge {
-        margin-top: -70px !important;
+        margin-top: -170px !important;
         position: relative;
         z-index: 5;
     }
@@ -7118,8 +7121,11 @@ function viewQuizReportSlideUp() {
 
 <style id="v390MobileBadge">
 @media (max-width: 768px) {
+    #jaiHeroSection .jaihero-logo {
+        transform: translateY(-50px);
+    }
     #jaiHeroSection .jaihero-badge {
-        margin-top: -24px !important;
+        margin-top: -124px !important;
         position: relative;
         z-index: 5;
     }
