@@ -2735,18 +2735,21 @@ async function tbSignOut() {
                 padding: 60px 48px 110px;
                 position: relative;
             }
+            #jaiHeroSection .jaihero-inner {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
             #jaiHeroSection .jaihero-logo {
-                width: 90% !important;
-                max-width: 900px !important;
+                width: 100% !important;
+                max-width: none !important;
                 height: auto !important;
                 aspect-ratio: auto !important;
-                transform: none !important;
-                margin: 0 auto 40px auto !important;
+                transform: translateY(-25px) !important;
+                margin: 0 auto 80px auto !important;
             }
-            /* Force badge back into flow under the logo — overrides the
-               screen rule that pulls it up 75/70px. */
+            /* Badge back to flow, with visible 15px+ clearance above */
             #jaiHeroSection .jaihero-badge {
-                margin-top: 0 !important;
+                margin-top: 15px !important;
             }
             /* v3.99 — Hide Public / Quiz History stacked buttons in PDF */
             .mob-page-actions,
