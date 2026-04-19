@@ -1476,15 +1476,6 @@
                 </button>
             </div>
             <div class="workflow-options">
-                <button class="workflow-option-btn" onclick="App.selectWorkflowType('recording')">
-                    <div class="workflow-option-icon" style="background:rgba(var(--brand-300-rgb),0.14);color:var(--brand-400)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-                    </div>
-                    <div class="workflow-option-text">
-                        <strong>Recording</strong>
-                        <span>Simple audio transcription</span>
-                    </div>
-                </button>
                 <button class="workflow-option-btn" onclick="App.selectWorkflowType('meeting')">
                     <div class="workflow-option-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -1494,13 +1485,13 @@
                         <span>AI summary, key points &amp; action items</span>
                     </div>
                 </button>
-                <button class="workflow-option-btn" onclick="App.selectWorkflowType('learning')">
-                    <div class="workflow-option-icon" style="background:rgba(16,185,129,0.1);color:#10b981">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <button class="workflow-option-btn" onclick="App.selectWorkflowType('recording')">
+                    <div class="workflow-option-icon" style="background:rgba(var(--brand-300-rgb),0.14);color:var(--brand-400)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
                     </div>
                     <div class="workflow-option-text">
-                        <strong>Learning Analysis</strong>
-                        <span>AI-powered learning report</span>
+                        <strong>Recording</strong>
+                        <span>Simple audio transcription</span>
                     </div>
                 </button>
             </div>
@@ -4364,6 +4355,21 @@
 }
 @media (max-width: 768px) {
     .rs-item-mail { height: 48px !important; }
+}
+</style>
+
+<style id="v400WorkflowPad">
+.workflow-options {
+    padding: 18px 20px 22px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+.workflow-option-btn {
+    padding: 14px 16px !important;
+}
+@media (max-width: 768px) {
+    .workflow-options { padding: 14px 16px 18px !important; gap: 10px !important; }
 }
 </style>
 </body>

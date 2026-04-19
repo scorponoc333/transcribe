@@ -7112,7 +7112,7 @@ function viewQuizReportSlideUp() {
 <style id="v388BadgeLift">
 @media (min-width: 769px) {
     #jaiHeroSection .jaihero-badge {
-        margin-top: -140px !important;
+        margin-top: -90px !important;
         position: relative;
         z-index: 5;
     }
