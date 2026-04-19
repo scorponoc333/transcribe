@@ -29,6 +29,209 @@ $resetToken = isset($_GET['reset']) ? htmlspecialchars($_GET['reset']) : '';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/login.css">
+
+<style id="loginAssemblyFx">
+/* ========== Transformers-style assembly (4.5s total) ========== */
+/* Initial hidden state for every piece we animate in. */
+.login-card,
+.login-logo,
+.login-tagline,
+.login-form .login-field:nth-of-type(1) > label,
+.login-form .login-field:nth-of-type(1) > input,
+.login-form .login-field:nth-of-type(2) > label,
+.login-form .login-field:nth-of-type(2) .login-field-password > input,
+.login-form .login-field:nth-of-type(2) .login-password-toggle,
+.login-form .login-btn,
+.login-form .login-links,
+.login-footer {
+    opacity: 0;
+    will-change: opacity, transform, clip-path;
+}
+
+/* 1. Panel assembly — clip-path letterbox opens + scale + blur-in */
+.login-card {
+    transform: scale(0.92) translateY(-18px);
+    clip-path: inset(50% 10% 50% 10% round 14px);
+    filter: blur(8px);
+    animation: loginCardAssemble 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0s forwards;
+    position: relative;
+}
+/* Scanning light streak during assembly */
+.login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -30%;
+    width: 30%; height: 100%;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(100, 180, 255, 0) 10%,
+        rgba(140, 210, 255, 0.55) 50%,
+        rgba(100, 180, 255, 0) 90%,
+        transparent 100%);
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+    animation: loginCardScan 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0s forwards;
+    border-radius: 14px;
+}
+@keyframes loginCardAssemble {
+    0%   { opacity: 0; transform: scale(0.92) translateY(-18px); clip-path: inset(50% 10% 50% 10% round 14px); filter: blur(8px); }
+    45%  { opacity: 1; clip-path: inset(0 0 0 0 round 14px); filter: blur(0); }
+    100% { opacity: 1; transform: scale(1) translateY(0); clip-path: inset(0 0 0 0 round 14px); filter: blur(0); }
+}
+@keyframes loginCardScan {
+    0%   { opacity: 0; left: -40%; }
+    50%  { opacity: 1; }
+    100% { opacity: 0; left: 120%; }
+}
+
+/* 2. Logo drops from above with a tiny settle */
+.login-logo {
+    transform: translateY(-30px) scale(0.75) rotate(-4deg);
+    animation: loginLogoDrop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s forwards;
+    position: relative;
+}
+/* Shockwave ripple from logo impact */
+.login-logo::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 2px solid rgba(140, 200, 255, 0.75);
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 0;
+    pointer-events: none;
+    animation: loginLogoRipple 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.35s forwards;
+}
+@keyframes loginLogoDrop {
+    0%   { opacity: 0; transform: translateY(-30px) scale(0.75) rotate(-4deg); }
+    70%  { opacity: 1; transform: translateY(6px) scale(1.04) rotate(1deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+@keyframes loginLogoRipple {
+    0%   { opacity: 0.9; transform: translate(-50%, -50%) scale(0.2); border-width: 3px; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(22); border-width: 0.5px; }
+}
+
+/* 3. Tagline sweeps left-to-right */
+.login-tagline {
+    clip-path: inset(0 100% 0 0);
+    animation: loginTaglineSweep 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.35s forwards;
+}
+@keyframes loginTaglineSweep {
+    0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
+    20%  { opacity: 1; }
+    100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+/* 4. EMAIL label — fade + slide from left */
+.login-form .login-field:nth-of-type(1) > label {
+    transform: translateX(-14px);
+    animation: loginFadeSlideX 0.4s ease 1.75s forwards;
+}
+/* 5. Email input — width grow + shine sweep */
+.login-form .login-field:nth-of-type(1) > input {
+    transform: scaleX(0.4);
+    transform-origin: left center;
+    animation: loginInputGrow 0.45s cubic-bezier(0.22, 1, 0.36, 1) 2.05s forwards;
+}
+
+/* 6. PASSWORD label */
+.login-form .login-field:nth-of-type(2) > label {
+    transform: translateX(-14px);
+    animation: loginFadeSlideX 0.4s ease 2.5s forwards;
+}
+/* 7. Password input */
+.login-form .login-field:nth-of-type(2) .login-field-password > input {
+    transform: scaleX(0.4);
+    transform-origin: left center;
+    animation: loginInputGrow 0.45s cubic-bezier(0.22, 1, 0.36, 1) 2.8s forwards;
+}
+/* 8. Eyeball toggle pops in with bounce */
+.login-form .login-field:nth-of-type(2) .login-password-toggle {
+    transform: scale(0.1) rotate(-90deg);
+    animation: loginEyePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 3.1s forwards;
+}
+
+@keyframes loginFadeSlideX {
+    to { opacity: 1; transform: translateX(0); }
+}
+@keyframes loginInputGrow {
+    0%   { opacity: 0; transform: scaleX(0.4); }
+    40%  { opacity: 1; }
+    100% { opacity: 1; transform: scaleX(1); }
+}
+@keyframes loginEyePop {
+    0%   { opacity: 0; transform: scale(0.1) rotate(-90deg); }
+    70%  { opacity: 1; transform: scale(1.15) rotate(8deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+/* 9. Sign In button — scales in + brand shine sweep */
+.login-form .login-btn {
+    transform: scale(0.5) translateY(14px);
+    animation: loginBtnIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 3.35s forwards;
+    position: relative;
+    overflow: hidden;
+}
+.login-form .login-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -120%;
+    width: 80%; height: 100%;
+    background: linear-gradient(100deg,
+        transparent 0%,
+        rgba(255,255,255,0.35) 50%,
+        transparent 100%);
+    pointer-events: none;
+    animation: loginBtnShine 0.8s ease 3.85s forwards;
+}
+@keyframes loginBtnIn {
+    0%   { opacity: 0; transform: scale(0.5) translateY(14px); }
+    70%  { opacity: 1; transform: scale(1.04) translateY(-2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes loginBtnShine {
+    0%   { left: -120%; }
+    100% { left: 120%; }
+}
+
+/* 10. Forgot password link */
+.login-form .login-links {
+    transform: translateY(8px);
+    animation: loginFadeUp 0.45s ease 3.85s forwards;
+}
+/* 11. Developed by Jason Hogan — LAST */
+.login-footer {
+    transform: translateY(8px);
+    animation: loginFadeUp 0.55s ease 4.1s forwards;
+}
+@keyframes loginFadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* If the user has a slow machine / prefers reduced motion, skip all of this */
+@media (prefers-reduced-motion: reduce) {
+    .login-card, .login-logo, .login-tagline,
+    .login-form .login-field > label,
+    .login-form .login-field > input,
+    .login-form .login-field-password > input,
+    .login-form .login-password-toggle,
+    .login-form .login-btn,
+    .login-form .login-links,
+    .login-footer {
+        opacity: 1 !important;
+        transform: none !important;
+        clip-path: none !important;
+        animation: none !important;
+        filter: none !important;
+    }
+    .login-card::before, .login-logo::after, .login-form .login-btn::after {
+        display: none !important;
+    }
+}
+</style>
 </head>
 <body class="login-page">
 
