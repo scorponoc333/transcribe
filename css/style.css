@@ -5862,3 +5862,36 @@ audio::-webkit-media-controls-panel {
 [data-theme="dark"] .history-table td a:hover svg {
     stroke: var(--brand-200, #bfdbfe) !important;
 }
+
+
+/* ═══ Assembler kind=row: cost-breakdown table rows ═══ */
+.asm.asm-kind-row {
+    transform: translateX(-16px);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--asm-delay, 0ms);
+    position: relative;
+    overflow: hidden;
+}
+.asm.asm-kind-row.is-assembled {
+    opacity: 1;
+    transform: translateX(0);
+}
+.asm.asm-kind-row::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -140%;
+    width: 60%; height: 100%;
+    background: linear-gradient(100deg,
+        transparent 0%,
+        rgba(var(--brand-300-rgb, 147, 197, 253), 0.18) 50%,
+        transparent 100%);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    opacity: 0;
+    transition: left 0.9s ease, opacity 0.2s;
+}
+.asm.asm-kind-row.is-assembled::after {
+    opacity: 1;
+    left: 140%;
+    transition-delay: calc(var(--asm-delay, 0ms) + 220ms);
+}

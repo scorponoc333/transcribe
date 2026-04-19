@@ -670,8 +670,8 @@ body {
     transform: scale(1.08);
 }
 .title-edit-input {
-    width: 90%;
-    max-width: 900px;
+    width: 96%;
+    max-width: 1100px;
     min-width: 360px;
     padding: 16px 22px;
     background: rgba(255,255,255,0.12);
@@ -1650,17 +1650,19 @@ body {
     margin: 0;
 }
 .study-time-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     font-size: 13px;
-    color: var(--ink-muted);
+    color: var(--ink-soft);
     margin: 0 auto 16px;
-    padding: 8px 16px;
-    background: var(--line-soft);
-    border-radius: 20px;
+    padding: 10px 20px;
+    background: rgba(var(--primary-rgb), 0.10);
+    border: 1px solid rgba(var(--primary-rgb), 0.22);
+    border-radius: 999px;
     width: fit-content;
+    font-weight: 500;
 }
 .study-time-badge svg { stroke: var(--primary); flex-shrink: 0; }
 .study-time-badge strong { color: var(--ink); }
@@ -5053,6 +5055,7 @@ function copyTranscript() {
 
 
 <style id="reportDarkFx">
+@media screen {
 /* ═══════════════════════════════════════════════════════════════════
    DARK-MODE OVERRIDES for the branded report pages.
    Activated whenever the user set theme=dark in the main app. The
@@ -5146,6 +5149,31 @@ function copyTranscript() {
 
 /* Any <a> inside report content should stay readable */
 [data-theme="dark"] .report-section a { color: var(--brand-300, #93c5fd) !important; }
+}  /* end @media screen — PDF always renders light mode */
+
+/* Dark-mode key-concept / difficulty pills — use stronger brand-tinted bg
+   and a near-white text so they pop against the dark card. */
+[data-theme="dark"] .importance-pill.importance-high {
+    background: rgba(239,68,68,0.22);
+    color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.35);
+}
+[data-theme="dark"] .importance-pill.importance-medium {
+    background: rgba(217,119,6,0.22);
+    color: #fcd34d;
+    border: 1px solid rgba(217,119,6,0.35);
+}
+[data-theme="dark"] .importance-pill.importance-low {
+    background: rgba(16,185,129,0.22);
+    color: #86efac;
+    border: 1px solid rgba(16,185,129,0.35);
+}
+[data-theme="dark"] .study-time-badge {
+    background: rgba(var(--primary-rgb), 0.22);
+    color: #e2e8f0;
+    border-color: rgba(var(--primary-rgb), 0.45);
+}
+[data-theme="dark"] .study-time-badge strong { color: #ffffff; }
 </style>
 
 </body>

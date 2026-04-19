@@ -361,7 +361,8 @@ const Analytics = {
         for (const row of costByOp) {
             const label = opLabels[row.operation] || prettify(row.operation);
             const color = opColors[row.operation] || '#64748b';
-            html += `<tr style="border-bottom:1px solid var(--border-light);">
+            const asmDelay = (costByOp.indexOf(row) * 160);
+            html += `<tr class="asm asm-kind-row" style="border-bottom:1px solid var(--border-light);--asm-delay:${asmDelay}ms">
                 <td style="padding:10px 12px;">
                     <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:8px;vertical-align:middle;"></span>
                     <span style="color:var(--fg-heading);font-weight:500;">${label}</span>
@@ -375,6 +376,12 @@ const Analytics = {
 
         html += '</tbody></table>';
         container.innerHTML = html;
+        // Stagger-reveal the rows when the cost-breakdown card enters view.
+        if (window.Assembler) {
+            container.querySelectorAll('tr.asm.asm-kind-row').forEach(tr => {
+                window.Assembler.observe(tr, { kind: 'row' });
+            });
+        }
     },
 
     renderMonthlyCosts(data) {
@@ -612,7 +619,50 @@ const Analytics = {
         this._destroyChart(canvasId);
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
-        this.charts[canvasId] = new Chart(canvas, { type, ...config });
+        // Merge in an 'assemble-style' animation default so every chart
+        // visibly builds itself when it first renders. Caller-provided
+        // options on config.options.animation win.
+        const defaults = {
+            options: Object.assign({}, config.options || {}, {
+                animation: Object.assign({
+                    duration: 2400,
+                    easing: 'easeOutCubic',
+                    animateRotate: true,  // doughnut/pie: rotate-in
+                    animateScale: false,
+                }, (config.options || {}).animation || {}),
+            }),
+        };
+        // Bar chart: grow from baseline ('y' axis zero) instead of materialising full height
+        if (type === 'bar') {
+            defaults.options.animations = Object.assign({}, defaults.options.animations || {}, {
+                y: Object.assign({
+                    from: (ctx) => (ctx.chart.scales && ctx.chart.scales.y ? ctx.chart.scales.y.getPixelForValue(0) : 0),
+                    duration: 2400,
+                    easing: 'easeOutCubic',
+                }, (defaults.options.animations || {}).y || {}),
+            });
+        }
+        // Re-assemble: when the chart's wrapper element scrolls into view,
+        // replay the animation by resetting + updating with animation mode.
+        const merged = Object.assign({}, config, { options: defaults.options });
+        this.charts[canvasId] = new Chart(canvas, { type, ...merged });
+        // Observe the chart's parent card for scroll-in replay.
+        const card = canvas.closest('.analytics-chart-card');
+        if (card && window.Assembler) {
+            window.Assembler.observe(card, {
+                kind: 'chart',
+                onEnter: () => {
+                    try {
+                        const ch = this.charts[canvasId];
+                        if (!ch) return;
+                        // Brute-force replay: reset() clears data arrays, then
+                        // update() animates from zero.
+                        if (typeof ch.reset === 'function') ch.reset();
+                        ch.update();
+                    } catch (e) {}
+                }
+            });
+        }
     },
 
     _destroyChart(canvasId) {

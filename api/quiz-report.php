@@ -697,5 +697,81 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
 [data-theme="dark"] .report-section a { color: var(--brand-300, #93c5fd) !important; }
 </style>
 
+
+<style id="quizReportDarkFx">
+@media screen {
+/* Quiz-report.php uses .report-card and qr-* classes — none of which were
+   targeted by the earlier report-page dark overrides. This block covers
+   all the big white tiles in the pop-quiz layout. */
+[data-theme="dark"] body {
+    background: linear-gradient(165deg, #050816 0%, #0a1128 45%, #0f1f40 100%) !important;
+    color: #e2e8f0 !important;
+}
+[data-theme="dark"] .report-card {
+    background: rgba(15, 23, 42, 0.72) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 28px rgba(0, 0, 0, 0.35) !important;
+    color: #e2e8f0 !important;
+}
+[data-theme="dark"] .qr-section-title {
+    color: #f1f5f9 !important;
+}
+[data-theme="dark"] .qr-summary-card {
+    background: rgba(15, 23, 42, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+[data-theme="dark"] .qr-summary-card.strengths {
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: rgba(16, 185, 129, 0.30) !important;
+}
+[data-theme="dark"] .qr-summary-card.weaknesses {
+    background: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.30) !important;
+}
+[data-theme="dark"] .qr-summary-card h3,
+[data-theme="dark"] .qr-summary-card li,
+[data-theme="dark"] .qr-summary-card p { color: #e2e8f0 !important; }
+[data-theme="dark"] .qr-question {
+    background: rgba(15, 23, 42, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+[data-theme="dark"] .qr-question.correct {
+    background: rgba(16, 185, 129, 0.10) !important;
+    border-color: rgba(16, 185, 129, 0.30) !important;
+}
+[data-theme="dark"] .qr-question.wrong {
+    background: rgba(239, 68, 68, 0.10) !important;
+    border-color: rgba(239, 68, 68, 0.30) !important;
+}
+[data-theme="dark"] .qr-q-text,
+[data-theme="dark"] .qr-question p,
+[data-theme="dark"] .qr-question li { color: #e2e8f0 !important; }
+[data-theme="dark"] .qr-answer {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    color: #cbd5e1 !important;
+}
+[data-theme="dark"] .qr-answer.selected-wrong {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border-color: rgba(239, 68, 68, 0.45) !important;
+    color: #fecaca !important;
+}
+[data-theme="dark"] .qr-answer.selected-correct,
+[data-theme="dark"] .qr-answer.correct-answer {
+    background: rgba(16, 185, 129, 0.18) !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
+    color: #bbf7d0 !important;
+}
+[data-theme="dark"] .qr-explanation {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-left: 3px solid rgba(var(--brand-400-rgb, 96, 165, 250), 0.55) !important;
+    color: #cbd5e1 !important;
+}
+[data-theme="dark"] .qr-footer {
+    color: rgba(255, 255, 255, 0.55) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+}  /* end @media screen — PDF stays light */
+</style>
 </body>
 </html>
