@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=2026041b1">
-    <link rel="stylesheet" href="css/ai-loading.css?v=2026041b1">
+    <link rel="stylesheet" href="css/style.css?v=2026041b2">
+    <link rel="stylesheet" href="css/ai-loading.css?v=2026041b2">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1948,18 +1948,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=2026041b1"></script>
-    <script src="js/api.js?v=2026041b1"></script>
-    <script src="js/pdf.js?v=2026041b1"></script>
-    <script src="js/email-template.js?v=2026041b1"></script>
-    <script src="js/autocomplete.js?v=2026041b1"></script>
-    <script src="js/history.js?v=2026041b1"></script>
-    <script src="js/assembler.js?v=2026041b1"></script>
-    <script src="js/analytics.js?v=2026041b1"></script>
-    <script src="js/contacts.js?v=2026041b1"></script>
-    <script src="js/users.js?v=2026041b1"></script>
-    <script src="js/app.js?v=2026041b1"></script>
-    <script src="js/upload-particles.js?v=2026041b1"></script>
+    <script src="js/ai-loading.js?v=2026041b2"></script>
+    <script src="js/api.js?v=2026041b2"></script>
+    <script src="js/pdf.js?v=2026041b2"></script>
+    <script src="js/email-template.js?v=2026041b2"></script>
+    <script src="js/autocomplete.js?v=2026041b2"></script>
+    <script src="js/history.js?v=2026041b2"></script>
+    <script src="js/assembler.js?v=2026041b2"></script>
+    <script src="js/analytics.js?v=2026041b2"></script>
+    <script src="js/contacts.js?v=2026041b2"></script>
+    <script src="js/users.js?v=2026041b2"></script>
+    <script src="js/app.js?v=2026041b2"></script>
+    <script src="js/upload-particles.js?v=2026041b2"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -4053,6 +4053,43 @@
     [data-theme="dark"] #rp2Table .rp2-open-btn {
         border-color: rgba(var(--brand-300-rgb, 147,197,253), 0.35) !important;
         color: var(--brand-300, #93c5fd) !important;
+    }
+}
+</style>
+
+<style id="v371HistoryMobile">
+@media (max-width: 768px) {
+    /* Title -> top, Actions -> bottom (reverse the v3.65 order) */
+    #historyTable tbody tr > td.cell-title { order: 1 !important; }
+    #historyTable tbody tr > td.cell-actions { order: 2 !important; }
+
+    /* Title 50% larger (15 -> 22) */
+    #historyTable tbody tr > td.cell-title {
+        font-size: 22px !important;
+        line-height: 1.3 !important;
+    }
+
+    /* Icons ~50% smaller: 44 -> 28 frame, svg 15 -> 12 */
+    #historyTable td.cell-actions .btn-icon {
+        min-width: 28px !important;
+        min-height: 28px !important;
+        width: 28px !important;
+        height: 28px !important;
+        padding: 4px !important;
+        border-radius: 8px !important;
+    }
+    #historyTable td.cell-actions .btn-icon svg {
+        width: 12px !important;
+        height: 12px !important;
+    }
+    /* And the eye (Open Full Report) button matches the new size */
+    #historyTable td.cell-actions a.btn-icon[data-open-report="1"] {
+        width: 28px !important;
+        min-height: 28px !important;
+        border-radius: 8px !important;
+    }
+    #historyTable td.cell-actions a.btn-icon[data-open-report="1"]::before {
+        width: 14px !important; height: 14px !important;
     }
 }
 </style>
