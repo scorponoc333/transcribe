@@ -2050,12 +2050,11 @@ audio::-webkit-media-controls-panel {
 }
 .settings-modal .settings-tabs {
     flex-shrink: 0;
-    margin: 0 20px;
+    margin: 14px 20px 16px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.10);
     border-radius: 10px;
     padding: 3px;
-    margin-bottom: 16px;
 }
 .settings-modal .settings-tab {
     color: rgba(255,255,255,0.6);
@@ -2126,8 +2125,7 @@ audio::-webkit-media-controls-panel {
 /* All action buttons/links in settings — white on glass so they're readable */
 .settings-modal .btn-secondary,
 .settings-modal .btn-ghost,
-.settings-modal .btn-sm:not(.btn-primary):not(.settings-tab),
-.settings-modal label[for] {
+.settings-modal .btn-sm:not(.btn-primary):not(.settings-tab) {
     color: #ffffff !important;
     border-color: rgba(255,255,255,0.28) !important;
     background: rgba(255,255,255,0.08) !important;
@@ -5711,4 +5709,17 @@ audio::-webkit-media-controls-panel {
     border: 1px solid rgba(var(--brand-300-rgb), 0.45) !important;
     box-shadow: 0 4px 12px rgba(var(--brand-500-rgb), 0.30) !important;
     color: #fff !important;
+}
+
+/* No pill background behind field labels inside settings */
+.settings-modal label[for] {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    color: rgba(255,255,255,0.62) !important;
+}
+
+/* Smooth ~1.2s resize when switching settings tabs */
+.settings-modal.size-animating {
+    transition: height 1.2s cubic-bezier(0.22, 1, 0.36, 1), width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }

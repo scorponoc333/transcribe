@@ -303,13 +303,40 @@ const App = {
             });
         }
 
-        // Settings tabs
+        // Settings tabs — with smooth 1.2s resize animation between tabs
         document.getElementById('settingsTabs').addEventListener('click', (e) => {
             const btn = e.target.closest('.settings-tab');
             if (!btn) return;
             const tab = btn.dataset.stab;
-            document.querySelectorAll('.settings-tab').forEach(b => b.classList.toggle('active', b.dataset.stab === tab));
-            document.querySelectorAll('.settings-panel').forEach(p => p.classList.toggle('active', p.dataset.stabPanel === tab));
+            const modal = document.querySelector('#settingsModal .settings-modal');
+
+            if (modal) {
+                // Lock current height so the switch doesn't snap
+                const h0 = modal.getBoundingClientRect().height;
+                modal.style.transition = 'none';
+                modal.style.height = h0 + 'px';
+                // Switch active panel (natural height will change once layout runs)
+                document.querySelectorAll('.settings-tab').forEach(b => b.classList.toggle('active', b.dataset.stab === tab));
+                document.querySelectorAll('.settings-panel').forEach(p => p.classList.toggle('active', p.dataset.stabPanel === tab));
+                // Measure new natural height by temporarily clearing height
+                modal.style.height = 'auto';
+                const h1 = modal.getBoundingClientRect().height;
+                // Snap back to start, then animate to target
+                modal.style.height = h0 + 'px';
+                void modal.offsetHeight; // force reflow
+                modal.classList.add('size-animating');
+                modal.style.transition = '';
+                modal.style.height = h1 + 'px';
+                clearTimeout(modal._sizeAnimTimer);
+                modal._sizeAnimTimer = setTimeout(() => {
+                    modal.classList.remove('size-animating');
+                    modal.style.height = '';
+                    modal.style.transition = '';
+                }, 1250);
+            } else {
+                document.querySelectorAll('.settings-tab').forEach(b => b.classList.toggle('active', b.dataset.stab === tab));
+                document.querySelectorAll('.settings-panel').forEach(p => p.classList.toggle('active', p.dataset.stabPanel === tab));
+            }
         });
 
         // Branding: logo upload

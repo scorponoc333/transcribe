@@ -2300,12 +2300,8 @@
         search: document.getElementById('rsSearch'),
 
         init() {
-            // Respect previously-closed state across reloads
-            if (localStorage.getItem('jaiReportsSidebarClosed') === '1') {
-                const sb = document.getElementById('reportsSidebar');
-                if (sb) sb.style.display = 'none';
-                return;
-            }
+            // (Closed state is intentionally NOT persisted — the sidebar
+            // re-appears on every page load / Transcribe click.)
             // Add body class to shift layout
             document.body.classList.add('has-reports-sidebar');
             // Play the 2.5s assembly animation on first appearance
@@ -2326,7 +2322,7 @@
                     setTimeout(() => {
                         sb.style.display = 'none';
                         sb.classList.remove('rs-closing');
-                        try { localStorage.setItem('jaiReportsSidebarClosed', '1'); } catch (e) {}
+                        // Do NOT persist — next page load / Transcribe click re-shows.
                     }, 1000);
                 });
             }
@@ -2518,8 +2514,8 @@
         const onTranscribe = ['upload', 'file', 'processing', 'results', 'error'].includes(name);
         const sb = document.getElementById('reportsSidebar');
         if (!sb) return;
-        const userClosed = localStorage.getItem('jaiReportsSidebarClosed') === '1';
-        if (onTranscribe && !userClosed) {
+        if (onTranscribe) {
+            // Re-show every time the user lands on the Transcribe flow
             sb.style.display = '';
             document.body.classList.add('has-reports-sidebar');
         } else {
@@ -2547,6 +2543,8 @@
         updateSidebarForSection(initialName || 'upload');
     }
     installSectionHook();
+    // Clean up any legacy closed-sidebar flag (feature now re-shows on every load)
+    try { localStorage.removeItem('jaiReportsSidebarClosed'); } catch (e) {}
 })();
 </script>
 <!-- ==================== /REPORTS SIDEBAR ==================== -->
