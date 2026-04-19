@@ -2521,21 +2521,24 @@ async function tbSignOut() {
             z-index: 0;
             pointer-events: none;
         }
-        /* Layer 1: brand gradient overlay — top bright, bottom dark, all in brand hue */
+        /* Layer 1: brand gradient overlay — darker overall, bright lift
+           anchored where the Jason AI logo sits; dark transition kicks
+           in right below the logo (v3.90). */
         #jaiHeroSection::before {
             content: '';
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(ellipse 70% 55% at 50% 22%,
-                    rgba(var(--brand-400-rgb), 0.55) 0%,
-                    rgba(var(--brand-500-rgb), 0.25) 45%,
-                    rgba(var(--brand-500-rgb), 0) 75%),
+                radial-gradient(ellipse 55% 40% at 50% 36%,
+                    rgba(var(--brand-300-rgb, 147,197,253), 0.50) 0%,
+                    rgba(var(--brand-500-rgb), 0.20) 55%,
+                    rgba(var(--brand-500-rgb), 0) 85%),
                 linear-gradient(180deg,
-                    rgba(var(--brand-400-rgb), 0.45) 0%,
-                    rgba(var(--brand-500-rgb), 0.65) 30%,
-                    rgba(var(--brand-grad-mid-rgb), 0.85) 70%,
-                    rgba(var(--brand-grad-dark-rgb), 0.95) 100%);
+                    rgba(var(--brand-grad-mid-rgb), 0.82) 0%,
+                    rgba(var(--brand-500-rgb), 0.55) 28%,
+                    rgba(var(--brand-grad-mid-rgb), 0.92) 48%,
+                    rgba(var(--brand-grad-dark-rgb), 0.98) 78%,
+                    rgba(5, 10, 28, 1) 100%);
             z-index: 1;
             pointer-events: none;
         }
@@ -2590,9 +2593,9 @@ async function tbSignOut() {
         }
         #jaiHeroSection .jaihero-logo {
             display: block;
-            height: 195px;
+            height: 293px;
             width: auto;
-            max-width: 850px;
+            max-width: 1275px;
             aspect-ratio: 2.5 / 1;
             object-fit: contain;
             margin: 0 auto 14px auto;
@@ -7106,7 +7109,17 @@ function viewQuizReportSlideUp() {
 <style id="v388BadgeLift">
 @media (min-width: 769px) {
     #jaiHeroSection .jaihero-badge {
-        margin-top: -35px !important;
+        margin-top: -70px !important;
+        position: relative;
+        z-index: 5;
+    }
+}
+</style>
+
+<style id="v390MobileBadge">
+@media (max-width: 768px) {
+    #jaiHeroSection .jaihero-badge {
+        margin-top: -24px !important;
         position: relative;
         z-index: 5;
     }
