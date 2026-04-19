@@ -5895,3 +5895,76 @@ audio::-webkit-media-controls-panel {
     left: 140%;
     transition-delay: calc(var(--asm-delay, 0ms) + 220ms);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   v3.43 PILL CONSISTENCY
+   Report Pages .type-badge styling (was undefined = plain text) and
+   more-vibrant, visually-distinct dark-mode hues for history badges.
+   ═══════════════════════════════════════════════════════════════════ */
+/* Base — Report Pages .type-badge */
+.type-badge {
+    display: inline-block;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    line-height: 1.4;
+}
+.type-badge.type-learning  { background: rgba(99, 102, 241, 0.12);  color: #4f46e5; }
+.type-badge.type-meeting   { background: rgba(217, 119, 6, 0.12);   color: #b45309; }
+.type-badge.type-recording { background: rgba(16, 185, 129, 0.12);  color: #047857; }
+.type-badge.type-audio     { background: rgba(16, 185, 129, 0.12);  color: #047857; }
+
+/* Dark — vibrant like the Users page role badges */
+[data-theme="dark"] .type-badge.type-learning {
+    background: rgba(129, 140, 248, 0.22);
+    color: #c7d2fe;
+    border: 1px solid rgba(129, 140, 248, 0.38);
+}
+[data-theme="dark"] .type-badge.type-meeting {
+    background: rgba(251, 191, 36, 0.22);
+    color: #fcd34d;
+    border: 1px solid rgba(251, 191, 36, 0.38);
+}
+[data-theme="dark"] .type-badge.type-recording,
+[data-theme="dark"] .type-badge.type-audio {
+    background: rgba(52, 211, 153, 0.22);
+    color: #6ee7b7;
+    border: 1px solid rgba(52, 211, 153, 0.38);
+}
+
+/* History table — same distinct-hue treatment, overriding the earlier
+   0.2-alpha brand-blue variants so Learning / Meeting / Recording
+   actually look different. */
+[data-theme="dark"] .badge.badge-learning {
+    background: rgba(129, 140, 248, 0.22) !important;
+    color: #c7d2fe !important;
+    border: 1px solid rgba(129, 140, 248, 0.38) !important;
+}
+[data-theme="dark"] .badge.badge-meeting {
+    background: rgba(251, 191, 36, 0.22) !important;
+    color: #fcd34d !important;
+    border: 1px solid rgba(251, 191, 36, 0.38) !important;
+}
+[data-theme="dark"] .badge.badge-recording {
+    background: rgba(52, 211, 153, 0.22) !important;
+    color: #6ee7b7 !important;
+    border: 1px solid rgba(52, 211, 153, 0.38) !important;
+}
+
+/* All Reports sidebar rs-type-chip — same dark-mode treatment */
+[data-theme="dark"] .rs-type-chip.type-learning {
+    background: rgba(129, 140, 248, 0.26) !important;
+    color: #dbeafe !important;
+}
+[data-theme="dark"] .rs-type-chip.type-meeting {
+    background: rgba(251, 191, 36, 0.26) !important;
+    color: #fde68a !important;
+}
+[data-theme="dark"] .rs-type-chip.type-recording {
+    background: rgba(52, 211, 153, 0.26) !important;
+    color: #a7f3d0 !important;
+}
