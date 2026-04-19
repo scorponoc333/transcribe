@@ -1257,6 +1257,24 @@ const App = window.App = {
             if (ccVal) emailOptions.cc = ccVal.split(',').map(e => e.trim()).filter(Boolean);
             if (bccVal) emailOptions.bcc = bccVal.split(',').map(e => e.trim()).filter(Boolean);
 
+            // Emailing the report == sharing it. Flip to public so the
+            // recipient's link actually works without them signing in,
+            // and the Share modal also reflects the new public state.
+            if (this.transcriptionId) {
+                try {
+                    const fd = new FormData();
+                    fd.append('id', this.transcriptionId);
+                    fd.append('public', '1');
+                    await fetch('/api/transcription-share.php', {
+                        method: 'POST',
+                        body: fd,
+                        credentials: 'same-origin'
+                    });
+                } catch (e) {
+                    console.warn('share toggle before send failed (non-fatal)', e);
+                }
+            }
+
             await API.sendSmtpEmail(emailOptions);
 
             // Log email send to database

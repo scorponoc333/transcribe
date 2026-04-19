@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=20260419d">
-    <link rel="stylesheet" href="css/ai-loading.css?v=20260419d">
+    <link rel="stylesheet" href="css/style.css?v=20260419e">
+    <link rel="stylesheet" href="css/ai-loading.css?v=20260419e">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1936,17 +1936,17 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=20260419d"></script>
-    <script src="js/api.js?v=20260419d"></script>
-    <script src="js/pdf.js?v=20260419d"></script>
-    <script src="js/email-template.js?v=20260419d"></script>
-    <script src="js/autocomplete.js?v=20260419d"></script>
-    <script src="js/history.js?v=20260419d"></script>
-    <script src="js/analytics.js?v=20260419d"></script>
-    <script src="js/contacts.js?v=20260419d"></script>
-    <script src="js/users.js?v=20260419d"></script>
-    <script src="js/app.js?v=20260419d"></script>
-    <script src="js/upload-particles.js?v=20260419d"></script>
+    <script src="js/ai-loading.js?v=20260419e"></script>
+    <script src="js/api.js?v=20260419e"></script>
+    <script src="js/pdf.js?v=20260419e"></script>
+    <script src="js/email-template.js?v=20260419e"></script>
+    <script src="js/autocomplete.js?v=20260419e"></script>
+    <script src="js/history.js?v=20260419e"></script>
+    <script src="js/analytics.js?v=20260419e"></script>
+    <script src="js/contacts.js?v=20260419e"></script>
+    <script src="js/users.js?v=20260419e"></script>
+    <script src="js/app.js?v=20260419e"></script>
+    <script src="js/upload-particles.js?v=20260419e"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -2862,10 +2862,15 @@
                 <td><span class="type-badge type-${mode}">${label}</span></td>
                 <td>${words}</td>
                 <td>
-                    <a href="/api/report.php?id=${encodeURIComponent(it.id)}" class="btn-primary btn-sm rp2-open-btn" data-id="${it.id}" data-title="${title}" style="display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;">
-                        Open Report
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                    </a>
+                    <div style="display:inline-flex;align-items:center;gap:8px;">
+                        <a href="/api/report.php?id=${encodeURIComponent(it.id)}" class="btn-primary btn-sm rp2-open-btn" data-id="${it.id}" data-title="${title}" style="display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;">
+                            Open Report
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </a>
+                        <button type="button" class="btn-icon btn-xs rp2-email-btn" data-id="${it.id}" title="Send Email" aria-label="Send Email" style="padding:8px">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </button>
+                    </div>
                 </td>
             </tr>`;
         }).join('');
@@ -2934,16 +2939,27 @@
         // Intercept Open Report clicks and replay the sidebar openReport animation
         document.getElementById('rp2TableBody')?.addEventListener('click', (e) => {
             const a = e.target.closest('a.rp2-open-btn');
-            if (!a) return;
-            const id = a.dataset.id;
-            const title = a.dataset.title || '';
-            if (!id) return;
-            if (window.__rsApi && typeof window.__rsApi.openReport === 'function') {
-                e.preventDefault();
-                try { window.__rsApi.openReport(id, title); return; }
-                catch (err) { console.warn('openReport animation failed, falling back to nav', err); }
+            if (a) {
+                const id = a.dataset.id;
+                const title = a.dataset.title || '';
+                if (!id) return;
+                if (window.__rsApi && typeof window.__rsApi.openReport === 'function') {
+                    e.preventDefault();
+                    try { window.__rsApi.openReport(id, title); return; }
+                    catch (err) { console.warn('openReport animation failed, falling back to nav', err); }
+                }
+                return;
             }
-            // If animation API is unavailable, let the default href navigation happen.
+            // Email button — reuse the same History.emailTranscript flow
+            const emailBtn = e.target.closest('button.rp2-email-btn');
+            if (emailBtn) {
+                const id = emailBtn.dataset.id;
+                if (!id) return;
+                if (window.History && typeof window.History.emailTranscript === 'function') {
+                    try { window.History.emailTranscript(id); return; }
+                    catch (err) { console.warn('emailTranscript failed', err); }
+                }
+            }
         });
     }
 

@@ -5,6 +5,58 @@
 
 const EmailTemplate = {
     logoUrl: 'https://jasonhogan.ca/jason/img/jh-white.png',
+    heroBase: 'https://transcribe.jasonhogan.ca/img/brand',
+
+    /**
+     * Build a mode-specific hero header cell. Uses a background image with a
+     * dark navy→blue gradient overlay so the text remains legible across all
+     * modern email clients (Gmail, Apple Mail, iOS, Outlook for Mac/Web).
+     * Desktop Outlook gets the solid bgcolor fallback.
+     */
+    _heroHeader(mode, title, modeLabel) {
+        const images = {
+            recording: `${this.heroBase}/hero-microphone.jpg`,
+            meeting:   `${this.heroBase}/hero-meeting.jpg`,
+            learning:  `${this.heroBase}/hero-learning.jpg`,
+        };
+        const img = images[mode] || images.recording;
+        const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        return `<tr><td background="${img}" bgcolor="#1a3a7a" style="background:linear-gradient(165deg,rgba(15,23,42,0.88) 0%,rgba(26,58,122,0.85) 35%,rgba(37,87,179,0.78) 70%,rgba(75,139,232,0.72) 100%),url('${img}') center/cover no-repeat;background-color:#1a3a7a;border-radius:16px 16px 0 0;padding:52px 40px 42px;text-align:center;">
+    <img src="${this.logoUrl}" alt="Jason Hogan" width="180" style="display:block;margin:0 auto 24px;max-width:180px;height:auto;opacity:0.96;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 18px;">
+    <tr><td style="background:rgba(0,0,0,0.32);border:1px solid rgba(255,255,255,0.14);border-radius:20px;padding:7px 22px;">
+        <span style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#ffffff;font-weight:700;">${modeLabel}</span>
+    </td></tr>
+    </table>
+    <div style="width:56px;height:2px;background:rgba(255,255,255,0.32);margin:0 auto 18px;border-radius:1px;"></div>
+    <h1 style="margin:0 0 0;font-size:24px;font-weight:800;color:#ffffff;line-height:1.3;letter-spacing:-0.4px;text-shadow:0 2px 16px rgba(0,0,0,0.35);">${this._esc(title)}</h1>
+    <p style="margin:14px 0 0;font-size:12px;color:rgba(255,255,255,0.6);letter-spacing:0.5px;">${date}</p>
+</td></tr>`;
+    },
+
+    /**
+     * Branded "View Report" CTA button. The href is the server-side placeholder
+     * {{REPORT_URL}} which api/send-smtp.php replaces with an HMAC-signed,
+     * 30-day-valid URL to api/report.php before forwarding the email.
+     *
+     * The landing page renders the full transcription, AI analysis, and
+     * a "Save as PDF" button that uses window.print() for a pixel-perfect PDF.
+     */
+    _reportButton(label = 'View Full Report') {
+        return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+    <tr><td style="padding:36px 40px 8px;text-align:center;">
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+        <tr><td style="background:linear-gradient(135deg,#4b8be8 0%,#2557b3 50%,#1a3a7a 100%);border-radius:12px;box-shadow:0 12px 32px rgba(37,87,179,0.38),0 2px 6px rgba(37,87,179,0.18);">
+            <a href="{{REPORT_URL}}" style="display:inline-block;padding:20px 56px;color:#ffffff;font-size:15px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+                <span style="display:inline-block;vertical-align:middle;margin-right:12px;font-size:18px;">&#128196;</span><span style="vertical-align:middle;">${label}</span>
+            </a>
+        </td></tr>
+        </table>
+        <p style="margin:16px 0 0;font-size:12px;color:#64748b;letter-spacing:0.3px;font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">Secure link &mdash; transcript, insights &amp; PDF download, valid 30 days</p>
+    </td></tr>
+    </table>`;
+    },
 
     /**
      * Generate a polished HTML email for a transcription
@@ -45,22 +97,14 @@ const EmailTemplate = {
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.06);">
 
 <!-- HEADER -->
-<tr><td style="background:linear-gradient(to bottom,#4b8be8 0%,#2557b3 40%,#1a3a7a 75%,#0f172a 100%);border-radius:16px 16px 0 0;padding:44px 40px 36px;text-align:center;">
-    <img src="${this.logoUrl}" alt="Jason Hogan" width="180" style="display:block;margin:0 auto 24px;max-width:180px;height:auto;opacity:0.95;">
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
-    <tr><td style="background:#000000;border-radius:20px;padding:6px 20px;">
-        <span style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#ffffff;font-weight:700;">${modeLabel} Transcription</span>
-    </td></tr>
-    </table>
-    <div style="width:48px;height:2px;background:rgba(255,255,255,0.25);margin:0 auto 16px;border-radius:1px;"></div>
-    <h1 style="margin:0 0 0;font-size:22px;font-weight:700;color:#ffffff;line-height:1.35;letter-spacing:-0.3px;">${this._esc(title)}</h1>
-    <p style="margin:14px 0 0;font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:0.5px;">${date}</p>
-</td></tr>
+${this._heroHeader(mode, title, `${modeLabel} Transcription`)}
 
 <!-- BODY -->
 <tr><td style="background:#ffffff;padding:0;">
 
-    ${this._greetingSection(`In this email you can find your transcription for <strong style="color:#1e293b;">${this._esc(title)}</strong>. The full transcript is attached as a PDF report. Below is the AI-generated summary and insights.`)}
+    ${this._greetingSection(`Your transcription for <strong style="color:#1e293b;">${this._esc(title)}</strong> is ready. Below is a quick overview of the AI-generated summary and insights. Click the button to view the full branded report, copy the transcript, or save a PDF.`)}
+
+    ${this._reportButton('View Report')}
 
     <!-- Blue divider -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -114,7 +158,7 @@ const EmailTemplate = {
     <!-- CTA -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
     <tr><td style="padding:32px 40px;">
-        <p style="margin:0;font-size:14px;color:#64748b;line-height:22px;text-align:center;font-style:italic;">The complete transcript and detailed AI analysis are included in the attached PDF report.</p>
+        <p style="margin:0;font-size:14px;color:#64748b;line-height:22px;text-align:center;font-style:italic;">Click "View Report" above for the complete transcript, detailed AI analysis, and a printable PDF.</p>
     </td></tr>
     </table>
 
@@ -152,22 +196,14 @@ ${this._consultationBanner()}
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.06);">
 
 <!-- HEADER -->
-<tr><td style="background:linear-gradient(to bottom,#4b8be8 0%,#2557b3 40%,#1a3a7a 75%,#0f172a 100%);border-radius:16px 16px 0 0;padding:44px 40px 36px;text-align:center;">
-    <img src="${this.logoUrl}" alt="Jason Hogan" width="180" style="display:block;margin:0 auto 24px;max-width:180px;height:auto;opacity:0.95;">
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
-    <tr><td style="background:#000000;border-radius:20px;padding:6px 20px;">
-        <span style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#ffffff;font-weight:700;">Audio Transcription</span>
-    </td></tr>
-    </table>
-    <div style="width:48px;height:2px;background:rgba(255,255,255,0.25);margin:0 auto 16px;border-radius:1px;"></div>
-    <h1 style="margin:0 0 0;font-size:22px;font-weight:700;color:#ffffff;line-height:1.35;letter-spacing:-0.3px;">${this._esc(title)}</h1>
-    <p style="margin:14px 0 0;font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:0.5px;">${date}</p>
-</td></tr>
+${this._heroHeader('recording', title, 'Audio Transcription')}
 
 <!-- BODY -->
 <tr><td style="background:#ffffff;padding:0;">
 
-    ${this._greetingSection(`Please find attached the transcription for <strong style="color:#1e293b;">${this._esc(title)}</strong>. The full transcript has been compiled into a professional PDF report for your convenience.`)}
+    ${this._greetingSection(`Your transcription for <strong style="color:#1e293b;">${this._esc(title)}</strong> is ready. Click below to view the full branded report, copy the transcript, or save a PDF.`)}
+
+    ${this._reportButton('View Report')}
 
     <!-- Blue divider -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -550,22 +586,14 @@ ${this._consultationBanner()}
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.06);">
 
 <!-- HEADER -->
-<tr><td style="background:linear-gradient(to bottom,#4b8be8 0%,#2557b3 40%,#1a3a7a 75%,#0f172a 100%);border-radius:16px 16px 0 0;padding:44px 40px 36px;text-align:center;">
-    <img src="${this.logoUrl}" alt="Jason Hogan" width="180" style="display:block;margin:0 auto 24px;max-width:180px;height:auto;opacity:0.95;">
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
-    <tr><td style="background:#000000;border-radius:20px;padding:6px 20px;">
-        <span style="font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#ffffff;font-weight:700;">Learning Analysis</span>
-    </td></tr>
-    </table>
-    <div style="width:48px;height:2px;background:rgba(255,255,255,0.25);margin:0 auto 16px;border-radius:1px;"></div>
-    <h1 style="margin:0 0 0;font-size:22px;font-weight:700;color:#ffffff;line-height:1.35;letter-spacing:-0.3px;">${this._esc(title)}</h1>
-    <p style="margin:14px 0 0;font-size:12px;color:rgba(255,255,255,0.5);letter-spacing:0.5px;">${date}</p>
-</td></tr>
+${this._heroHeader('learning', title, 'Learning Analysis')}
 
 <!-- BODY -->
 <tr><td style="background:#ffffff;padding:0;">
 
-    ${this._greetingSection(`Here is your learning analysis report for <strong style="color:#1e293b;">${this._esc(title)}</strong>. The full report is attached as a PDF. Below you'll find the AI-generated insights and analysis.`)}
+    ${this._greetingSection(`Your learning analysis report for <strong style="color:#1e293b;">${this._esc(title)}</strong> is ready. Below you'll find the AI-generated insights. Click the button to view the full branded report, copy the transcript, or save a PDF.`)}
+
+    ${this._reportButton('View Report')}
 
     <!-- Gradient divider -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -579,7 +607,7 @@ ${this._consultationBanner()}
     <!-- CTA -->
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
     <tr><td style="padding:32px 40px;">
-        <p style="margin:0;font-size:14px;color:#64748b;line-height:22px;text-align:center;font-style:italic;">The complete learning analysis is included in the attached PDF report.</p>
+        <p style="margin:0;font-size:14px;color:#64748b;line-height:22px;text-align:center;font-style:italic;">Click "View Report" above for the full analysis, transcript, and a printable PDF.</p>
     </td></tr>
     </table>
 
