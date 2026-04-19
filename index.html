@@ -47,8 +47,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css?v=2026041a6">
-    <link rel="stylesheet" href="css/ai-loading.css?v=2026041a6">
+    <link rel="stylesheet" href="css/style.css?v=2026041a7">
+    <link rel="stylesheet" href="css/ai-loading.css?v=2026041a7">
 </head>
 
 <body class="font-sans min-h-screen">
@@ -1939,18 +1939,18 @@
     <style>@keyframes jai-fb-spin { to { transform: rotate(360deg); } }</style>
 
     <!-- ==================== SCRIPTS ==================== -->
-    <script src="js/ai-loading.js?v=2026041a6"></script>
-    <script src="js/api.js?v=2026041a6"></script>
-    <script src="js/pdf.js?v=2026041a6"></script>
-    <script src="js/email-template.js?v=2026041a6"></script>
-    <script src="js/autocomplete.js?v=2026041a6"></script>
-    <script src="js/history.js?v=2026041a6"></script>
-    <script src="js/assembler.js?v=2026041a6"></script>
-    <script src="js/analytics.js?v=2026041a6"></script>
-    <script src="js/contacts.js?v=2026041a6"></script>
-    <script src="js/users.js?v=2026041a6"></script>
-    <script src="js/app.js?v=2026041a6"></script>
-    <script src="js/upload-particles.js?v=2026041a6"></script>
+    <script src="js/ai-loading.js?v=2026041a7"></script>
+    <script src="js/api.js?v=2026041a7"></script>
+    <script src="js/pdf.js?v=2026041a7"></script>
+    <script src="js/email-template.js?v=2026041a7"></script>
+    <script src="js/autocomplete.js?v=2026041a7"></script>
+    <script src="js/history.js?v=2026041a7"></script>
+    <script src="js/assembler.js?v=2026041a7"></script>
+    <script src="js/analytics.js?v=2026041a7"></script>
+    <script src="js/contacts.js?v=2026041a7"></script>
+    <script src="js/users.js?v=2026041a7"></script>
+    <script src="js/app.js?v=2026041a7"></script>
+    <script src="js/upload-particles.js?v=2026041a7"></script>
 <!-- ==================== REPORTS SIDEBAR (desktop only) ==================== -->
 <style>
     #reportsSidebar {
@@ -3748,7 +3748,7 @@
         height: 100%;
         pointer-events: none;
         z-index: 0;
-        opacity: 0.28;
+        opacity: 0.14;
     }
     .header > nav,
     .header > .mx-auto {
@@ -3790,7 +3790,7 @@
     function tick() {
         if (!running) return;
         // translucent overlay for trail fade
-        ctx.fillStyle = 'rgba(0, 8, 24, 0.18)';
+        ctx.fillStyle = 'rgba(0, 8, 24, 0.08)';
         ctx.fillRect(0, 0, W, H);
 
         ctx.font = 'bold ' + (13 * dpr) + "px 'Courier New', monospace";
@@ -3804,7 +3804,7 @@
             ctx.fillStyle = 'rgba(220, 235, 255, 0.95)';
             ctx.fillText(ch, x, y);
             // Drop + reset
-            drops[i] += cellH * 0.55;
+            drops[i] += cellH * 0.22;
             if (drops[i] > H + Math.random() * 40) {
                 drops[i] = -cellH * (Math.random() * 6 + 1);
             }
