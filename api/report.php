@@ -6277,7 +6277,7 @@ function copyTranscript() {
 </style>
 
 <button type="button" id="unifiedMenuBtn" class="unified-menu-btn no-print" aria-label="Menu">
-    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 </button>
 
 <div id="mobileOffcanvasBackdrop" class="offcanvas-backdrop" onclick="closeMobileMenu()"></div>
@@ -7152,7 +7152,7 @@ function viewQuizReportSlideUp() {
 <style id="v390MobileBadge">
 @media (max-width: 768px) {
     #jaiHeroSection .jaihero-badge {
-        margin-top: 15px !important;
+        margin-top: -25px !important;
         position: relative;
         z-index: 5;
     }
@@ -7183,7 +7183,9 @@ function viewQuizReportSlideUp() {
     .topbar-brand-logo,
     .topbar-logo {
         height: 22px !important;
-        max-width: 90px !important;
+        max-width: 200px !important;
+        margin-left: -5px !important;
+        opacity: 1 !important;
     }
 }
 @media (min-width: 769px) {

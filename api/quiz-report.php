@@ -1820,7 +1820,9 @@ async function tbSignOut() { try { await fetch('/api/auth.php', { method: 'POST'
     .topbar-brand-logo,
     .topbar-logo {
         height: 22px !important;
-        max-width: 90px !important;
+        max-width: 200px !important;
+        margin-left: -5px !important;
+        opacity: 1 !important;
     }
 }
 @media (min-width: 769px) {
